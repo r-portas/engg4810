@@ -31,210 +31,8 @@ var app = new Vue({
       var isoString = date.toISOString();
       var parseTime = d3.isoParse;
       this.data.push({date: parseTime(isoString), value: value});
-
-      // this.makeChart();
     },
 
-    makeChart() {
-      var chart = d3.select(this.$refs.chart);
-      var scope = this;
-
-      // Delete any artifacts
-      chart.selectAll('*').remove();
-
-      var margin = {top: 20, right: 20, bottom: 30, left: 50};
-      var height = this.$refs.chart.getBoundingClientRect().height - margin.top - margin.bottom;
-      var width = this.$refs.chart.getBoundingClientRect().width - margin.right - margin.left;
-      var g = chart.append('g').attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
-
-      var x = d3.scaleTime()
-        .rangeRound([0, width]);
-
-      var y = d3.scaleLinear()
-        .rangeRound([height, 0]);
-
-      // The line for the data
-      var line = d3.line()
-        .x(function(d) { return x(d.date) })
-        .y(function(d) { return y(d.value) });
-
-      var numOfMaskPoints = 10;
-
-      var mask = [
-        {x: 0, top: 0, bottom: height}
-      ];
-
-      for (var i = 0; i < numOfMaskPoints; i++) {
-        mask.push({
-          x: (i/numOfMaskPoints) * width + 1,
-          top: 10,
-          bottom: height - 10
-        });
-      }
-
-      mask.push({x: width, top: 0, bottom: height});
-
-      // Draw the circles
-
-      var topMask = d3.line()
-        .x(function(d) { return d.x })
-        .y(function(d) { return d.top })
-        .curve(d3.curveCatmullRom.alpha(0.5));
-
-      var bottomMask = d3.line()
-        .x(function(d) { return d.x })
-        .y(function(d) { return d.bottom });
-
-      x.domain(d3.extent(this.data, function(d) { return d.date }));
-      y.domain(d3.extent(this.data, function(d) { return d.value }));
-
-      // X axis
-      g.append('g')
-        .attr('transform', 'translate(0, ' + height + ')')
-        .call(d3.axisBottom(x))
-        .select(".domain")
-        .remove();
-
-      // Y axis
-      g.append('g')
-        .call(d3.axisLeft(y))
-        .append("text")
-        .attr("fill", "#000")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", "0.71em")
-        .attr("text-anchor", "end")
-        .text("Reading");
-
-      // Data
-      g.append('path')
-        .datum(this.data)
-        .attr('fill', 'none')
-        .attr('stroke', 'steelblue')
-        .attr('stroke-width', 1.5)
-        .attr('d', line);
-
-      // Top mask
-      g.append('path')
-        .classed('topmask', true)
-        .datum(mask)
-        .attr('fill', 'lightblue')
-        .attr('stroke', 'lightblue')
-        .attr('stroke-width', 1.5)
-        .attr('d', topMask)
-        .enter().append('circle')
-          .attr('class', 'line');
-
-      function mouseMove(d) {
-        console.log('Dragging');
-        var m = d3.mouse(g.node());
-        d.top = m[1];
-        d.x = m[0];
-
-        g.selectAll('circle').remove();
-
-        // Redraw
-        g.selectAll('circle').data(mask)
-          .enter()
-          .append('circle')
-          .data(mask)
-          .classed('topmask', true)
-          .attr('r', 6.5)
-          .attr('cx', function(d, i) { return d.x })
-          .attr('cy', function(d) { return d.top })
-          .style('stroke', 'blue')
-          .call(d3.drag()
-            .on('drag', mouseMove)
-          );
-
-        g.select('path.topmask').remove();
-
-        // Redraw the path
-        g.append('path')
-          .classed('topmask', true)
-          .datum(mask)
-          .attr('fill', 'lightblue')
-          .attr('stroke', 'lightblue')
-          .attr('stroke-width', 1.5)
-          .attr('d', topMask)
-          .enter().append('circle')
-            .attr('class', 'line');
-      }
-
-      // Draw the top mask circles
-      var circle = g.selectAll('circle')
-        .data(mask)
-        .enter().append('circle')
-        .classed('topmask', true)
-        .attr('r', 6.5)
-        .attr('cx', function(d, i) { return d.x })
-        .attr('cy', function(d) { return d.top })
-        .style('stroke', 'blue')
-        .call(d3.drag()
-          .on('drag', mouseMove)
-        );
-
-      // Draw the crosshair
-      g.append('line')
-        .classed('x', true)
-        .style('stroke', 'black')
-        .style('stroke-width', '1px')
-        .style('stroke-dasharray', '3 3');
-
-      g.append('line')
-        .classed('y', true)
-        .style('stroke', 'black')
-        .style('stroke-width', '1px')
-        .style('stroke-dasharray', '3 3');
-
-      // The text value
-      g.append('text')
-        .classed('description', true);
-
-      g.append('circle')
-        .attr('class', 'y')
-        .style('fill', 'none')
-        .style('stroke', 'blue')
-        .attr('r', 4);
-
-      chart.on('mousemove', function() {
-        var bisectDate = d3.bisector(function(d) {
-          return d.date;
-        }).left;
-
-        var mouse = d3.mouse(this);
-        var x0 = x.invert(mouse[0]);
-
-        var i = bisectDate(scope.data, x0, 1);
-        if (i < scope.data.length) {
-          var d0 = scope.data[i - 1];
-          var d1 = scope.data[i];
-          // TODO: Refactor
-          var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-
-          g.select('circle.y')
-            .attr('transform', 'translate(' + x(d.date) + ', ' + y(d.value) + ')');
-          
-          g.select('line.x')
-            .attr('x1', 0)
-            .attr('x2', x(d.date))
-            .attr('y1', y(d.value))
-            .attr('y2', y(d.value));
-
-          g.select('line.y')
-            .attr('x1', x(d.date))
-            .attr('x2', x(d.date))
-            .attr('y1', height)
-            .attr('y2', y(d.value));
-
-          g.select('text.description')
-            .attr('x', x(d.date) + 10)
-            .attr('y', y(d.value) - 10)
-            .text(d.value);
-        }
-
-      });
-    }
   },
 
   computed: {
@@ -249,8 +47,6 @@ var app = new Vue({
       scope.queues = data;
     });
 
-    // this.makeChart();
-
     // TESTING CODE
     var date = moment();
 
@@ -259,12 +55,10 @@ var app = new Vue({
     this.addEntry(date.add(1, 'hours'), 6);
 
     var scope = this;
-    /*
     setInterval(function() {
       var rand = Math.floor((Math.random() * 100) + 1);
       scope.addEntry(date.add(1, 'hours'), rand);
     }, 1000);
-    */
 
     // END TESTING
 
