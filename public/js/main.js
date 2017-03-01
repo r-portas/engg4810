@@ -37,6 +37,7 @@ var app = new Vue({
 
     makeChart() {
       var chart = d3.select(this.$refs.chart);
+      var scope = this;
 
       // Delete any artifacts
       chart.selectAll('*').remove();
@@ -72,6 +73,8 @@ var app = new Vue({
       }
 
       mask.push({x: width, top: 0, bottom: height});
+
+      // Draw the circles
 
       var topMask = d3.line()
         .x(function(d) { return d.x })
@@ -122,6 +125,55 @@ var app = new Vue({
         .enter().append('circle')
           .attr('class', 'line');
 
+      function mouseMove(d) {
+        console.log('Dragging');
+        var m = d3.mouse(g.node());
+        d.top = m[1];
+        d.x = m[0];
+
+        g.selectAll('circle').remove();
+
+        // Redraw
+        g.selectAll('circle').data(mask)
+          .enter()
+          .append('circle')
+          .data(mask)
+          .classed('topmask', true)
+          .attr('r', 6.5)
+          .attr('cx', function(d, i) { return d.x })
+          .attr('cy', function(d) { return d.top })
+          .style('stroke', 'blue')
+          .call(d3.drag()
+            .on('drag', mouseMove)
+          );
+
+        g.select('path.topmask').remove();
+
+        // Redraw the path
+        g.append('path')
+          .classed('topmask', true)
+          .datum(mask)
+          .attr('fill', 'lightblue')
+          .attr('stroke', 'lightblue')
+          .attr('stroke-width', 1.5)
+          .attr('d', topMask)
+          .enter().append('circle')
+            .attr('class', 'line');
+      }
+
+      // Draw the top mask circles
+      var circle = g.selectAll('circle')
+        .data(mask)
+        .enter().append('circle')
+        .classed('topmask', true)
+        .attr('r', 6.5)
+        .attr('cx', function(d, i) { return d.x })
+        .attr('cy', function(d) { return d.top })
+        .style('stroke', 'blue')
+        .call(d3.drag()
+          .on('drag', mouseMove)
+        );
+
       // Draw the crosshair
       g.append('line')
         .classed('x', true)
@@ -145,7 +197,6 @@ var app = new Vue({
         .style('stroke', 'blue')
         .attr('r', 4);
 
-      var scope = this;
       chart.on('mousemove', function() {
         var bisectDate = d3.bisector(function(d) {
           return d.date;
@@ -208,10 +259,12 @@ var app = new Vue({
     this.addEntry(date.add(1, 'hours'), 6);
 
     var scope = this;
+    /*
     setInterval(function() {
       var rand = Math.floor((Math.random() * 100) + 1);
       scope.addEntry(date.add(1, 'hours'), rand);
     }, 1000);
+    */
 
     // END TESTING
 
