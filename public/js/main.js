@@ -32,7 +32,7 @@ var app = new Vue({
       var parseTime = d3.isoParse;
       this.data.push({date: parseTime(isoString), value: value});
 
-      this.makeChart();
+      // this.makeChart();
     },
 
     makeChart() {
@@ -249,7 +249,7 @@ var app = new Vue({
       scope.queues = data;
     });
 
-    this.makeChart();
+    // this.makeChart();
 
     // TESTING CODE
     var date = moment();
@@ -270,7 +270,7 @@ var app = new Vue({
 
     var scope = this;
     window.onresize = function(e) {
-      scope.makeChart();
+      // scope.makeChart();
     }
   }
 });
