@@ -18,7 +18,8 @@ Vue.component('chart', {
 
       // Masks
       numOfMaskPoints: 10,
-      mask: []
+      topMasks: [],
+      bottomMasks: []
     }
   },
 
@@ -27,7 +28,7 @@ Vue.component('chart', {
       var topMask = d3.line()
         .x(function(d) { return d.x })
         .y(function(d) { return d.top })
-        .curve(d3.curveCatmullRom.alpha(0.5));
+        .curve(d3.curveCardinal);
 
       var bottomMask = d3.line()
         .x(function(d) { return d.x })
@@ -41,7 +42,7 @@ Vue.component('chart', {
       // Top mask
       this.g.append('path')
         .classed('topmask', true)
-        .datum(this.mask)
+        .datum(this.topMasks)
         .attr('fill', 'lightblue')
         .attr('stroke', 'lightblue')
         .attr('stroke-width', 1.5)
@@ -51,7 +52,7 @@ Vue.component('chart', {
 
       // Top mask circles
       this.g.selectAll('circle.topmask')
-        .data(this.mask)
+        .data(this.topMasks.slice(1, this.topMasks.length - 1))
         .enter()
         .append('circle')
         .classed('topmask', true)
@@ -66,7 +67,7 @@ Vue.component('chart', {
       // Bottom mask
       this.g.append('path')
         .classed('bottommask', true)
-        .datum(this.mask)
+        .datum(this.bottomMasks)
         .attr('fill', 'red')
         .attr('stroke', 'red')
         .attr('stroke-width', 1.5)
@@ -76,7 +77,7 @@ Vue.component('chart', {
 
       // Bottom mask circles
       this.g.selectAll('circle.bottommask')
-        .data(this.mask)
+        .data(this.bottomMasks.slice(1, this.bottomMasks.length - 1))
         .enter()
         .append('circle')
         .classed('bottommask', true)
@@ -215,8 +216,38 @@ Vue.component('chart', {
       this.drawMasks();
     },
 
-    updateChart: function() {
+    setupChart() {
+      this.chart = d3.select(this.$refs.chart);
+
+      this.height = this.$refs.chart.getBoundingClientRect().height - this.margin.top - this.margin.bottom;
+      this.width = this.$refs.chart.getBoundingClientRect().width - this.margin.right - this.margin.left; 
+
+      this.topMasks = [
+        {x: 0, top: 0}
+      ];
+
+      this.bottomMasks = [
+        {x: 0, bottom: this.height}
+      ];
+
+      for (var i = 0; i < this.numOfMaskPoints; i++) {
+        this.topMasks.push({
+          x: (i / this.numOfMaskPoints) * this.width + 1,
+          top: 10
+        });
+
+        this.bottomMasks.push({
+          x: (i / this.numOfMaskPoints) * this.width + 1,
+          bottom: this.height - 10
+        });
+      }
+
+      this.topMasks.push({x: this.width, top: 0});
+      this.bottomMasks.push({x: this.width, bottom: this.height});
+
+      this.drawChart();
     }
+
   },
 
   watch: {
@@ -226,26 +257,12 @@ Vue.component('chart', {
   },
 
   mounted: function() {
-    this.chart = d3.select(this.$refs.chart);
+    this.setupChart(); 
 
-    this.height = this.$refs.chart.getBoundingClientRect().height - this.margin.top - this.margin.bottom;
-    this.width = this.$refs.chart.getBoundingClientRect().width - this.margin.right - this.margin.left; 
-
-    this.mask = [
-      {x: 0, top: 0, bottom: this.height}
-    ];
-
-    for (var i = 0; i < this.numOfMaskPoints; i++) {
-      this.mask.push({
-        x: (i / this.numOfMaskPoints) * this.width + 1,
-        top: 10,
-        bottom: this.height - 10
-      });
-    }
-
-    this.mask.push({x: this.width, top: 0, bottom: this.height});
-
-    this.drawChart();
-    console.log(this.data);
+    var scope = this;
+    window.addEventListener('resize', function(e) {
+      console.log("Redrawing");
+      scope.setupChart(); 
+    });
   }
 });
