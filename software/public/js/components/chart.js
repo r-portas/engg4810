@@ -114,39 +114,39 @@ Vue.component('chart', {
       // Delete any artifacts
       this.chart.selectAll('*').remove();
 
-      this.g = this.chart.append('g').attr('transform', 'translate(' + this.margin.left + ', ' + this.margin.top + ')');
+      this.g = this.chart.append('g').attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
 
-      var x = d3.scaleTime()
+      const x = d3.scaleTime()
         .rangeRound([0, this.width]);
 
-      var y = d3.scaleLinear()
+      const y = d3.scaleLinear()
         .rangeRound([this.height, 0]);
 
       // The line for the data
-      var line = d3.line()
-        .x(function(d) { return x(d.date) })
-        .y(function(d) { return y(d.value) });
+      const line = d3.line()
+        .x((d) => { return x(d.date); })
+        .y((d) => { return y(d.value); });
 
-      x.domain(d3.extent(this.data, function(d) { return d.date }));
-      y.domain(d3.extent(this.data, function(d) { return d.value }));
+      x.domain(d3.extent(this.data, (d) => { return d.date; }));
+      y.domain(d3.extent(this.data, (d) => { return d.value; }));
 
       // X axis
       this.g.append('g')
-        .attr('transform', 'translate(0, ' + this.height + ')')
+        .attr('transform', `translate(0, ${this.height})`)
         .call(d3.axisBottom(x))
-        .select(".domain")
+        .select('.domain')
         .remove();
 
       // Y axis
       this.g.append('g')
         .call(d3.axisLeft(y))
-        .append("text")
-        .attr("fill", "#000")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", "0.71em")
-        .attr("text-anchor", "end")
-        .text("Reading");
+        .append('text')
+        .attr('fill', '#000')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 6)
+        .attr('dy', '0.71em')
+        .attr('text-anchor', 'end')
+        .text('Reading');
 
       // Data
       this.g.append('path')
@@ -179,25 +179,25 @@ Vue.component('chart', {
         .style('stroke', 'blue')
         .attr('r', 4);
 
-      var scope = this;
-      this.chart.on('mousemove', function() {
-        var bisectDate = d3.bisector(function(d) {
+      const scope = this;
+      this.chart.on('mousemove', () => {
+        const bisectDate = d3.bisector((d) => {
           return d.date;
         }).left;
 
-        var mouse = d3.mouse(this);
-        var x0 = x.invert(mouse[0]);
+        const mouse = d3.mouse(this);
+        const x0 = x.invert(mouse[0]);
 
-        var i = bisectDate(scope.data, x0, 1);
+        const i = bisectDate(scope.data, x0, 1);
         if (i < scope.data.length) {
-          var d0 = scope.data[i - 1];
-          var d1 = scope.data[i];
+          const d0 = scope.data[i - 1];
+          const d1 = scope.data[i];
           // TODO: Refactor
-          var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+          const d = x0 - d0.date > d1.date - x0 ? d1 : d0;
 
           scope.g.select('circle.y')
-            .attr('transform', 'translate(' + x(d.date) + ', ' + y(d.value) + ')');
-          
+            .attr('transform', `translate(${x(d.date)}, ${y(d.value)})`);
+
           scope.g.select('line.x')
             .attr('x1', 0)
             .attr('x2', x(d.date))
@@ -223,15 +223,18 @@ Vue.component('chart', {
     setupChart() {
       this.chart = d3.select(this.$refs.chart);
 
-      this.height = this.$refs.chart.getBoundingClientRect().height - this.margin.top - this.margin.bottom;
-      this.width = this.$refs.chart.getBoundingClientRect().width - this.margin.right - this.margin.left; 
+      this.height = this.$refs.chart.getBoundingClientRect().height
+        - this.margin.top - this.margin.bottom;
+
+      this.width = this.$refs.chart.getBoundingClientRect().width
+        - this.margin.right - this.margin.left;
 
       this.topMasks = [
-        {x: 0, top: 0}
+        { x: 0, top: 0 },
       ];
 
       this.bottomMasks = [
-        {x: 0, bottom: this.height}
+        { x: 0, bottom: this.height },
       ];
 
       for (var i = 0; i < this.numOfMaskPoints; i++) {
@@ -265,7 +268,7 @@ Vue.component('chart', {
 
     var scope = this;
     window.addEventListener('resize', function(e) {
-      console.log("Redrawing");
+      console.log('Redrawing');
       scope.setupChart(); 
     });
   }

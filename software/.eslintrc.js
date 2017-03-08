@@ -6,6 +6,7 @@ module.exports = {
   'rules': {
     'no-console': 'off',
     'no-new': 'off',
-    'arrow-body-style': 'off'
+    'arrow-body-style': 'off',
+    'linebreak-style': 'off'
   }
 };
