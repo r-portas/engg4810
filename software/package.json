@@ -4,7 +4,8 @@
   "description": "A web based application for interfacing with a multimeter created for ENGG4810",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint index.js public/js/*"
   },
   "repository": {
     "type": "git",
@@ -19,5 +20,10 @@
   "dependencies": {
     "express": "^4.14.1",
     "socket.io": "^1.7.3"
+  },
+  "devDependencies": {
+    "eslint": "^3.17.1",
+    "eslint-config-airbnb-base": "^11.1.1",
+    "eslint-plugin-import": "^2.2.0"
   }
 }

@@ -1,3 +1,5 @@
+/* global d3, moment, io, window, Vue */
+
 Vue.component('chart', {
   template: `
     <div class="chart">
@@ -7,32 +9,32 @@ Vue.component('chart', {
 
   props: ['data'],
 
-  data: function() {
+  data() {
     return {
       bus: null,
       chart: null,
       g: null,
       height: 0,
       width: 0,
-      margin: {top: 20, right: 20, bottom: 30, left: 50},
+      margin: { top: 20, right: 20, bottom: 30, left: 50 },
 
       // Masks
       numOfMaskPoints: 10,
       topMasks: [],
-      bottomMasks: []
-    }
+      bottomMasks: [],
+    };
   },
 
   methods: {
-    drawMasks: function() {
-      var topMask = d3.line()
-        .x(function(d) { return d.x })
-        .y(function(d) { return d.top })
+    drawMasks() {
+      const topMask = d3.line()
+        .x((d) => { return d.x; })
+        .y((d) => { return d.top; })
         .curve(d3.curveCardinal);
 
-      var bottomMask = d3.line()
-        .x(function(d) { return d.x })
-        .y(function(d) { return d.bottom })
+      const bottomMask = d3.line()
+        .x((d) => { return d.x; })
+        .y((d) => { return d.bottom; })
         .curve(d3.curveCatmullRom.alpha(0.5));
 
       // Remove the old masks
@@ -47,7 +49,8 @@ Vue.component('chart', {
         .attr('stroke', 'lightblue')
         .attr('stroke-width', 1.5)
         .attr('d', topMask)
-        .enter().append('circle')
+        .enter()
+        .append('circle')
           .attr('class', 'line');
 
       // Top mask circles
@@ -57,13 +60,13 @@ Vue.component('chart', {
         .append('circle')
         .classed('topmask', true)
         .attr('r', 6.5)
-        .attr('cx', function(d, i) { return d.x })
-        .attr('cy', function(d) { return d.top })
+        .attr('cx', (d) => { return d.x; })
+        .attr('cy', (d) => { return d.top; })
         .style('stroke', 'blue')
         .call(d3.drag()
-          .on('drag', this.moveTopMaskCircle)
+          .on('drag', this.moveTopMaskCircle),
         );
-      
+
       // Bottom mask
       this.g.append('path')
         .classed('bottommask', true)
@@ -72,7 +75,8 @@ Vue.component('chart', {
         .attr('stroke', 'red')
         .attr('stroke-width', 1.5)
         .attr('d', bottomMask)
-        .enter().append('circle')
+        .enter()
+        .append('circle')
           .attr('class', 'line');
 
       // Bottom mask circles
@@ -82,31 +86,31 @@ Vue.component('chart', {
         .append('circle')
         .classed('bottommask', true)
         .attr('r', 6.5)
-        .attr('cx', function(d, i) { return d.x })
-        .attr('cy', function(d) { return d.bottom })
+        .attr('cx', (d) => { return d.x; })
+        .attr('cy', (d) => { return d.bottom; })
         .style('stroke', 'red')
         .call(d3.drag()
-          .on('drag', this.moveBottomMaskCircle)
+          .on('drag', this.moveBottomMaskCircle),
         );
     },
 
-    moveTopMaskCircle: function(d) {
-      var m = d3.mouse(this.g.node());
+    moveTopMaskCircle(d) {
+      const m = d3.mouse(this.g.node());
       d.top = m[1];
       d.x = m[0];
 
       this.drawMasks();
     },
 
-    moveBottomMaskCircle: function(d) {
-      var m = d3.mouse(this.g.node());
+    moveBottomMaskCircle(d) {
+      const m = d3.mouse(this.g.node());
       d.bottom = m[1];
       d.x = m[0];
 
       this.drawMasks();
     },
 
-    drawChart: function() {
+    drawChart() {
       // Delete any artifacts
       this.chart.selectAll('*').remove();
 

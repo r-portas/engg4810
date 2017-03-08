@@ -1,17 +1,19 @@
+/* global d3, moment, io, window, Vue */
+
 /**
  * The main vue instance
  *
  * @author Roy Portas <royportas@gmail.com>
  */
 
-var app = new Vue({
+new Vue({
   el: '#app',
 
-  data: function() {
+  data() {
     return {
       socket: null,
 
-      data: []
+      data: [],
     };
   },
 
@@ -20,17 +22,17 @@ var app = new Vue({
      * Shows a notification through the snackbar
      */
     showSnackbar(message) {
-      var sb = this.$refs.snackbar;
-      var data = {
-        message: message,
+      const sb = this.$refs.snackbar;
+      const data = {
+        message,
       };
       sb.MaterialSnackbar.showSnackbar(data);
     },
 
     addEntry(date, value) {
-      var isoString = date.toISOString();
-      var parseTime = d3.isoParse;
-      this.data.push({date: parseTime(isoString), value: value});
+      const isoString = date.toISOString();
+      const parseTime = d3.isoParse;
+      this.data.push({ date: parseTime(isoString), value });
     },
 
   },
@@ -39,32 +41,26 @@ var app = new Vue({
 
   },
 
-  mounted: function() {
-    this.socket = io({path: window.location.pathname + 'socket.io'});
+  mounted() {
+    this.socket = io({ path: `${window.location.pathname}socket.io` });
 
-    var scope = this;
-    this.socket.on('update', function(data) {
+    const scope = this;
+    this.socket.on('update', (data) => {
       scope.queues = data;
     });
 
     // TESTING CODE
-    var date = moment();
+    const date = moment();
 
     this.addEntry(date.add(1, 'hours'), 5);
     this.addEntry(date.add(1, 'hours'), 4);
     this.addEntry(date.add(1, 'hours'), 6);
 
-    var scope = this;
-    setInterval(function() {
-      var rand = Math.floor((Math.random() * 100) + 1);
+    setInterval(() => {
+      const rand = Math.floor((Math.random() * 100) + 1);
       scope.addEntry(date.add(1, 'hours'), rand);
     }, 1000);
 
     // END TESTING
-
-    var scope = this;
-    window.onresize = function(e) {
-      // scope.makeChart();
-    }
-  }
+  },
 });
