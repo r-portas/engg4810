@@ -177,14 +177,13 @@ Vue.component('chart', {
 
       const scope = this;
       // TODO: Refactor to arrow notation, but allow 'this' keyword
+      // Should this be a vue method?
       this.chart.on('mousemove', function() {
         const bisectDate = d3.bisector((d) => {
           return d.date;
         }).left;
 
-        console.log(d3);
         const mouse = d3.mouse(this);
-        console.log(mouse);
         const x0 = x.invert(mouse[0]);
 
         const i = bisectDate(scope.data, x0, 1);
@@ -219,6 +218,37 @@ Vue.component('chart', {
       this.drawMasks();
     },
 
+    /**
+     * Sets up the masks
+     */
+    setupMask() {
+      this.topMasks = [
+        { x: 0, top: 0 },
+      ];
+
+      this.bottomMasks = [
+        { x: 0, bottom: this.height },
+      ];
+
+      for (let i = 0; i < this.numOfMaskPoints; i += 1) {
+        this.topMasks.push({
+          x: ((i / this.numOfMaskPoints) * this.width) + 1,
+          top: 10,
+        });
+
+        this.bottomMasks.push({
+          x: ((i / this.numOfMaskPoints) * this.width) + 1,
+          bottom: this.height - 10,
+        });
+      }
+
+      this.topMasks.push({ x: this.width, top: 0 });
+      this.bottomMasks.push({ x: this.width, bottom: this.height });
+    },
+
+    /**
+     * Sets up the chart for display
+     */
     setupChart() {
       this.chart = d3.select(this.$refs.chart);
 
@@ -228,47 +258,26 @@ Vue.component('chart', {
       this.width = this.$refs.chart.getBoundingClientRect().width
         - this.margin.right - this.margin.left;
 
-      this.topMasks = [
-        { x: 0, top: 0 },
-      ];
-
-      this.bottomMasks = [
-        { x: 0, bottom: this.height },
-      ];
-
-      for (var i = 0; i < this.numOfMaskPoints; i++) {
-        this.topMasks.push({
-          x: (i / this.numOfMaskPoints) * this.width + 1,
-          top: 10
-        });
-
-        this.bottomMasks.push({
-          x: (i / this.numOfMaskPoints) * this.width + 1,
-          bottom: this.height - 10
-        });
-      }
-
-      this.topMasks.push({x: this.width, top: 0});
-      this.bottomMasks.push({x: this.width, bottom: this.height});
+      this.setupMask();
 
       this.drawChart();
-    }
+    },
 
   },
 
   watch: {
-    data: function() {
+    data() {
       this.drawChart();
-    }
+    },
   },
 
-  mounted: function() {
-    this.setupChart(); 
+  mounted() {
+    this.setupChart();
 
-    var scope = this;
-    window.addEventListener('resize', function(e) {
+    const scope = this;
+    window.addEventListener('resize', () => {
       console.log('Redrawing');
-      scope.setupChart(); 
+      scope.setupChart();
     });
-  }
+  },
 });
