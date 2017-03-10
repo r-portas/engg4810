@@ -63,9 +63,7 @@ Vue.component('chart', {
         .attr('cx', (d) => { return d.x; })
         .attr('cy', (d) => { return d.top; })
         .style('stroke', 'blue')
-        .call(d3.drag()
-          .on('drag', this.moveTopMaskCircle),
-        );
+        .call(d3.drag().on('drag', this.moveTopMaskCircle));
 
       // Bottom mask
       this.g.append('path')
@@ -89,9 +87,7 @@ Vue.component('chart', {
         .attr('cx', (d) => { return d.x; })
         .attr('cy', (d) => { return d.bottom; })
         .style('stroke', 'red')
-        .call(d3.drag()
-          .on('drag', this.moveBottomMaskCircle),
-        );
+        .call(d3.drag().on('drag', this.moveBottomMaskCircle));
     },
 
     moveTopMaskCircle(d) {
@@ -180,12 +176,15 @@ Vue.component('chart', {
         .attr('r', 4);
 
       const scope = this;
-      this.chart.on('mousemove', () => {
+      // TODO: Refactor to arrow notation, but allow 'this' keyword
+      this.chart.on('mousemove', function() {
         const bisectDate = d3.bisector((d) => {
           return d.date;
         }).left;
 
+        console.log(d3);
         const mouse = d3.mouse(this);
+        console.log(mouse);
         const x0 = x.invert(mouse[0]);
 
         const i = bisectDate(scope.data, x0, 1);
