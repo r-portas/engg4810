@@ -30,7 +30,7 @@ Vue.component('chart', {
       const topMask = d3.line()
         .x((d) => { return d.x; })
         .y((d) => { return d.top; })
-        .curve(d3.curveCardinal);
+        .curve(d3.curveMonotoneX);
 
       const bottomMask = d3.line()
         .x((d) => { return d.x; })
