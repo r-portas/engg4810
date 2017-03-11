@@ -103,4 +103,50 @@ describe('Collision', () => {
       assert.isTrue(collision.checkBoundingBoxCollision(seg1, seg1));
     });
   });
+
+  describe('convertArrayToSegments', () => {
+    it('Should return empty if array has less than 2 elements', () => {
+      let data = [];
+
+      assert.deepEqual(collision.convertArrayToSegments(data), []);
+
+      data = [
+        {x: 1, y: 1},
+      ];
+
+      assert.deepEqual(collision.convertArrayToSegments(data), []);
+    });
+
+    it('Should be able to convert a simple case with 2 points', () => {
+      const data = [
+        {x: 1, y: 1},
+        {x: 2, y: 2},
+      ];
+
+      const expected = [
+        collision.getLineSegment(2, 2, 1, 1),
+      ];
+
+      assert.deepEqual(collision.convertArrayToSegments(data), expected);
+
+    });
+
+    it('Should be able to convert 4 points', () => {
+      const data = [
+        {x: 1, y: 1},
+        {x: 2, y: 2},
+        {x: 3, y: 3},
+        {x: 4, y: 4},
+      ];
+
+      const expected = [
+        collision.getLineSegment(2, 2, 1, 1),
+        collision.getLineSegment(3, 3, 2, 2),
+        collision.getLineSegment(4, 4, 3, 3),
+      ];
+
+      assert.deepEqual(collision.convertArrayToSegments(data), expected);
+
+    });
+  });
 });

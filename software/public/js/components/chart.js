@@ -17,6 +17,9 @@ Vue.component('chart', {
       height: 0,
       width: 0,
       margin: { top: 20, right: 20, bottom: 30, left: 50 },
+      // The time scale on the x axis
+      xscale: null,
+      yscale: null,
 
       // Masks
       numOfMaskPoints: 10,
@@ -29,12 +32,12 @@ Vue.component('chart', {
     drawMasks() {
       const topMask = d3.line()
         .x((d) => { return d.x; })
-        .y((d) => { return d.top; })
+        .y((d) => { return d.y; })
         .curve(d3.curveMonotoneX);
 
       const bottomMask = d3.line()
         .x((d) => { return d.x; })
-        .y((d) => { return d.bottom; })
+        .y((d) => { return d.y; })
         .curve(d3.curveCatmullRom.alpha(0.5));
 
       // Remove the old masks
@@ -61,7 +64,7 @@ Vue.component('chart', {
         .classed('topmask', true)
         .attr('r', 6.5)
         .attr('cx', (d) => { return d.x; })
-        .attr('cy', (d) => { return d.top; })
+        .attr('cy', (d) => { return d.y; })
         .style('stroke', 'blue')
         .call(d3.drag().on('drag', this.moveTopMaskCircle));
 
@@ -85,25 +88,46 @@ Vue.component('chart', {
         .classed('bottommask', true)
         .attr('r', 6.5)
         .attr('cx', (d) => { return d.x; })
-        .attr('cy', (d) => { return d.bottom; })
+        .attr('cy', (d) => { return d.y; })
         .style('stroke', 'red')
         .call(d3.drag().on('drag', this.moveBottomMaskCircle));
     },
 
     moveTopMaskCircle(d) {
       const m = d3.mouse(this.g.node());
-      d.top = m[1];
-      d.x = m[0];
+      const item = this.topMasks[this.topMasks.indexOf(d)];
+      item.y = m[1];
+      item.x = m[0];
 
       this.drawMasks();
     },
 
     moveBottomMaskCircle(d) {
       const m = d3.mouse(this.g.node());
-      d.bottom = m[1];
-      d.x = m[0];
+      const item = this.bottomMasks[this.bottomMasks.indexOf(d)];
+      item.y = m[1];
+      item.x = m[0];
 
       this.drawMasks();
+    },
+
+    getData() {
+      const translated = this.data.map((item) => {
+        const translatedItem = {
+          y: this.yscale(item.value),
+          x: this.xscale(item.date),
+        };
+
+        return translatedItem;
+      });
+
+      const data = {
+        topMask: this.topMasks,
+        bottomMask: this.bottomMasks,
+        data: translated,
+      };
+
+      return data;
     },
 
     drawChart() {
@@ -115,8 +139,14 @@ Vue.component('chart', {
       const x = d3.scaleTime()
         .rangeRound([0, this.width]);
 
+      // Set the xscale
+      this.xscale = x;
+
       const y = d3.scaleLinear()
         .rangeRound([this.height, 0]);
+
+      // Set the yscale
+      this.yscale = y;
 
       // The line for the data
       const line = d3.line()
@@ -124,7 +154,8 @@ Vue.component('chart', {
         .y((d) => { return y(d.value); });
 
       x.domain(d3.extent(this.data, (d) => { return d.date; }));
-      y.domain(d3.extent(this.data, (d) => { return d.value; }));
+      // y.domain(d3.extent(this.data, (d) => { return d.value; }));
+      y.domain([0, 15]);
 
       // X axis
       this.g.append('g')
@@ -223,27 +254,27 @@ Vue.component('chart', {
      */
     setupMask() {
       this.topMasks = [
-        { x: 0, top: 0 },
+        { x: 0, y: 0 },
       ];
 
       this.bottomMasks = [
-        { x: 0, bottom: this.height },
+        { x: 0, y: this.height },
       ];
 
       for (let i = 0; i < this.numOfMaskPoints; i += 1) {
         this.topMasks.push({
           x: ((i / this.numOfMaskPoints) * this.width) + 1,
-          top: 10,
+          y: 10,
         });
 
         this.bottomMasks.push({
           x: ((i / this.numOfMaskPoints) * this.width) + 1,
-          bottom: this.height - 10,
+          y: this.height - 10,
         });
       }
 
-      this.topMasks.push({ x: this.width, top: 0 });
-      this.bottomMasks.push({ x: this.width, bottom: this.height });
+      this.topMasks.push({ x: this.width, y: 0 });
+      this.bottomMasks.push({ x: this.width, y: this.height });
     },
 
     /**
@@ -266,8 +297,29 @@ Vue.component('chart', {
   },
 
   watch: {
+    topMasks: {
+      handler: function() {
+        const test = this.getData();
+        collision.checkCollision(test.data, test.topMask, test.bottomMask);
+      },
+      deep: true,
+    },
+
+    bottomMasks: {
+      handler: function() {
+        const test = this.getData();
+        collision.checkCollision(test.data, test.topMask, test.bottomMask);
+      },
+      deep: true,
+    },
+
     data() {
       this.drawChart();
+
+      // Testing
+      const test = this.getData();
+      console.log(test);
+      collision.checkCollision(test.data, test.topMask, test.bottomMask);
     },
   },
 
