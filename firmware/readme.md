@@ -14,7 +14,7 @@ The Tiva TM4C123G is the supported device for this project
 4. Add the TivaWare libraries by:
     - Go to Project > Properties
     - Under Build > ARM Compiler > Include Options, add the TivaWare folder to the '#include search path'
-    - Under Build > ARM Linker > File Search Path, include the library file located at $TIVA_FOLDER/driverlib/ccs/Debug/driverlib.lib and add the folder $TIVA_FOLDER/inc to the library search path
+    - Under Build > ARM Linker > File Search Path, include the library file located at $TIVA-FOLDER/driverlib/ccs/Debug/driverlib.lib and add the folder $TIVA-FOLDER/inc to the library search path
 5. Build the program and test program the board
 
 
