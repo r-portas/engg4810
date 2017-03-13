@@ -11,6 +11,10 @@ The Tiva TM4C123G is the supported device for this project
 1. Install Code Composer Studio
 2. Download the [TivaWare Software](https://focus-webapps.ti.com/licreg/docs/swlicexportcontrol.tsp?form_type=2&prod_no=SW-TM4C-2.1.4.178.exe&ref_url=http://software-dl.ti.com/tiva-c/SW-TM4C/latest/&form_id=154910)
 3. Import this project into Code Composer Studio
+    - Create a workspace in your home folder
+    - Go to Project > Import CCS Projects...
+    - Click Browse next to the search directory option
+    - Select the folder named 'firmware' in this repo
 4. Add the TivaWare libraries by:
     - Go to Project > Properties
     - Under Build > ARM Compiler > Include Options, add the TivaWare folder to the '#include search path'
