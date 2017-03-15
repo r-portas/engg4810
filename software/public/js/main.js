@@ -14,6 +14,13 @@ new Vue({
       socket: null,
 
       data: [],
+
+      currentTab: 'Chart',
+      tabs: {
+        CHART: 'Chart',
+        DATA: 'Data',
+        SETTINGS: 'Settings',
+      },
     };
   },
 
@@ -33,6 +40,13 @@ new Vue({
       const isoString = date.toISOString();
       const parseTime = d3.isoParse;
       this.data.push({ date: parseTime(isoString), value });
+    },
+
+    /**
+     * Checks if the current tab is active
+     */
+    checkTabActive(tabName) {
+      return tabName === this.currentTab;
     },
 
   },
@@ -56,12 +70,10 @@ new Vue({
     this.addEntry(date.add(1, 'hours'), 4);
     this.addEntry(date.add(1, 'hours'), 6);
 
-    /*
     setInterval(() => {
       const rand = Math.floor((Math.random() * 100) + 1);
       scope.addEntry(date.add(1, 'hours'), rand);
     }, 1000);
-    */
 
     // END TESTING
   },

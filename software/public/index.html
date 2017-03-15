@@ -18,11 +18,17 @@
     </head>
 
     <body>
-        <div id="app" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <div id="app" class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
             <header class="mdl-layout__header">
                 <div class="mdl-layout__header-row">
                     <!-- Title -->
                     <span class="mdl-layout-title">Multimeter</span>
+                </div>
+
+                <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+                    <a v-on:click="currentTab = tabs.CHART" v-bind:class="{ 'is-active': checkTabActive(tabs.CHART) }" class="mdl-layout__tab">Chart</a>
+                    <a v-on:click="currentTab = tabs.DATA" v-bind:class="{ 'is-active': checkTabActive(tabs.DATA) }" class="mdl-layout__tab">Data</a>
+                    <a v-on:click="currentTab = tabs.SETTINGS" v-bind:class="{ 'is-active': checkTabActive(tabs.SETTINGS) }" class="mdl-layout__tab">Settings</a>
                 </div>
             </header>
 
@@ -33,7 +39,7 @@
             </div>
 
             <main class="mdl-layout__content">
-                <div class="page-content">
+                <div v-if="currentTab == tabs.CHART" class="page-content">
                     <chart :data="data"></chart>
                 </div>
             </main>

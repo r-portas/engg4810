@@ -25,6 +25,9 @@ Vue.component('chart', {
       numOfMaskPoints: 10,
       topMasks: [],
       bottomMasks: [],
+
+      // Configuration
+      dataLimit: 10,
     };
   },
 
@@ -111,8 +114,16 @@ Vue.component('chart', {
       this.drawMasks();
     },
 
+    /**
+     * Processes and prepares data from plotting
+     * Includes limiting the amount of data to plot
+     */
     getData() {
-      const translated = this.data.map((item) => {
+
+      // Return at most 'dataLimit' elements from the end of data
+      let limitedData = this.data.slice(Math.max(this.data.length - this.dataLimit, 0));
+
+      const translated = limitedData.map((item) => {
         const translatedItem = {
           y: this.yscale(item.value),
           x: this.xscale(item.date),
@@ -121,10 +132,12 @@ Vue.component('chart', {
         return translatedItem;
       });
 
+      // TODO: Refactor 'data' to 'translatedData'
       const data = {
         topMask: this.topMasks,
         bottomMask: this.bottomMasks,
         data: translated,
+        rawData: limitedData,
       };
 
       return data;
@@ -148,14 +161,20 @@ Vue.component('chart', {
       // Set the yscale
       this.yscale = y;
 
+      const data = this.getData().rawData;
+
       // The line for the data
       const line = d3.line()
         .x((d) => { return x(d.date); })
         .y((d) => { return y(d.value); });
 
-      x.domain(d3.extent(this.data, (d) => { return d.date; }));
+      x.domain(d3.extent(data, (d) => { return d.date; }));
       // y.domain(d3.extent(this.data, (d) => { return d.value; }));
-      y.domain([0, 15]);
+
+      // TODO: This is gonna cause issues with the masks
+      // TUTOR QUESTION
+      // y.domain([0, 15]);
+      y.domain([d3.min(data, (d) => { return d.value; }) - 4, d3.max(data, (d) => { return d.value }) + 4]);
 
       // X axis
       this.g.append('g')
@@ -177,7 +196,7 @@ Vue.component('chart', {
 
       // Data
       this.g.append('path')
-        .datum(this.data)
+        .datum(data)
         .attr('fill', 'none')
         .attr('stroke', 'steelblue')
         .attr('stroke-width', 1.5)
