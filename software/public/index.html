@@ -9,6 +9,7 @@
         <meta name="description" content="A multimeter tool">
         <meta name="author" content="Roy Portas">
 
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link rel="stylesheet" href="lib/material.blue_grey-red.min.css">
         <link rel="stylesheet" href="css/style.css">
 
@@ -42,17 +43,23 @@
                 <div v-if="currentTab == tabs.CHART" class="page-content">
                     <chart :data="data"></chart>
                 </div>
+
+                <div v-if="currentTab == tabs.SETTINGS" class="page-content">
+                    <settings></settings>
+                </div>
             </main>
         </div>
 
         <script src="lib/vue.js"></script>
         <script src="lib/moment.js"></script>
+        <script src="lib/papaparse.js"></script>
         <script src="lib/socket.io.js"></script>
         <script src="lib/material.min.js"></script>
         <script src="lib/d3.js"></script>
 
         <!-- Components -->
         <script src="js/components/chart.js"></script>
+        <script src="js/components/settings.js"></script>
 
         <script src="js/collision.js"></script>
         <script src="js/main.js"></script>

@@ -132,11 +132,10 @@ Vue.component('chart', {
         return translatedItem;
       });
 
-      // TODO: Refactor 'data' to 'translatedData'
       const data = {
         topMask: this.topMasks,
         bottomMask: this.bottomMasks,
-        data: translated,
+        translatedData: translated,
         rawData: limitedData,
       };
 
@@ -319,7 +318,7 @@ Vue.component('chart', {
     topMasks: {
       handler: function() {
         const test = this.getData();
-        collision.checkCollision(test.data, test.topMask, test.bottomMask);
+        collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
       },
       deep: true,
     },
@@ -327,7 +326,7 @@ Vue.component('chart', {
     bottomMasks: {
       handler: function() {
         const test = this.getData();
-        collision.checkCollision(test.data, test.topMask, test.bottomMask);
+        collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
       },
       deep: true,
     },
@@ -338,7 +337,7 @@ Vue.component('chart', {
       // Testing
       const test = this.getData();
       console.log(test);
-      collision.checkCollision(test.data, test.topMask, test.bottomMask);
+      collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
     },
   },
 
