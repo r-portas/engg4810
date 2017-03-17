@@ -336,7 +336,6 @@ Vue.component('chart', {
 
       // Testing
       const test = this.getData();
-      console.log(test);
       collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
     },
   },
@@ -346,7 +345,6 @@ Vue.component('chart', {
 
     const scope = this;
     window.addEventListener('resize', () => {
-      console.log('Redrawing');
       scope.setupChart();
     });
   },
