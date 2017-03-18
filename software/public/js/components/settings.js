@@ -11,7 +11,6 @@ Vue.component('settings', {
 
         <h5>Export Data</h5>
 
-
         <button v-on:click="exportData()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
           Export data
         </button> 
@@ -114,14 +113,13 @@ Vue.component('settings', {
 
     parseDataLine(line) {
       // Check for line errors
-      if (line.length !== 3) {
+      if (line.length !== 2) {
         return null;
       }
 
       const parsed = {
-        timestamp: moment(line[0]),
-        reading: parseFloat(line[1]),
-        unit: line[3],
+        date: moment(line[0]),
+        value: parseFloat(line[1]),
       };
 
       return parsed;

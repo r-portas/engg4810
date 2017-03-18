@@ -43,12 +43,16 @@ new Vue({
       const parseTime = d3.isoParse;
       this.data.push({ date: parseTime(isoString), value });
     },
-
-    /**
+/**
      * Checks if the current tab is active
      */
     checkTabActive(tabName) {
       return tabName === this.currentTab;
+    },
+
+    setData(data) {
+      console.log(data);
+      this.data = data;
     },
 
   },
@@ -76,14 +80,15 @@ new Vue({
     this.addEntry(date.add(1, 'hours'), 4);
     this.addEntry(date.add(1, 'hours'), 6);
 
-    setInterval(() => {
-      const rand = Math.floor((Math.random() * 100) + 1);
-      scope.addEntry(date.add(1, 'hours'), rand);
-    }, 1000);
+    // setInterval(() => {
+    //   const rand = Math.floor((Math.random() * 100) + 1);
+    //   scope.addEntry(date.add(1, 'hours'), rand);
+    // }, 1000);
 
     // END TESTING
     
 
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
+    this.bus.$on('set-data', this.setData);
   },
 });

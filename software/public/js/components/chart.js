@@ -160,16 +160,8 @@ Vue.component('chart', {
       // Set the xscale
       this.xscale = x;
 
-      let y;
-
-      if (this.selectedRange === 'resistance') {
-        y = d3.scaleLog()
-          .base(Math.E)
-          .range([this.height, 0]);
-      } else {
-        y = d3.scaleLinear()
-          .rangeRound([this.height, 0]);
-      }
+      const y = d3.scaleLinear()
+        .rangeRound([this.height, 0]);
 
       // Set the yscale
       this.yscale = y;
@@ -377,6 +369,11 @@ Vue.component('chart', {
       this.bus.$emit('show-snackbar', 'Masks loaded from file');
     },
 
+    handleClick() {
+      var coords = d3.mouse(this);
+      console.log(coords);
+    },
+
   },
 
   watch: {
@@ -414,5 +411,6 @@ Vue.component('chart', {
     });
 
     this.bus.$on('set-masks', (masks) => { this.setMasks(masks); });
+    this.bus.$on('set-range', (range) => { this.setRange(range); });
   },
 });
