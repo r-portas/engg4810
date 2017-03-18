@@ -27,6 +27,11 @@ Vue.component('chart', {
 
       // Configuration
       dataLimit: 10,
+      voltageRange: [-12, 12],
+      currentRange: [-200, 200],
+      resistanceRange: [0, 1000000],
+
+      selectedRange: 'voltage',
 
       yLabelObj: null,
     };
@@ -155,8 +160,16 @@ Vue.component('chart', {
       // Set the xscale
       this.xscale = x;
 
-      const y = d3.scaleLinear()
-        .rangeRound([this.height, 0]);
+      let y;
+
+      if (this.selectedRange === 'resistance') {
+        y = d3.scaleLog()
+          .base(Math.E)
+          .range([this.height, 0]);
+      } else {
+        y = d3.scaleLinear()
+          .rangeRound([this.height, 0]);
+      }
 
       // Set the yscale
       this.yscale = y;
@@ -174,7 +187,24 @@ Vue.component('chart', {
       // TODO: This is gonna cause issues with the masks
       // TUTOR QUESTION
       // y.domain([0, 15]);
-      y.domain([d3.min(data, (d) => { return d.value; }) - 4, d3.max(data, (d) => { return d.value }) + 4]);
+
+      switch (this.selectedRange) {
+        case 'voltage':
+          y.domain(this.voltageRange);
+          break;
+
+        case 'current':
+          y.domain(this.currentRange);
+          break;
+
+        case 'resistance':
+          y.domain(this.resistanceRange);
+          break;
+
+        default:
+          console.log(`Range '${this.selectedRange}' is not supported`);
+          break;
+      }
 
       // X axis
       this.g.append('g')
@@ -197,7 +227,7 @@ Vue.component('chart', {
         .attr('x', 0 - (this.height / 2))
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
-        .text('Data');
+        .text(this.selectedRange);
 
       // Data
       this.g.append('path')
@@ -319,6 +349,15 @@ Vue.component('chart', {
       this.drawChart();
     },
 
+    /**
+     * Updates the range of the chart and redraws it
+     */
+    setRange(range) {
+      this.selectedRange = range;
+
+      this.drawChart();
+    },
+
     setMasks(masks) {
       // Clear the masks
       this.topMasks = [];
@@ -336,10 +375,6 @@ Vue.component('chart', {
       });
 
       this.bus.$emit('show-snackbar', 'Masks loaded from file');
-    },
-
-    setYLabel(text) {
-      this.yLabelObj.text(text);
     },
 
   },
