@@ -11,6 +11,8 @@ new Vue({
 
   data() {
     return {
+      bus: {},
+
       socket: null,
 
       data: [],
@@ -55,6 +57,10 @@ new Vue({
 
   },
 
+  created() {
+    this.bus = new Vue();
+  },
+
   mounted() {
     this.socket = io({ path: `${window.location.pathname}socket.io` });
 
@@ -76,5 +82,8 @@ new Vue({
     }, 1000);
 
     // END TESTING
+    
+
+    this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
   },
 });

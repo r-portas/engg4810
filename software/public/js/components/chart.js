@@ -7,11 +7,10 @@ Vue.component('chart', {
     </div> 
   `,
 
-  props: ['data'],
+  props: ['data', 'bus'],
 
   data() {
     return {
-      bus: null,
       chart: null,
       g: null,
       height: 0,
@@ -28,6 +27,8 @@ Vue.component('chart', {
 
       // Configuration
       dataLimit: 10,
+
+      yLabelObj: null,
     };
   },
 
@@ -188,10 +189,15 @@ Vue.component('chart', {
         .append('text')
         .attr('fill', '#000')
         .attr('transform', 'rotate(-90)')
-        .attr('y', 6)
-        .attr('dy', '0.71em')
-        .attr('text-anchor', 'end')
-        .text('Reading');
+        .attr('y', 6);
+
+      this.yLabelObj = this.g.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0 - this.margin.left)
+        .attr('x', 0 - (this.height / 2))
+        .attr('dy', '1em')
+        .style('text-anchor', 'middle')
+        .text('Data');
 
       // Data
       this.g.append('path')
@@ -307,9 +313,33 @@ Vue.component('chart', {
       this.width = this.$refs.chart.getBoundingClientRect().width
         - this.margin.right - this.margin.left;
 
-      this.setupMask();
+      // TODO: Refactor this, we don't need it to work like this
+      // this.setupMask();
 
       this.drawChart();
+    },
+
+    setMasks(masks) {
+      // Clear the masks
+      this.topMasks = [];
+      this.bottomMasks = [];
+
+      masks.forEach((mask) => {
+        console.log(this.topMasks);
+        if (mask.mask === 'high') {
+          this.topMasks.push(mask);
+        } else if (mask.mask === 'low') {
+          this.bottomMasks.push(mask);
+        } else {
+          console.log(`Tried to parse mask '${mask.mask}'`);
+        }
+      });
+
+      this.bus.$emit('show-snackbar', 'Masks loaded from file');
+    },
+
+    setYLabel(text) {
+      this.yLabelObj.text(text);
     },
 
   },
@@ -347,5 +377,7 @@ Vue.component('chart', {
     window.addEventListener('resize', () => {
       scope.setupChart();
     });
+
+    this.bus.$on('set-masks', (masks) => { this.setMasks(masks); });
   },
 });

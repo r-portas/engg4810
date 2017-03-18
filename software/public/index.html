@@ -40,18 +40,19 @@
             </div>
 
             <main class="mdl-layout__content">
-                <div v-if="currentTab == tabs.CHART" class="page-content">
-                    <chart :data="data"></chart>
+                <div v-show="currentTab == tabs.CHART" class="page-content">
+                    <chart :data="data" :bus="bus"></chart>
                 </div>
 
-                <div v-if="currentTab == tabs.SETTINGS" class="page-content">
-                    <settings></settings>
+                <div v-show="currentTab == tabs.SETTINGS" class="page-content">
+                    <settings :data="data" :bus="bus"></settings>
                 </div>
             </main>
         </div>
 
         <script src="lib/vue.js"></script>
         <script src="lib/moment.js"></script>
+        <script src="lib/FileSaver.js"></script>
         <script src="lib/papaparse.js"></script>
         <script src="lib/socket.io.js"></script>
         <script src="lib/material.min.js"></script>
