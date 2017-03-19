@@ -34,6 +34,10 @@ Vue.component('data-card', {
         </label> 
         <br>
 
+        <button v-on:click="clearMasks" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+          Clear Masks
+        </button> 
+
       </div>
     </div>
   `,
@@ -47,6 +51,9 @@ Vue.component('data-card', {
   props: ['bus'],
 
   methods: {
+    clearMasks() {
+      this.bus.$emit('set-masks', []);
+    }
   },
 
   watch: {

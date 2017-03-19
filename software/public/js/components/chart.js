@@ -33,12 +33,21 @@ Vue.component('chart', {
 
       selectedRange: 'voltage',
 
+      rangeLabel: {
+        voltage: 'Voltage (V)',
+        current: 'Current (mA)',
+        resistance: 'Resistance (ohms)',
+      },
+
       yLabelObj: null,
     };
   },
 
   methods: {
     drawMasks() {
+      this.drawSingleMask(this.topMasks, 'topmask', 'blue', 'rgba(1, 0, 255, 0.3)', this.moveTopMaskCircle);
+      this.drawSingleMask(this.bottomMasks, 'bottommask', 'red', 'rgba(255, 0, 1, 0.3)', this.moveBottomMaskCircle);
+      /*
       const topMask = d3.line()
         .x((d) => { return d.x; })
         .y((d) => { return d.y; })
@@ -65,9 +74,23 @@ Vue.component('chart', {
         .append('circle')
           .attr('class', 'line');
 
+      // Draw the dashed lines
+      const minTopMaskPoint = this.getMinimumMaskValue(this.topMasks);
+      if (minTopMaskPoint !== null) {
+        this.g.append('line')
+          .classed('topmask', true)
+          .attr('x1', 0)
+          .attr('y1', minTopMaskPoint.y)
+          .attr('x2', minTopMaskPoint.x)
+          .attr('y2', minTopMaskPoint.y)
+          .attr('stroke', 'lightblue')
+          .attr('stroke-width', 1.5);
+        console.log(minTopMaskPoint);
+      }
+
       // Top mask circles
       this.g.selectAll('circle.topmask')
-        .data(this.topMasks.slice(1, this.topMasks.length - 1))
+        .data(this.topMasks)
         .enter()
         .append('circle')
         .classed('topmask', true)
@@ -91,7 +114,7 @@ Vue.component('chart', {
 
       // Bottom mask circles
       this.g.selectAll('circle.bottommask')
-        .data(this.bottomMasks.slice(1, this.bottomMasks.length - 1))
+        .data(this.bottomMasks)
         .enter()
         .append('circle')
         .classed('bottommask', true)
@@ -100,6 +123,7 @@ Vue.component('chart', {
         .attr('cy', (d) => { return d.y; })
         .style('stroke', 'red')
         .call(d3.drag().on('drag', this.moveBottomMaskCircle));
+      */
     },
 
     moveTopMaskCircle(d) {
@@ -125,9 +149,8 @@ Vue.component('chart', {
      * Includes limiting the amount of data to plot
      */
     getData() {
-
       // Return at most 'dataLimit' elements from the end of data
-      let limitedData = this.data.slice(Math.max(this.data.length - this.dataLimit, 0));
+      const limitedData = this.data.slice(Math.max(this.data.length - this.dataLimit, 0));
 
       const translated = limitedData.map((item) => {
         const translatedItem = {
@@ -193,6 +216,10 @@ Vue.component('chart', {
           y.domain(this.resistanceRange);
           break;
 
+        case 'auto':
+          console.log('Auto range not implemented yet');
+          break;
+
         default:
           console.log(`Range '${this.selectedRange}' is not supported`);
           break;
@@ -213,13 +240,14 @@ Vue.component('chart', {
         .attr('transform', 'rotate(-90)')
         .attr('y', 6);
 
+      // Y axis label
       this.yLabelObj = this.g.append('text')
         .attr('transform', 'rotate(-90)')
         .attr('y', 0 - this.margin.left)
         .attr('x', 0 - (this.height / 2))
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
-        .text(this.selectedRange);
+        .text(this.rangeLabel[this.selectedRange]);
 
       // Data
       this.g.append('path')
@@ -253,6 +281,20 @@ Vue.component('chart', {
         .attr('r', 4);
 
       const scope = this;
+
+      this.chart.on('click', function() {
+        const mouse = d3.mouse(this);
+
+        // If the shift key is pressed, add to the bottom mask
+        if (d3.event.ctrlKey) {
+          scope.addMask(mouse[0], mouse[1], 'low');
+        } else {
+          scope.addMask(mouse[0], mouse[1], 'high');
+        }
+
+        scope.drawMasks();
+      });
+
       // TODO: Refactor to arrow notation, but allow 'this' keyword
       // Should this be a vue method?
       this.chart.on('mousemove', function() {
@@ -350,6 +392,162 @@ Vue.component('chart', {
       this.drawChart();
     },
 
+    /**
+     * Adds a single mask
+     */
+    addMask(x, y, mask) {
+      const m = {
+        x,
+        y,
+        mask,
+      };
+
+      if (mask === 'high') {
+        this.topMasks.push(m);
+      } else if (mask === 'low') {
+        this.bottomMasks.push(m);
+      } else {
+        console.log(`Tried to parse mask '${mask}'`);
+      }
+    },
+
+    /**
+     * Draws a single mask
+     */
+    drawSingleMask(maskData, cssSelector, lineColor, fillColor, moveMaskFunction) {
+
+      if (maskData.length === 0) {
+      }
+
+      const mask = d3.line()
+        .x((d) => { return d.x; })
+        .y((d) => { return d.y; })
+        .curve(d3.curveMonotoneX);
+
+      this.g.selectAll(`.${cssSelector}`).remove();
+
+      // Draw the dashed lines
+      const minMaskPoint = this.getMinimumMaskValue(maskData);
+      if (minMaskPoint !== null) {
+        this.g.append('line')
+          .classed(cssSelector, true)
+          .attr('x1', 0)
+          .attr('y1', minMaskPoint.y)
+          .attr('x2', minMaskPoint.x)
+          .attr('y2', minMaskPoint.y)
+          .attr('stroke', lineColor)
+          .attr('stroke-width', 1.5)
+          .style('stroke-dasharray', ('3, 3'));
+      }
+
+      const maxMaskPoint = this.getMaximumMaskValue(maskData);
+      if (maxMaskPoint !== null) {
+        this.g.append('line')
+          .classed(cssSelector, true)
+          .attr('x1', this.width)
+          .attr('y1', maxMaskPoint.y)
+          .attr('x2', maxMaskPoint.x)
+          .attr('y2', maxMaskPoint.y)
+          .attr('stroke', lineColor)
+          .attr('stroke-width', 1.5)
+          .style('stroke-dasharray', ('3, 3'));
+      }
+
+
+      // If we have valid points, draw the area
+      if (maxMaskPoint !== null && minMaskPoint !== null) {
+        const minPoint = {
+          x: 0,
+          y: minMaskPoint.y,
+        };
+
+        const maxPoint = {
+          x: this.width,
+          y: maxMaskPoint.y,
+        };
+
+        let allPoints = [];
+        if (cssSelector === 'bottommask') {
+          allPoints = [
+            { x: 0, y: this.height },
+            minPoint,
+          ];
+
+          allPoints = allPoints.concat(maskData);
+          allPoints = allPoints.concat([
+            maxPoint,
+            { x: this.width, y: this.height },
+          ]);
+        } else if (cssSelector === 'topmask') {
+          allPoints = [
+            { x: 0, y: 0 },
+            minPoint,
+          ];
+
+          allPoints = allPoints.concat(maskData);
+          allPoints = allPoints.concat([
+            maxPoint,
+            { x: this.width, y: 0 },
+          ]);
+        }
+
+        // Draw the fill area
+        this.g.append('path')
+          .classed(cssSelector, true)
+          .datum(allPoints)
+          .attr('fill', fillColor)
+          .attr('stroke-width', 0)
+          .attr('d', mask);
+      }
+
+      // Top mask circles
+      this.g.selectAll(`circle${cssSelector}`)
+        .data(maskData)
+        .enter()
+        .append('circle')
+        .classed(cssSelector, true)
+        .attr('r', 6.5)
+        .attr('cx', (d) => { return d.x; })
+        .attr('cy', (d) => { return d.y; })
+        .style('stroke', lineColor)
+        .call(d3.drag().on('drag', moveMaskFunction));
+    },
+
+
+    /**
+     * Returns the minimum value for the mask
+     */
+    getMinimumMaskValue(masks) {
+      if (masks.length === 0) {
+        return null;
+      }
+
+      return masks.reduce((p, v) => {
+        if (p.x < v.x) {
+          return p;
+        }
+
+        return v;
+      });
+    },
+
+    /**
+     * Returns the maximum value for the mask
+     */
+    getMaximumMaskValue(masks) {
+      if (masks.length === 0) {
+        return null;
+      }
+
+      return masks.reduce((p, v) => {
+        if (p.x > v.x) {
+          return p;
+        }
+
+        return v;
+      });
+    },
+
     setMasks(masks) {
       // Clear the masks
       this.topMasks = [];
@@ -366,12 +564,13 @@ Vue.component('chart', {
         }
       });
 
-      this.bus.$emit('show-snackbar', 'Masks loaded from file');
-    },
+      if (masks.length === 0) {
+        this.bus.$emit('show-snackbar', 'Masks cleared');
+      } else {
+        this.bus.$emit('show-snackbar', 'Masks loaded from file');
+      }
 
-    handleClick() {
-      var coords = d3.mouse(this);
-      console.log(coords);
+      this.drawMasks();
     },
 
   },
