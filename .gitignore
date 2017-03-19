@@ -38,3 +38,6 @@ jspm_packages
 
 # MacOS
 .DS_Store
+
+/Output
+node.exe

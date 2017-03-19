@@ -9,6 +9,12 @@ Vue.component('settings', {
 
       <div class="mdl-card__supporting-text">
 
+        <h5>Export Mask</h5>
+
+        <button v-on:click="exportMasks()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+          Export data
+        </button> 
+
         <h5>Export Data</h5>
 
         <button v-on:click="exportData()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
@@ -42,6 +48,12 @@ Vue.component('settings', {
     /**
      * Export masks
      */
+    exportMasks() {
+      const csv = this.data.map((d) => { return ''; }).join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      saveAs(blob, 'data.csv');
+    },
 
     /**
      * Export data
