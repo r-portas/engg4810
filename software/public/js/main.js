@@ -51,7 +51,6 @@ new Vue({
     },
 
     setData(data) {
-      console.log(data);
       this.data = data;
     },
 
@@ -76,17 +75,12 @@ new Vue({
     // TESTING CODE
     const date = moment();
 
-    this.addEntry(date.add(1, 'hours'), 5);
-    this.addEntry(date.add(1, 'hours'), 4);
-    this.addEntry(date.add(1, 'hours'), 6);
-
     // setInterval(() => {
     //   const rand = Math.floor((Math.random() * 100) + 1);
     //   scope.addEntry(date.add(1, 'hours'), rand);
     // }, 1000);
 
     // END TESTING
-    
 
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
