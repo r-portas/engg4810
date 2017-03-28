@@ -15,6 +15,8 @@ new Vue({
 
       socket: null,
 
+      intervalRef: null,
+
       data: [],
 
       currentTab: 'Chart',
@@ -58,6 +60,19 @@ new Vue({
       this.data = data;
     },
 
+    startRandomData() {
+      const date = moment();
+
+      this.intervalRef = setInterval(() => {
+        const rand = Math.floor((Math.random() * 100) + 1);
+        this.addEntry(date.add(1, 'hours'), rand);
+      }, 1000);
+    },
+
+    stopRandomData() {
+      clearInterval(this.intervalRef);
+    },
+
   },
 
   computed: {
@@ -77,7 +92,7 @@ new Vue({
     });
 
     // TESTING CODE
-    const date = moment();
+    // const date = moment();
 
     // setInterval(() => {
     //   const rand = Math.floor((Math.random() * 100) + 1);
@@ -89,5 +104,8 @@ new Vue({
 
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
+
+    this.bus.$on('start-random-data', this.startRandomData);
+    this.bus.$on('stop-random-data', this.stopRandomData);
   },
 });
