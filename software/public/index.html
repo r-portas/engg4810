@@ -23,7 +23,9 @@
             <header class="mdl-layout__header">
                 <div class="mdl-layout__header-row">
                     <!-- Title -->
-                    <span class="mdl-layout-title">Multimeter</span>
+
+                    <span v-if="isConnected" class="mdl-layout-title">Multimeter (connected)</span>
+                    <span v-else class="mdl-layout-title">Multimeter (disconnected)</span>
                 </div>
 
                 <div class="mdl-layout__tab-bar mdl-js-ripple-effect">

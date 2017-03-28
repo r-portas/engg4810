@@ -59,7 +59,10 @@ Vue.component('settings', {
      * Export data
      */
     exportData() {
-      const csv = this.data.map((d) => { return `${d.date},${d.value}`; }).join('\n');
+      const csv = this.data.map((d) => {
+        const date = d.date.toISOString();
+        return `${date},${d.value}`;
+      }).join('\n');
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       saveAs(blob, 'data.csv');

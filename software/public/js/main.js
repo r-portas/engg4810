@@ -15,6 +15,12 @@ new Vue({
 
       socket: null,
 
+      // Keeps a reference to the random data interval timer
+      intervalRef: null,
+
+      // True if we are connected to the multimeter
+      isConnected: false,
+
       data: [],
 
       currentTab: 'Chart',
@@ -51,7 +57,23 @@ new Vue({
     },
 
     setData(data) {
-      this.data = data;
+      for (let item of data) {
+        const date = moment(item.date);
+        this.addEntry(date, item.value);
+      }
+    },
+
+    startRandomData() {
+      const date = moment();
+
+      this.intervalRef = setInterval(() => {
+        const rand = Math.floor((Math.random() * 20) + 1) - 10;
+        this.addEntry(date.add(1, 'hours'), rand);
+      }, 1000);
+    },
+
+    stopRandomData() {
+      clearInterval(this.intervalRef);
     },
 
   },
@@ -73,7 +95,7 @@ new Vue({
     });
 
     // TESTING CODE
-    const date = moment();
+    // const date = moment();
 
     // setInterval(() => {
     //   const rand = Math.floor((Math.random() * 100) + 1);
@@ -84,5 +106,8 @@ new Vue({
 
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
+
+    this.bus.$on('start-random-data', this.startRandomData);
+    this.bus.$on('stop-random-data', this.stopRandomData);
   },
 });
