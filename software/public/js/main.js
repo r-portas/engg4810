@@ -15,7 +15,11 @@ new Vue({
 
       socket: null,
 
+      // Keeps a reference to the random data interval timer
       intervalRef: null,
+
+      // True if we are connected to the multimeter
+      isConnected: false,
 
       data: [],
 
