@@ -51,7 +51,10 @@ new Vue({
     },
 
     setData(data) {
-      console.log(data);
+      for (let item of data) {
+        const date = moment(item.date);
+        this.addEntry(date, item.value);
+      }
       this.data = data;
     },
 
@@ -75,10 +78,6 @@ new Vue({
 
     // TESTING CODE
     const date = moment();
-
-    this.addEntry(date.add(1, 'hours'), 5);
-    this.addEntry(date.add(1, 'hours'), 4);
-    this.addEntry(date.add(1, 'hours'), 6);
 
     // setInterval(() => {
     //   const rand = Math.floor((Math.random() * 100) + 1);
