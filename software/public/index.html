@@ -45,6 +45,7 @@
                 <div v-show="currentTab == tabs.CHART" class="page-content">
                     <chart :data="data" :bus="bus"></chart>
                     <data-card :bus="bus"></data-card>
+                    <collision-card :bus="bus"></collision-card>
                 </div>
 
                 <div v-show="currentTab == tabs.SETTINGS" class="page-content">
@@ -65,6 +66,7 @@
         <script src="js/components/chart.js"></script>
         <script src="js/components/settings.js"></script>
         <script src="js/components/data-card.js"></script>
+        <script src="js/components/collision-card.js"></script>
 
         <script src="js/collision.js"></script>
         <script src="js/main.js"></script>

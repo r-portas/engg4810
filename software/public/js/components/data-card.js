@@ -2,7 +2,7 @@
 
 Vue.component('data-card', {
   template: `
-    <div class="mdl-card mdl-shadow--4dp">
+    <div class="mdl-card mdl-shadow--4dp mm-card">
       <div class="mdl-card__title">
         <h2 class="mdl-card__title-text">
           Data

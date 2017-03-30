@@ -2,7 +2,7 @@
 
 Vue.component('settings', {
   template: `
-    <div class="mdl-card settings">
+    <div class="mdl-card mdl-shadow--4dp settings mm-card">
       <div class="mdl-card__title">
         <h2 class="mdl-card__title-text">Settings</h2>
       </div>

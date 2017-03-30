@@ -2,7 +2,7 @@
 
 Vue.component('chart', {
   template: `
-    <div class="chart">
+    <div class="mdl-card mdl-shadow--4dp chart mm-card">
       <svg ref="chart" id="vis" class="d3-chart"></svg>
     </div> 
   `,
@@ -211,7 +211,7 @@ Vue.component('chart', {
         const mouse = d3.mouse(this);
 
         // If the shift key is pressed, add to the bottom mask
-        if (d3.event.ctrlKey) {
+        if (d3.event.ctrlKey || d3.event.shiftKey) {
           scope.addMask(mouse[0], mouse[1], 'low');
         } else {
           scope.addMask(mouse[0], mouse[1], 'high');
@@ -498,13 +498,15 @@ Vue.component('chart', {
       this.drawMasks();
     },
 
+
   },
 
   watch: {
     topMasks: {
       handler: function() {
         const test = this.getData();
-        collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+        const collisions = collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+        this.bus.$emit('check-top-collisions', collisions);
       },
       deep: true,
     },
@@ -512,7 +514,8 @@ Vue.component('chart', {
     bottomMasks: {
       handler: function() {
         const test = this.getData();
-        collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+        const collisions = collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+        this.bus.$emit('check-bottom-collisions', collisions);
       },
       deep: true,
     },
