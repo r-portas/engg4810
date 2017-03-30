@@ -213,6 +213,8 @@ Vue.component('chart', {
         // If the shift key is pressed, add to the bottom mask
         if (d3.event.ctrlKey || d3.event.shiftKey) {
           scope.addMask(mouse[0], mouse[1], 'low');
+        } else if (d3.event.altKey) {
+          console.log(`Delete mask at ${mouse}`);
         } else {
           scope.addMask(mouse[0], mouse[1], 'high');
         }
@@ -498,34 +500,63 @@ Vue.component('chart', {
       this.drawMasks();
     },
 
+    translatedCollisionScale(collisions) {
+      collisions.map((c) => {
+        const temp = c;
+        temp.startCollision = this.xscale.invert(c.dataItem.point1.x);
+        temp.endCollision = this.xscale.invert(c.dataItem.point2.x);
+        return temp;
+      });
+
+      return collisions;
+    },
+
+    /**
+     * Processes the collisions
+     *
+     * Checks for collisions and emits an 'collisions' event on
+     * the main bus along with a array of collision data
+     */
+    processCollisions() {
+      const data = this.getData();
+      let collisions = collision.checkCollision(data.translatedData, data.topMask, data.bottomMask);
+      collisions = this.translatedCollisionScale(collisions);
+      this.bus.$emit('collisions', collisions);
+    },
 
   },
 
   watch: {
     topMasks: {
       handler: function() {
-        const test = this.getData();
-        const collisions = collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
-        this.bus.$emit('check-top-collisions', collisions);
+        this.processCollisions();
       },
       deep: true,
     },
 
     bottomMasks: {
       handler: function() {
+        this.processCollisions();
+        /*
         const test = this.getData();
-        const collisions = collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+        let collisions = collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+        collisions = this.translatedCollisionScale(collisions);
         this.bus.$emit('check-bottom-collisions', collisions);
+        */
       },
       deep: true,
     },
 
     data() {
       this.drawChart();
-
+      this.processCollisions();
+      /*
       // Testing
       const test = this.getData();
-      collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+      let collisions = collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+      collisions = this.translatedCollisionScale(collisions);
+      this.bus.$emit('check-collisions', collisions);
+      */
     },
   },
 

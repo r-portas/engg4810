@@ -120,6 +120,17 @@ const collision = {
   },
 
   /**
+   * The dataItem can also be a maskItem for mask collisions
+   */
+  createCollisionObject(name, dataItem, maskItem) {
+    return {
+      name,
+      dataItem,
+      maskItem,
+    };
+  },
+
+  /**
    * Checks if the data has collisions against the mask
    */
   checkCollision(data, topMask, bottomMask) {
@@ -136,16 +147,14 @@ const collision = {
       for (let j = 0; j < topMaskSegments.length; j += 1) {
         const topMaskItem = topMaskSegments[j];
         if (this.checkIntersect(dataItem, topMaskItem)) {
-          collisions.push(['Top Mask', dataItem, topMaskItem]);
-          console.log('Found collision between top mask and line segment');
+          collisions.push(this.createCollisionObject('Top Mask', dataItem, topMaskItem));
         }
       }
 
       for (let j = 0; j < bottomMaskSegments.length; j += 1) {
         const bottomMaskItem = bottomMaskSegments[j];
         if (this.checkIntersect(dataItem, bottomMaskItem)) {
-          collisions.push(['Bottom Mask', dataItem, bottomMaskItem]);
-          console.log('Found collision between bottom mask and line segment');
+          collisions.push(this.createCollisionObject('Bottom Mask', dataItem, bottomMaskItem));
         }
       }
     }
@@ -156,8 +165,7 @@ const collision = {
         const topMaskItem = topMaskSegments[j];
 
         if (this.checkIntersect(bottomMaskItem, topMaskItem)) {
-          console.log('Detected invalid mask configuration');
-          collisions.push(['Invalid Mask Configuration', topMaskItem, bottomMaskItem]);
+          collisions.push(this.createCollisionObject('Invalid Mask Configuration', topMaskItem, bottomMaskItem));
         }
       }
     }

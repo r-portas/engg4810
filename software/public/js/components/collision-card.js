@@ -11,12 +11,8 @@ Vue.component('collision-card', {
 
       <div class="mdl-card__supporting-text">
         <ul class="mdl-list">
-          <li v-for="collision in topCollisions" v-bind:class="{ 'invalid-mask': checkInvalid(collision) }" class="mdl-list__item">
-            {{collision[0]}}
-          </li>
-
-          <li v-for="collision in bottomCollisions" v-bind:class="{ 'invalid-mask': checkInvalid(collision) }" class="mdl-list__item">
-            {{collision[0]}}
+          <li v-for="collision in collisions" v-bind:class="{ 'invalid-mask': checkInvalid(collision) }" class="mdl-list__item">
+            {{collision}}
           </li>
         </ul>
       </div>
@@ -25,40 +21,23 @@ Vue.component('collision-card', {
 
   data() {
     return {
-      topCollisions: [],
-      bottomCollisions: [],
+      collisions: [],
     };
   },
 
   props: ['bus'],
 
   methods: {
-    checkTopCollisions(data) {
-      console.log(data);
-      this.topCollisions = data;
-    },
-
-    checkBottomCollisions(data) {
-      console.log(data);
-      this.bottomCollisions = data;
+    handleCollisions(collisions) {
+      this.collisions = collisions;
     },
 
     checkInvalid(collision) {
-      return collision[0] === 'Invalid Mask Configuration';
-    },
-
-    /**
-     * Processes the collisions from the checkCollision function
-     */
-    processCollisions(collisions) {
-      for (let i = 0; i < collisions.length; i += 1) {
-        console.log(collisions[i]);
-      }
+      return collision.name === 'Invalid Mask Configuration';
     },
   },
 
   created() {
-    this.bus.$on('check-top-collisions', this.checkTopCollisions);
-    this.bus.$on('check-bottom-collisions', this.checkBottomCollisions);
+    this.bus.$on('collisions', this.handleCollisions);
   },
 });
