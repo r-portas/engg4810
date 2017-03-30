@@ -61,14 +61,13 @@ new Vue({
         const date = moment(item.date);
         this.addEntry(date, item.value);
       }
-      this.data = data;
     },
 
     startRandomData() {
       const date = moment();
 
       this.intervalRef = setInterval(() => {
-        const rand = Math.floor((Math.random() * 100) + 1);
+        const rand = Math.floor((Math.random() * 20) + 1) - 10;
         this.addEntry(date.add(1, 'hours'), rand);
       }, 1000);
     },
@@ -104,7 +103,6 @@ new Vue({
     // }, 1000);
 
     // END TESTING
-    
 
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
