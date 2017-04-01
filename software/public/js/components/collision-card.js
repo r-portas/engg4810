@@ -12,7 +12,7 @@ Vue.component('collision-card', {
       <div class="mdl-card__supporting-text">
         <ul class="mdl-list">
           <li v-for="collision in collisions" v-bind:class="{ 'invalid-mask': checkInvalid(collision) }" class="mdl-list__item">
-            {{collision}}
+            Collision with {{collision.name}} between {{collision.startCollision}} and {{collision.endCollision}}
           </li>
         </ul>
       </div>

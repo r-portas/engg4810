@@ -44,8 +44,10 @@
             <main class="mdl-layout__content">
                 <div v-show="currentTab == tabs.CHART" class="page-content">
                     <chart :data="data" :bus="bus"></chart>
-                    <data-card :bus="bus"></data-card>
-                    <collision-card :bus="bus"></collision-card>
+                    <div class="flex-container">
+                        <data-card :bus="bus"></data-card>
+                        <collision-card :bus="bus"></collision-card>
+                    </div>
                 </div>
 
                 <div v-show="currentTab == tabs.SETTINGS" class="page-content">

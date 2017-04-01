@@ -27,3 +27,7 @@ body {
     background: #ffffff;
 }
 
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+}
