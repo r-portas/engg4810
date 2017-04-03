@@ -37,13 +37,51 @@ Vue.component('settings', {
           Import Data
         </button> 
 
+        <h5>Serial Communication</h5>
+        <button v-on:click="getPorts" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+          Get Ports
+        </button>
+
+        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp ports-table">
+          <thead>
+            <tr>
+              <th>Comm Name</th>
+              <th>Manufacturer</th>
+              <th>Set</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-for="port in ports">
+              <td>{{ port.comName }}</td>
+              <td>{{ port.manufacturer }}</td>
+              <td>
+                <button v-on:click="setPort(port)" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Set</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
       </div>
     </div>
   `,
 
   props: ['bus', 'data'],
 
+  data() {
+    return {
+      ports: []
+    };
+  },
+
   methods: {
+
+    /**
+     * Polls the server for a list of connected serial ports
+     */
+    getPorts() {
+      this.bus.$emit('getports');
+    },
 
     /**
      * Export masks
@@ -139,5 +177,17 @@ Vue.component('settings', {
 
       return parsed;
     },
+
+    loadPorts(ports) {
+      this.ports = ports;
+    },
+
+    setPort(port) {
+      console.log(port);
+    },
+  },
+
+  mounted() {
+    this.bus.$on('portslist', this.loadPorts);
   },
 });

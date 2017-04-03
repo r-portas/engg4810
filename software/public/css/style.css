@@ -31,3 +31,7 @@ body {
     display: flex;
     flex-wrap: wrap;
 }
+
+.ports-table {
+    margin: 10px;
+}

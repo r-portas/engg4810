@@ -94,6 +94,10 @@ new Vue({
       scope.queues = data;
     });
 
+    this.socket.on('portslist', (ports) => {
+      this.bus.$emit('portslist', ports);
+    });
+
     // TESTING CODE
     // const date = moment();
 
@@ -109,5 +113,9 @@ new Vue({
 
     this.bus.$on('start-random-data', this.startRandomData);
     this.bus.$on('stop-random-data', this.stopRandomData);
+
+    this.bus.$on('getports', () => {
+      this.socket.emit('getports');
+    });
   },
 });

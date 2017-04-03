@@ -5,6 +5,7 @@
  */
 
 const express = require('express');
+const SerialPort = require('serialport');
 
 // Setup socketio server
 const app = express();
@@ -21,6 +22,20 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('User disconnected');
+  });
+
+  /**
+   * Returns a list of connected serial ports
+   */
+  socket.on('getports', () => {
+    SerialPort.list((err, ports) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      socket.emit('portslist', ports);
+    });
   });
 });
 
