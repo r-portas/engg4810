@@ -183,7 +183,7 @@ Vue.component('settings', {
     },
 
     setPort(port) {
-      console.log(port);
+      this.bus.$emit('setport', port);
     },
   },
 

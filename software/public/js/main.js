@@ -21,6 +21,9 @@ new Vue({
       // True if we are connected to the multimeter
       isConnected: false,
 
+      // The name of the device
+      deviceName: '',
+
       data: [],
 
       currentTab: 'Chart',
@@ -76,6 +79,31 @@ new Vue({
       clearInterval(this.intervalRef);
     },
 
+    /**
+     * Sets the program into a connected state
+     */
+    setConnected(deviceName) {
+      this.deviceName = deviceName;
+      this.isConnected = true;
+      this.showSnackbar(`Serial communication established with ${deviceName}`);
+    },
+
+    /**
+     * Sets the program into a disconnected state
+     */
+    setDisconnected() {
+      this.deviceName = '';
+      this.isConnected = false;
+      this.showSnackbar('Serial communication disconnected');
+    },
+
+    /**
+     * Processes serial input
+     */
+    processData(data) {
+      console.log(data);
+    },
+
   },
 
   computed: {
@@ -98,6 +126,10 @@ new Vue({
       this.bus.$emit('portslist', ports);
     });
 
+    this.socket.on('deviceconnected', this.setConnected);
+    this.socket.on('devicedisconnected', this.setDisconnected);
+    this.socket.on('devicedata', this.processData);
+
     // TESTING CODE
     // const date = moment();
 
@@ -113,6 +145,10 @@ new Vue({
 
     this.bus.$on('start-random-data', this.startRandomData);
     this.bus.$on('stop-random-data', this.stopRandomData);
+
+    this.bus.$on('setport', (port) => {
+      this.socket.emit('setport', port);
+    });
 
     this.bus.$on('getports', () => {
       this.socket.emit('getports');

@@ -14,6 +14,8 @@ const io = require('socket.io')(http);
 
 const port = process.env.PORT || 3000;
 
+let serialDevice = null;
+
 // Host files in the public folder
 app.use(express.static('public'));
 
@@ -35,6 +37,30 @@ io.on('connection', (socket) => {
       }
 
       socket.emit('portslist', ports);
+    });
+  });
+
+  socket.on('setport', (newport) => {
+    console.log(`Connecting to ${newport.comName}`);
+
+    // Connect to the device
+    serialDevice = new SerialPort(newport.comName,
+      { parser: SerialPort.parsers.readline('\n') },
+      (err) => {
+        if (err) {
+          console.log(`Error: ${err.message}`);
+        }
+
+        // Notify the clients that the server connected
+        socket.emit('deviceconnected', newport.comName);
+      });
+
+    serialDevice.on('data', (data) => {
+      socket.emit('devicedata', data);
+    });
+
+    serialDevice.on('close', () => {
+      socket.emit('devicedisconnected');
     });
   });
 });
