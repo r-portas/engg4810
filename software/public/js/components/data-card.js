@@ -2,7 +2,7 @@
 
 Vue.component('data-card', {
   template: `
-    <div class="mdl-card mdl-shadow--4dp">
+    <div class="mdl-card mdl-shadow--4dp mm-card">
       <div class="mdl-card__title">
         <h2 class="mdl-card__title-text">
           Data
@@ -38,6 +38,11 @@ Vue.component('data-card', {
           Clear Masks
         </button> 
 
+
+        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="random-switch">
+          <input v-model="randomSwitch" type="checkbox" id="random-switch" class="mdl-switch__input">
+          <span class="mdl-switch__label">Random data</span>
+        </label>
       </div>
     </div>
   `,
@@ -45,6 +50,7 @@ Vue.component('data-card', {
   data() {
     return {
       rangeOption: 'auto',
+      randomSwitch: false
     };
   },
 
@@ -53,12 +59,28 @@ Vue.component('data-card', {
   methods: {
     clearMasks() {
       this.bus.$emit('set-masks', []);
-    }
+    },
+
+    startRandomData() {
+      this.bus.$emit('start-random-data');
+    },
+
+    stopRandomData() {
+      this.bus.$emit('stop-random-data');
+    },
   },
 
   watch: {
     rangeOption(newVal) {
       this.bus.$emit('set-range', newVal);
+    },
+
+    randomSwitch(newVal) {
+      if (newVal) {
+        this.startRandomData();
+      } else {
+        this.stopRandomData();
+      }
     },
   },
 });

@@ -2,7 +2,7 @@
 
 Vue.component('settings', {
   template: `
-    <div class="mdl-card settings">
+    <div class="mdl-card mdl-shadow--4dp settings mm-card">
       <div class="mdl-card__title">
         <h2 class="mdl-card__title-text">Settings</h2>
       </div>
@@ -37,13 +37,51 @@ Vue.component('settings', {
           Import Data
         </button> 
 
+        <h5>Serial Communication</h5>
+        <button v-on:click="getPorts" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+          Get Ports
+        </button>
+
+        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp ports-table">
+          <thead>
+            <tr>
+              <th>Comm Name</th>
+              <th>Manufacturer</th>
+              <th>Set</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-for="port in ports">
+              <td>{{ port.comName }}</td>
+              <td>{{ port.manufacturer }}</td>
+              <td>
+                <button v-on:click="setPort(port)" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Set</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
       </div>
     </div>
   `,
 
   props: ['bus', 'data'],
 
+  data() {
+    return {
+      ports: []
+    };
+  },
+
   methods: {
+
+    /**
+     * Polls the server for a list of connected serial ports
+     */
+    getPorts() {
+      this.bus.$emit('getports');
+    },
 
     /**
      * Export masks
@@ -59,7 +97,10 @@ Vue.component('settings', {
      * Export data
      */
     exportData() {
-      const csv = this.data.map((d) => { return `${d.date},${d.value}`; }).join('\n');
+      const csv = this.data.map((d) => {
+        const date = d.date.toISOString();
+        return `${date},${d.value}`;
+      }).join('\n');
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       saveAs(blob, 'data.csv');
@@ -136,5 +177,17 @@ Vue.component('settings', {
 
       return parsed;
     },
+
+    loadPorts(ports) {
+      this.ports = ports;
+    },
+
+    setPort(port) {
+      this.bus.$emit('setport', port);
+    },
+  },
+
+  mounted() {
+    this.bus.$on('portslist', this.loadPorts);
   },
 });

@@ -15,6 +15,15 @@ new Vue({
 
       socket: null,
 
+      // Keeps a reference to the random data interval timer
+      intervalRef: null,
+
+      // True if we are connected to the multimeter
+      isConnected: false,
+
+      // The name of the device
+      deviceName: '',
+
       data: [],
 
       currentTab: 'Chart',
@@ -51,8 +60,48 @@ new Vue({
     },
 
     setData(data) {
+      for (let item of data) {
+        const date = moment(item.date);
+        this.addEntry(date, item.value);
+      }
+    },
+
+    startRandomData() {
+      const date = moment();
+
+      this.intervalRef = setInterval(() => {
+        const rand = Math.floor((Math.random() * 20) + 1) - 10;
+        this.addEntry(date.add(1, 'hours'), rand);
+      }, 1000);
+    },
+
+    stopRandomData() {
+      clearInterval(this.intervalRef);
+    },
+
+    /**
+     * Sets the program into a connected state
+     */
+    setConnected(deviceName) {
+      this.deviceName = deviceName;
+      this.isConnected = true;
+      this.showSnackbar(`Serial communication established with ${deviceName}`);
+    },
+
+    /**
+     * Sets the program into a disconnected state
+     */
+    setDisconnected() {
+      this.deviceName = '';
+      this.isConnected = false;
+      this.showSnackbar('Serial communication disconnected');
+    },
+
+    /**
+     * Processes serial input
+     */
+    processData(data) {
       console.log(data);
-      this.data = data;
     },
 
   },
@@ -73,12 +122,16 @@ new Vue({
       scope.queues = data;
     });
 
-    // TESTING CODE
-    const date = moment();
+    this.socket.on('portslist', (ports) => {
+      this.bus.$emit('portslist', ports);
+    });
 
-    this.addEntry(date.add(1, 'hours'), 5);
-    this.addEntry(date.add(1, 'hours'), 4);
-    this.addEntry(date.add(1, 'hours'), 6);
+    this.socket.on('deviceconnected', this.setConnected);
+    this.socket.on('devicedisconnected', this.setDisconnected);
+    this.socket.on('devicedata', this.processData);
+
+    // TESTING CODE
+    // const date = moment();
 
     // setInterval(() => {
     //   const rand = Math.floor((Math.random() * 100) + 1);
@@ -86,9 +139,19 @@ new Vue({
     // }, 1000);
 
     // END TESTING
-    
 
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
+
+    this.bus.$on('start-random-data', this.startRandomData);
+    this.bus.$on('stop-random-data', this.stopRandomData);
+
+    this.bus.$on('setport', (port) => {
+      this.socket.emit('setport', port);
+    });
+
+    this.bus.$on('getports', () => {
+      this.socket.emit('getports');
+    });
   },
 });

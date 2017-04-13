@@ -2,7 +2,7 @@
 
 Vue.component('chart', {
   template: `
-    <div class="chart">
+    <div class="mdl-card mdl-shadow--4dp chart mm-card">
       <svg ref="chart" id="vis" class="d3-chart"></svg>
     </div> 
   `,
@@ -47,83 +47,6 @@ Vue.component('chart', {
     drawMasks() {
       this.drawSingleMask(this.topMasks, 'topmask', 'blue', 'rgba(1, 0, 255, 0.3)', this.moveTopMaskCircle);
       this.drawSingleMask(this.bottomMasks, 'bottommask', 'red', 'rgba(255, 0, 1, 0.3)', this.moveBottomMaskCircle);
-      /*
-      const topMask = d3.line()
-        .x((d) => { return d.x; })
-        .y((d) => { return d.y; })
-        .curve(d3.curveMonotoneX);
-
-      const bottomMask = d3.line()
-        .x((d) => { return d.x; })
-        .y((d) => { return d.y; })
-        .curve(d3.curveCatmullRom.alpha(0.5));
-
-      // Remove the old masks
-      this.g.selectAll('.topmask').remove();
-      this.g.selectAll('.bottommask').remove();
-
-      // Top mask
-      this.g.append('path')
-        .classed('topmask', true)
-        .datum(this.topMasks)
-        .attr('fill', 'rgba(0, 0, 255, 0.3)')
-        .attr('stroke', 'blue')
-        .attr('stroke-width', 1.5)
-        .attr('d', topMask)
-        .enter()
-        .append('circle')
-          .attr('class', 'line');
-
-      // Draw the dashed lines
-      const minTopMaskPoint = this.getMinimumMaskValue(this.topMasks);
-      if (minTopMaskPoint !== null) {
-        this.g.append('line')
-          .classed('topmask', true)
-          .attr('x1', 0)
-          .attr('y1', minTopMaskPoint.y)
-          .attr('x2', minTopMaskPoint.x)
-          .attr('y2', minTopMaskPoint.y)
-          .attr('stroke', 'lightblue')
-          .attr('stroke-width', 1.5);
-        console.log(minTopMaskPoint);
-      }
-
-      // Top mask circles
-      this.g.selectAll('circle.topmask')
-        .data(this.topMasks)
-        .enter()
-        .append('circle')
-        .classed('topmask', true)
-        .attr('r', 6.5)
-        .attr('cx', (d) => { return d.x; })
-        .attr('cy', (d) => { return d.y; })
-        .style('stroke', 'blue')
-        .call(d3.drag().on('drag', this.moveTopMaskCircle));
-
-      // Bottom mask
-      this.g.append('path')
-        .classed('bottommask', true)
-        .datum(this.bottomMasks)
-        .attr('fill', 'rgba(255, 0, 0, 0.3)')
-        .attr('stroke', 'red')
-        .attr('stroke-width', 1.5)
-        .attr('d', bottomMask)
-        .enter()
-        .append('circle')
-          .attr('class', 'line');
-
-      // Bottom mask circles
-      this.g.selectAll('circle.bottommask')
-        .data(this.bottomMasks)
-        .enter()
-        .append('circle')
-        .classed('bottommask', true)
-        .attr('r', 6.5)
-        .attr('cx', (d) => { return d.x; })
-        .attr('cy', (d) => { return d.y; })
-        .style('stroke', 'red')
-        .call(d3.drag().on('drag', this.moveBottomMaskCircle));
-      */
     },
 
     moveTopMaskCircle(d) {
@@ -225,10 +148,12 @@ Vue.component('chart', {
           break;
       }
 
+      const xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat('%H'));
+
       // X axis
       this.g.append('g')
         .attr('transform', `translate(0, ${this.height})`)
-        .call(d3.axisBottom(x))
+        .call(xAxis)
         .select('.domain')
         .remove();
 
@@ -286,8 +211,10 @@ Vue.component('chart', {
         const mouse = d3.mouse(this);
 
         // If the shift key is pressed, add to the bottom mask
-        if (d3.event.ctrlKey) {
+        if (d3.event.ctrlKey || d3.event.shiftKey) {
           scope.addMask(mouse[0], mouse[1], 'low');
+        } else if (d3.event.altKey) {
+          console.log(`Delete mask at ${mouse}`);
         } else {
           scope.addMask(mouse[0], mouse[1], 'high');
         }
@@ -573,31 +500,63 @@ Vue.component('chart', {
       this.drawMasks();
     },
 
+    translatedCollisionScale(collisions) {
+      collisions.map((c) => {
+        const temp = c;
+        temp.startCollision = this.xscale.invert(c.dataItem.point1.x);
+        temp.endCollision = this.xscale.invert(c.dataItem.point2.x);
+        return temp;
+      });
+
+      return collisions;
+    },
+
+    /**
+     * Processes the collisions
+     *
+     * Checks for collisions and emits an 'collisions' event on
+     * the main bus along with a array of collision data
+     */
+    processCollisions() {
+      const data = this.getData();
+      let collisions = collision.checkCollision(data.translatedData, data.topMask, data.bottomMask);
+      collisions = this.translatedCollisionScale(collisions);
+      this.bus.$emit('collisions', collisions);
+    },
+
   },
 
   watch: {
     topMasks: {
       handler: function() {
-        const test = this.getData();
-        collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+        this.processCollisions();
       },
       deep: true,
     },
 
     bottomMasks: {
       handler: function() {
+        this.processCollisions();
+        /*
         const test = this.getData();
-        collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+        let collisions = collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+        collisions = this.translatedCollisionScale(collisions);
+        this.bus.$emit('check-bottom-collisions', collisions);
+        */
       },
       deep: true,
     },
 
     data() {
       this.drawChart();
-
+      this.processCollisions();
+      /*
       // Testing
       const test = this.getData();
-      collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+      let collisions = collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
+      collisions = this.translatedCollisionScale(collisions);
+      this.bus.$emit('check-collisions', collisions);
+      */
     },
   },
 

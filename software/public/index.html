@@ -23,7 +23,9 @@
             <header class="mdl-layout__header">
                 <div class="mdl-layout__header-row">
                     <!-- Title -->
-                    <span class="mdl-layout-title">Multimeter</span>
+
+                    <span v-if="isConnected" class="mdl-layout-title">Multimeter (connected to {{deviceName}})</span>
+                    <span v-else class="mdl-layout-title">Multimeter (disconnected)</span>
                 </div>
 
                 <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
@@ -42,7 +44,10 @@
             <main class="mdl-layout__content">
                 <div v-show="currentTab == tabs.CHART" class="page-content">
                     <chart :data="data" :bus="bus"></chart>
-                    <data-card :bus="bus"></data-card>
+                    <div class="flex-container">
+                        <data-card :bus="bus"></data-card>
+                        <collision-card :bus="bus"></collision-card>
+                    </div>
                 </div>
 
                 <div v-show="currentTab == tabs.SETTINGS" class="page-content">
@@ -63,6 +68,7 @@
         <script src="js/components/chart.js"></script>
         <script src="js/components/settings.js"></script>
         <script src="js/components/data-card.js"></script>
+        <script src="js/components/collision-card.js"></script>
 
         <script src="js/collision.js"></script>
         <script src="js/main.js"></script>
