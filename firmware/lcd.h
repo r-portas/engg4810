@@ -38,4 +38,6 @@ extern void storeSpecialChar();
 extern void sendSpecialChar();
 extern void sendByte(char byteToSend, int isData);
 
+// TODO: Check for extra functions
+
 #endif
