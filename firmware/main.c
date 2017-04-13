@@ -16,9 +16,10 @@
 #include "driverlib/uart.h"
 #include "driverlib/rom_map.h"
 #include "driverlib/ssi.h"
-#include "inc/hw_ssi.h"
 #include "utils/uartstdio.h"
 #include "lcd.h"
+#include "led.h"
+#include "uart.h"
 //#include "brd_adc.h"
 
 float voltage = 0.00;
@@ -188,9 +189,53 @@ void adc_read() {
 
 }
 
-int main()
-{
+
+// State machine states
+enum state_t {
+    LCD,
+    LED,
+    SD_CARD,
+    UART,
+    ADC
+} state = LCD;
+
+
+void state_machine() {
+    switch (state) {
+        case LCD:
+            ledOn(RED_LED);
+            state = LED;
+            break;
+
+        case LED:
+            ledOn(BLUE_LED);
+            state = SD_CARD;
+            break;
+
+        case SD_CARD:
+            ledOn(GREEN_LED);
+            state = UART;
+            break;
+
+        case UART:
+            UARTprintf("UART PRINTING STUFF");
+            state = ADC;
+            break;
+
+        case ADC:
+
+            state = LCD;
+            break;
+    }
+}
+
+int main() {
     initLCD();
+
+    initLed();
+    initUart();
+    storeSpecialChar();
+
     SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     init_adc();
@@ -200,6 +245,7 @@ int main()
     //storeSpecialChar();
    // ADCIntClear(ADC1_BASE, 3);
     while(1) {
+        state_machine();
         //sendSpecialChar();
         //adc_debug();
         adc_read();
