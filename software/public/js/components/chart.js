@@ -94,6 +94,43 @@ Vue.component('chart', {
       return data;
     },
 
+    checkProximity(x, y, point) {
+      const p = 20;
+
+      console.log('Checking');
+      console.log(point);
+      console.log(`(${x}, ${y})`);
+      if ((x-p) < point.x && point.x < (x+p)) {
+        console.log("Passed x");
+        if ((y-p) < point.y && point.y < (y+p)) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+
+    /**
+     * Deletes the masks at the specified x, y point
+     */
+    deleteMask(x, y) {
+      for (let i = 0; i < this.topMasks.length; i++) {
+        const point = this.topMasks[i];
+        if (this.checkProximity(x, y, point)) {
+          this.topMasks.splice(i, 1);
+          this.bus.$emit('show-snackbar', 'Mask point deleted');
+        }
+      }
+      
+      for (let i = 0; i < this.bottomMasks.length; i++) {
+        const point = this.bottomMasks[i];
+        if (this.checkProximity(x, y, point)) {
+          this.bottomMasks.splice(i, 1);
+          this.bus.$emit('show-snackbar', 'Mask point deleted');
+        }
+      }
+    },
+
     drawChart() {
       // Delete any artifacts
       this.chart.selectAll('*').remove();
@@ -210,11 +247,15 @@ Vue.component('chart', {
       this.chart.on('click', function() {
         const mouse = d3.mouse(this);
 
+        // Fix the margin offsets
+        mouse[0] -= scope.margin.left;
+        mouse[1] -= scope.margin.top;
+
         // If the shift key is pressed, add to the bottom mask
         if (d3.event.ctrlKey || d3.event.shiftKey) {
           scope.addMask(mouse[0], mouse[1], 'low');
         } else if (d3.event.altKey) {
-          console.log(`Delete mask at ${mouse}`);
+          scope.deleteMask(mouse[0], mouse[1]);
         } else {
           scope.addMask(mouse[0], mouse[1], 'high');
         }
