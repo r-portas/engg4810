@@ -70,7 +70,7 @@ Vue.component('settings', {
 
   data() {
     return {
-      ports: []
+      ports: [],
     };
   },
 
@@ -80,17 +80,40 @@ Vue.component('settings', {
      * Polls the server for a list of connected serial ports
      */
     getPorts() {
-      this.bus.$emit('getports');
+      this.bus.$emit('get-ports');
+    },
+
+    createMasksCsv(masks) {
+      let meas = null;
+
+      switch (masks.measurement) {
+        case 'voltage':
+          meas = 'V';
+          break;
+        case 'current':
+          meas = 'A';
+          break;
+        case 'resistance':
+          meas = 'Ohm';
+          break;
+        default:
+          meas = 'N/A';
+          break;
+      }
+
+      let csv = masks.topMasks.map((m) => { return `${m.mask},${m.x},${m.y},${meas}`; }).join('\n');
+      csv += '\n';
+      csv += masks.bottomMasks.map((m) => { return `${m.mask},${m.x},${m.y},${meas}`; }).join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      saveAs(blob, 'data.csv');
     },
 
     /**
      * Export masks
      */
     exportMasks() {
-      const csv = this.data.map((d) => { return ''; }).join('\n');
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-      saveAs(blob, 'data.csv');
+      this.bus.$emit('get-masks');
     },
 
     /**
@@ -189,5 +212,6 @@ Vue.component('settings', {
 
   mounted() {
     this.bus.$on('portslist', this.loadPorts);
+    this.bus.$on('masks', this.createMasksCsv);
   },
 });

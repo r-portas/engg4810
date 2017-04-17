@@ -1,4 +1,4 @@
-/* global d3, moment, io, window, Vue */
+/* global d3, moment, io, window, Vue, collision */
 
 Vue.component('chart', {
   template: `
@@ -524,25 +524,41 @@ Vue.component('chart', {
       this.bus.$emit('collisions', collisions);
     },
 
+    /**
+     * Translates a set of masks to the required format
+     */
+    translateMasks(masks) {
+      return masks.map((m) => {
+        const temp = {};
+        temp.mask = m.mask;
+        temp.x = this.xscale.invert(m.x);
+        temp.y = m.y;
+
+        return temp;
+      });
+    },
+
+    getMasks() {
+      this.bus.$emit('masks', {
+        topMasks: this.topMasks,
+        bottomMasks: this.bottomMasks,
+        measurement: this.selectedRange,
+      });
+    },
+
   },
 
   watch: {
     topMasks: {
-      handler: function() {
+      handler() {
         this.processCollisions();
       },
       deep: true,
     },
 
     bottomMasks: {
-      handler: function() {
+      handler() {
         this.processCollisions();
-        /*
-        const test = this.getData();
-        let collisions = collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
-        collisions = this.translatedCollisionScale(collisions);
-        this.bus.$emit('check-bottom-collisions', collisions);
-        */
       },
       deep: true,
     },
@@ -550,13 +566,6 @@ Vue.component('chart', {
     data() {
       this.drawChart();
       this.processCollisions();
-      /*
-      // Testing
-      const test = this.getData();
-      let collisions = collision.checkCollision(test.translatedData, test.topMask, test.bottomMask);
-      collisions = this.translatedCollisionScale(collisions);
-      this.bus.$emit('check-collisions', collisions);
-      */
     },
   },
 
@@ -570,5 +579,6 @@ Vue.component('chart', {
 
     this.bus.$on('set-masks', (masks) => { this.setMasks(masks); });
     this.bus.$on('set-range', (range) => { this.setRange(range); });
+    this.bus.$on('get-masks', () => this.getMasks());
   },
 });
