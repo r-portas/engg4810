@@ -50,6 +50,10 @@
                     </div>
                 </div>
 
+                <div v-show="currentTab == tabs.DATA" class="page-content">
+                    <data-view :data="data"></data-view>
+                </div>
+
                 <div v-show="currentTab == tabs.SETTINGS" class="page-content">
                     <settings :data="data" :bus="bus"></settings>
                 </div>
@@ -68,6 +72,7 @@
         <script src="js/components/chart.js"></script>
         <script src="js/components/settings.js"></script>
         <script src="js/components/data-card.js"></script>
+        <script src="js/components/data-view.js"></script>
         <script src="js/components/collision-card.js"></script>
 
         <script src="js/collision.js"></script>

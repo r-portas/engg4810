@@ -4,6 +4,9 @@ Vue.component('chart', {
   template: `
     <div class="mdl-card mdl-shadow--4dp chart mm-card">
       <svg ref="chart" id="vis" class="d3-chart"></svg>
+
+      <input class="mdl-slider mdl-js-slider" type="range"
+        min="0" :max="dataItems" v-model="scrollIndex" tabindex="0">
     </div> 
   `,
 
@@ -25,11 +28,15 @@ Vue.component('chart', {
       topMasks: [],
       bottomMasks: [],
 
+      // The index to scroll to
+      scrollIndex: 0,
+
       // Configuration
       dataLimit: 10,
       voltageRange: [-12, 12],
       currentRange: [-200, 200],
       resistanceRange: [0, 1000000],
+      logicRange: [-0.5, 1.5],
 
       selectedRange: 'voltage',
 
@@ -37,10 +44,17 @@ Vue.component('chart', {
         voltage: 'Voltage (V)',
         current: 'Current (mA)',
         resistance: 'Resistance (ohms)',
+        logic: 'Logic Level (digital)',
       },
 
       yLabelObj: null,
     };
+  },
+
+  computed: {
+    dataItems() {
+      return Math.max(this.data.length, 1);
+    },
   },
 
   methods: {
@@ -73,7 +87,7 @@ Vue.component('chart', {
      */
     getData() {
       // Return at most 'dataLimit' elements from the end of data
-      const limitedData = this.data.slice(Math.max(this.data.length - this.dataLimit, 0));
+      const limitedData = this.data.slice(Math.max(this.scrollIndex - this.dataLimit, 0));
 
       const translated = limitedData.map((item) => {
         const translatedItem = {
@@ -100,9 +114,8 @@ Vue.component('chart', {
       console.log('Checking');
       console.log(point);
       console.log(`(${x}, ${y})`);
-      if ((x-p) < point.x && point.x < (x+p)) {
-        console.log("Passed x");
-        if ((y-p) < point.y && point.y < (y+p)) {
+      if ((x - p) < point.x && point.x < (x + p)) {
+        if ((y - p) < point.y && point.y < (y + p)) {
           return true;
         }
       }
@@ -134,6 +147,7 @@ Vue.component('chart', {
     drawChart() {
       // Delete any artifacts
       this.chart.selectAll('*').remove();
+      this.chart.selectAll('.line').remove();
 
       this.g = this.chart.append('g').attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
 
@@ -149,6 +163,7 @@ Vue.component('chart', {
       // Set the yscale
       this.yscale = y;
 
+      // Apply the scrollIndex
       const data = this.getData().rawData;
 
       // The line for the data
@@ -174,6 +189,10 @@ Vue.component('chart', {
 
         case 'resistance':
           y.domain(this.resistanceRange);
+          break;
+
+        case 'logic':
+          y.domain(this.logicRange);
           break;
 
         case 'auto':
@@ -214,6 +233,7 @@ Vue.component('chart', {
       // Data
       this.g.append('path')
         .datum(data)
+        .classed('line', true)
         .attr('fill', 'none')
         .attr('stroke', 'steelblue')
         .attr('stroke-width', 1.5)
@@ -604,7 +624,15 @@ Vue.component('chart', {
       deep: true,
     },
 
+    scrollIndex() {
+      console.log('Scroll index changed');
+      this.drawChart();
+    },
+
     data() {
+      // Set the scroll index to the end
+      this.scrollIndex = this.data.length;
+
       this.drawChart();
       this.processCollisions();
     },

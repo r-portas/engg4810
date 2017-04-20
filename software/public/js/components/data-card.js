@@ -34,6 +34,13 @@ Vue.component('data-card', {
         </label> 
         <br>
 
+        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="logic">
+          <input type="radio" id="logic" class="mdl-radio__button" value="logic" v-model="rangeOption">
+          <span class="mdl-radio__label">Logic Level</span>
+        </label> 
+        <br>
+
+
         <button v-on:click="clearMasks" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
           Clear Masks
         </button> 
@@ -50,7 +57,7 @@ Vue.component('data-card', {
   data() {
     return {
       rangeOption: 'auto',
-      randomSwitch: false
+      randomSwitch: false,
     };
   },
 

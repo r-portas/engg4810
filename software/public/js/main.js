@@ -12,6 +12,7 @@ new Vue({
   data() {
     return {
       bus: {},
+      date: {},
 
       socket: null,
 
@@ -67,11 +68,12 @@ new Vue({
     },
 
     startRandomData() {
-      const date = moment();
+
 
       this.intervalRef = setInterval(() => {
+        this.date.add(1, 'hours');
         const rand = Math.floor((Math.random() * 20) + 1) - 10;
-        this.addEntry(date.add(1, 'hours'), rand);
+        this.addEntry(this.date, rand);
       }, 1000);
     },
 
@@ -112,6 +114,8 @@ new Vue({
 
   created() {
     this.bus = new Vue();
+
+    this.date = moment();
   },
 
   mounted() {
@@ -129,16 +133,6 @@ new Vue({
     this.socket.on('deviceconnected', this.setConnected);
     this.socket.on('devicedisconnected', this.setDisconnected);
     this.socket.on('devicedata', this.processData);
-
-    // TESTING CODE
-    // const date = moment();
-
-    // setInterval(() => {
-    //   const rand = Math.floor((Math.random() * 100) + 1);
-    //   scope.addEntry(date.add(1, 'hours'), rand);
-    // }, 1000);
-
-    // END TESTING
 
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
