@@ -177,16 +177,21 @@ void debug_adc() {
 
 void adc_read() {
     GPIOPinWrite(GPIO_PORTA_BASE, CS_PIN , CS_PIN);
-    SysCtlDelay(35);
+    SysCtlDelay(40);
     GPIOPinWrite(GPIO_PORTA_BASE, CS_PIN , 0);
-    SysCtlDelay(70);
+    SysCtlDelay(80);
     SSIDataPut(SSI0_BASE, 'D');
     while(SSIBusy(SSI0_BASE))
     {
 
     }
     SSIDataGet(SSI0_BASE, &pui32DataRx[0]);
-
+    float final = (pui32DataRx[0] - 331);
+    float final2 = final * (3309);
+    float final3 = (final2 / 65536);
+    int beforeDec = final3 / 1000;
+    int after = final3 - (beforeDec * 1000);
+    UARTprintf("number is %d %d.%d\n",pui32DataRx[0], beforeDec, after);
 }
 
 
@@ -223,7 +228,7 @@ void state_machine() {
             break;
 
         case ADC:
-
+				
             state = LCD;
             break;
     }
@@ -245,36 +250,11 @@ int main() {
     //storeSpecialChar();
    // ADCIntClear(ADC1_BASE, 3);
     while(1) {
-        state_machine();
+        //state_machine();
         //sendSpecialChar();
         //adc_debug();
         adc_read();
-        printLCD("hello !");
-        //adc_debug();
-        // sending the position of
-        /*sendByte(0x00, TRUE);
-
-        strcpy(myStr, str);
-        strcat(myStr, ".");
-        strcat(myStr, decValStr);
-        printLCD(myStr);
-        Delay(10000000);
-        */
-        // ADC stuff
-        /*ADCProcessorTrigger(ADC1_BASE, 3);
-        while(!ADCIntStatus(ADC1_BASE, 3, false))
-        {
-
-        }
-        ADCIntClear(ADC1_BASE, 3);
-        ADCSequenceDataGet(ADC1_BASE, 3, &result);
-        // convert to voltage and grab value
-        voltage = result* 0.000805;
-        int volInt = (int)voltage;
-        toString(volInt, str, 10);
-        decVal = (voltage * 100) - (volInt * 100);
-        toString(decVal , decValStr, 10);
-        */
-
+        //printLCD("hello !");
+		//Delay(1000000);
     }
 }
