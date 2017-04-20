@@ -17,9 +17,15 @@
 #include "driverlib/rom_map.h"
 #include "driverlib/ssi.h"
 #include "utils/uartstdio.h"
+#include "utils/fatfs/src/ff.h"
+#include "utils/fatfs/src/diskio.h"
 #include "lcd.h"
 #include "led.h"
 #include "uart.h"
+#include "sd_card.h"
+
+
+
 //#include "brd_adc.h"
 
 float voltage = 0.00;
@@ -69,7 +75,7 @@ int toString(int value, char *sp, int radix)
         i = v % radix;
         v /= radix; // v/=radix uses less CPU clocks than v=v/radix does
         if (i < 10)
-          *tp++ = i+'0';
+          *tp++ = i +'0';
         else
           *tp++ = i + 'a' - 10;
     }
@@ -169,7 +175,6 @@ void debug_adc() {
        {
            SSIDataPut(SSI0_BASE, 'a');
        }
-
 }
 
 
@@ -243,17 +248,22 @@ int main() {
 
     SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
-    init_adc();
+    //init_adc();
+    //init_sd_card();
     //init_special();
     //InitConsole();
     //set_up();
     //storeSpecialChar();
    // ADCIntClear(ADC1_BASE, 3);
+    //card_setup();
+    sd_card_attempt2();
     while(1) {
-        //state_machine();
+       //write_data();
+       // state_machine();
         //sendSpecialChar();
         //adc_debug();
-        adc_read();
+       // adc_read();
+
         //printLCD("hello !");
 		//Delay(1000000);
     }
