@@ -35,9 +35,19 @@ io.on('connection', (socket) => {
         console.log(err);
         return;
       }
-
+      
       socket.emit('portslist', ports);
     });
+  });
+
+  /**
+   * A range is changing the measurement mode
+   */
+  socket.on('set-range', (newRange) => {
+    console.log(`Sending '${newRange}' over serial`);
+    if (serialDevice != null) {
+      serialDevice.write(`${newRange}\n`);
+    }
   });
 
   socket.on('setport', (newport) => {
@@ -56,6 +66,7 @@ io.on('connection', (socket) => {
       });
 
     serialDevice.on('data', (data) => {
+      console.log(`Receiving '${data}' over serial`);
       socket.emit('devicedata', data);
     });
 

@@ -137,6 +137,10 @@ new Vue({
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
 
+    this.bus.$on('set-range', (newRange) => {
+      this.socket.emit('set-range', newRange);
+    });
+
     this.bus.$on('start-random-data', this.startRandomData);
     this.bus.$on('stop-random-data', this.stopRandomData);
 
@@ -144,7 +148,7 @@ new Vue({
       this.socket.emit('setport', port);
     });
 
-    this.bus.$on('getports', () => {
+    this.bus.$on('get-ports', () => {
       this.socket.emit('getports');
     });
   },

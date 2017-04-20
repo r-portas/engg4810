@@ -40,11 +40,9 @@ Vue.component('data-card', {
         </label> 
         <br>
 
-
         <button v-on:click="clearMasks" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
           Clear Masks
         </button> 
-
 
         <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="random-switch">
           <input v-model="randomSwitch" type="checkbox" id="random-switch" class="mdl-switch__input">
