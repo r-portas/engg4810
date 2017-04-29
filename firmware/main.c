@@ -1,3 +1,4 @@
+////////// INCLUDES
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -17,254 +18,47 @@
 #include "driverlib/rom_map.h"
 #include "driverlib/ssi.h"
 #include "utils/uartstdio.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/systick.h"
 #include "utils/fatfs/src/ff.h"
 #include "utils/fatfs/src/diskio.h"
+
 #include "lcd.h"
 #include "led.h"
 #include "uart.h"
 #include "sd_card.h"
+#include "button.h"
+#include "mux.h"
+#include "adc.h"
+#include "timer_updates.h"
 
 
-
-//#include "brd_adc.h"
-
-float voltage = 0.00;
-uint32_t result;
-char str[10];
-char myStr[20];
-int decVal;
-char decValStr[20];
-
-#define A GPIO_PIN_4 // Pin 5
-#define B GPIO_PIN_5 // Pin 6
-#define C GPIO_PIN_6 // Pin 23
-
-#define MUX_PINS A | B | C
-#define MUX_PORT SYSCTL_PERIPH_GPIOF
-#define BUTTON_PORT SYSCTL_PERIPH_GPIO
-
-// ADC pins
-#define ADC_SCLK_PIN  GPIO_PIN_2           //output
-#define CS_PIN   GPIO_PIN_3           //command/ control out
-#define RX_PIN   GPIO_PIN_4           // Set pin as input for
-#define TX_PIN   GPIO_PIN_5
-
-
-#define ADC_PORT SYSCTL_PERIPH_GPIOA
-#define ADC_PINS ADC_SCLK_PIN | CS_PIN | DATA_IN_PIN
-
-
-// Yet, another good itoa implementation
-// returns: the length of the number string
-
-int toString(int value, char *sp, int radix)
-{
-    char tmp[16];// be careful with the length of the buffer
-    char *tp = tmp;
-    int i;
-    unsigned v;
-
-    int sign = (radix == 10 && value < 0);
-    if (sign)
-        v = -value;
-    else
-        v = (unsigned)value;
-
-    while (v || tp == tmp)
-    {
-        i = v % radix;
-        v /= radix; // v/=radix uses less CPU clocks than v=v/radix does
-        if (i < 10)
-          *tp++ = i +'0';
-        else
-          *tp++ = i + 'a' - 10;
-    }
-
-    int len = tp - tmp;
-
-    if (sign)
-    {
-        *sp++ = '-';
-        len++;
-    }
-
-    while (tp > tmp)
-        *sp++ = *--tp;
-
-    return len;
+void hardware_init() {
+   init_LCD();
+   init_uart();
+   initTimer();
+   //init_sd_card();
+   init_interrupt_button();
+   init_mux();
+   init_adc();
+   // set up for the system tick / watch dog
 }
 
-void output_mux(int val) {
-    switch (val) {
-         case(1) :
-                GPIOPinWrite(MUX_PORT, A , 0);
-                GPIOPinWrite(MUX_PORT, B , 0);
-                GPIOPinWrite(MUX_PORT, C , 0);
-                break;
-        case (2):
-                GPIOPinWrite(MUX_PORT, A , 1);
-                GPIOPinWrite(MUX_PORT, B , 0);
-                GPIOPinWrite(MUX_PORT, C , 0);
-                break;
-        case (3):
-                GPIOPinWrite(MUX_PORT, A , 0);
-                GPIOPinWrite(MUX_PORT, B , 1);
-                GPIOPinWrite(MUX_PORT, C , 0);
-                break;
-        case (4):
-                GPIOPinWrite(MUX_PORT, A , 1);
-                GPIOPinWrite(MUX_PORT, B , 1);
-                GPIOPinWrite(MUX_PORT, C , 0);
-                break;
-        case (5):
-                GPIOPinWrite(MUX_PORT, A , 0);
-                GPIOPinWrite(MUX_PORT, B , 0);
-                GPIOPinWrite(MUX_PORT, C , 1);
-                break;
-    }
-}
-
-void init_adc() {
-    // configure the clock for ADC
-        // enable the SSI and GPIO port
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI0);
-	while(!SysCtlPeripheralReady(SYSCTL_PERIPH_SSI0)) {
-
-	}
-	//SSIClockSourceSet(SYSCTL_PERIPH_SSI0, SSI_CLOCK_SYSTEM);
-    SysCtlPeripheralEnable(ADC_PORT);
-	SysCtlDelay(3);
-
-
-	// set up the pins for SSI
-    GPIOPinConfigure(GPIO_PA2_SSI0CLK);
-    GPIOPinConfigure(GPIO_PA4_SSI0RX);
-    GPIOPinConfigure(GPIO_PA5_SSI0TX);
-    GPIOPinTypeSSI(GPIO_PORTA_BASE, GPIO_PIN_5 | GPIO_PIN_4 | GPIO_PIN_2);
-
-    // Configure the CS pin as output to select CS
-	SysCtlDelay(3);
-	GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, GPIO_PIN_3);
-
-
-	// for TX
-	//SysCtlDelay(3);
-	//GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, GPIO_PIN_5);
-
-	SysCtlDelay(3);
-    // Configure the clock settings
-    // SPI mode, master mode, 1MHz SSI frequency, and 8-bit data
-    SSIConfigSetExpClk(SSI0_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
-                           SSI_MODE_MASTER, 1000000, 16);
-
-    // Link clock and enable SSI for conversion
-    SSIEnable(SSI0_BASE);
-}
-
-uint32_t DataRx[1000];
-#define NUM_SSI_DATA            3
-uint32_t pui32DataTx[NUM_SSI_DATA];
-uint32_t pui32DataRx[NUM_SSI_DATA];
-uint32_t ui32Index;
-
-void debug_adc() {
-    while(SSIDataGetNonBlocking(SSI0_BASE, &pui32DataRx[0]))
-       {
-       }
-       for(ui32Index = 0; ui32Index < NUM_SSI_DATA; ui32Index++)
-       {
-           SSIDataPut(SSI0_BASE, 'a');
-       }
-}
-
-
-
-
-void adc_read() {
-    GPIOPinWrite(GPIO_PORTA_BASE, CS_PIN , CS_PIN);
-    SysCtlDelay(40);
-    GPIOPinWrite(GPIO_PORTA_BASE, CS_PIN , 0);
-    SysCtlDelay(80);
-    SSIDataPut(SSI0_BASE, 'D');
-    while(SSIBusy(SSI0_BASE))
-    {
-
-    }
-    SSIDataGet(SSI0_BASE, &pui32DataRx[0]);
-    float final = (pui32DataRx[0] - 331);
-    float final2 = final * (3309);
-    float final3 = (final2 / 65536);
-    int beforeDec = final3 / 1000;
-    int after = final3 - (beforeDec * 1000);
-    UARTprintf("number is %d %d.%d\n",pui32DataRx[0], beforeDec, after);
-}
-
-
-// State machine states
-enum state_t {
-    LCD,
-    LED,
-    SD_CARD,
-    UART,
-    ADC
-} state = LCD;
-
-
-void state_machine() {
-    switch (state) {
-        case LCD:
-            ledOn(RED_LED);
-            state = LED;
-            break;
-
-        case LED:
-            ledOn(BLUE_LED);
-            state = SD_CARD;
-            break;
-
-        case SD_CARD:
-            ledOn(GREEN_LED);
-            state = UART;
-            break;
-
-        case UART:
-            UARTprintf("UART PRINTING STUFF");
-            state = ADC;
-            break;
-
-        case ADC:
-				
-            state = LCD;
-            break;
-    }
-}
-
+// call adc read in a timer
 int main() {
-    initLCD();
-
-    initLed();
-    initUart();
-    storeSpecialChar();
-
+    // set the clock frequency
     SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
-    //init_adc();
-    //init_sd_card();
-    //init_special();
-    //InitConsole();
-    //set_up();
-    //storeSpecialChar();
-   // ADCIntClear(ADC1_BASE, 3);
-    //card_setup();
-    sd_card_attempt2();
+    // Initialize the hardware module
+    hardware_init();
+    // don't play with the watch dog timer
     while(1) {
-       //write_data();
-       // state_machine();
+        clearLCD();
+        //storeSpecialChar();
         //sendSpecialChar();
-        //adc_debug();
-       // adc_read();
-
-        //printLCD("hello !");
-		//Delay(1000000);
+        //sendByte(0x00, lcd_true);
+        //printLCD("HELLO !!! ");
+        adc_read();
+        //Delay(1000000);
     }
 }

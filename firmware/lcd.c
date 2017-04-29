@@ -50,7 +50,7 @@ void sendByte(char byteToSend, int isData)
 
 // Hide cursor from screen
 void cursorOffLCD(void) {
-    sendByte(0x0C, FALSE);
+    sendByte(0x0C, lcd_false);
 }
 
 
@@ -58,13 +58,13 @@ void cursorOffLCD(void) {
 // clear the LCD
 void clearLCD(void)
 {
-    sendByte(0x01, FALSE); // Clear screen
-    sendByte(0x02, FALSE); // Back to home
+    sendByte(0x01, lcd_false); // Clear screen
+    sendByte(0x02, lcd_false); // Back to home
     Delay(30000);
 }
 
 // Initialize the LCD
-void initLCD(void)
+void init_LCD(void)
 {
     //
     // set the MSP pin configurations
@@ -92,10 +92,12 @@ void initLCD(void)
     pulseLCD();
     GPIOPinWrite(DATA_PORT, ALLDATAPINS, 0b0010);
     pulseLCD();
-    sendByte(0x28,FALSE);  // Set two lines
+    sendByte(0x28,lcd_false);  // Set two lines
     cursorOffLCD();       // Cursor invisible
-    sendByte(0x06, FALSE); // Set insert mode
+    sendByte(0x06, lcd_false); // Set insert mode
     clearLCD();
+
+    storeSpecialChar();
 }
 
 
@@ -107,7 +109,7 @@ void printLCD(char *text)
 
     while ((c != 0) && (*c != 0))
     {
-        sendByte(*c, TRUE);
+        sendByte(*c, lcd_true);
         c++;
     }
 }
@@ -125,16 +127,16 @@ char customChar[8] = {
 
 void storeSpecialChar() {
     // select the CGRAM
-    sendByte(0x40, FALSE);
+    sendByte(0x40, lcd_false);
     // send the byte
     int i;
     for (i = 0 ;i < 8; i++) {
-        sendByte(customChar[i], TRUE);
+        sendByte(customChar[i], lcd_true);
     }
     // switch back to DDRAM for LCD display
 }
 
 
 void sendSpecialChar() {
-    sendByte(0x80, FALSE);
+    sendByte(0x80, lcd_false);
 }

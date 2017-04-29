@@ -1,5 +1,7 @@
-#ifndef SD_CARD_H
-#define SD_CARD_H
+#ifndef MUX_H
+#define MUX_H
+
+
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -19,11 +21,17 @@
 #include "driverlib/uart.h"
 #include "driverlib/rom_map.h"
 #include "driverlib/ssi.h"
-#include "inc/hw_ssi.h"
 #include "utils/uartstdio.h"
 #include "utils/fatfs/src/ff.h"
 #include "utils/fatfs/src/diskio.h"
 
-extern void init_sd_card() ;
+// using the same peripheral as buttons, so don't have to necessarily change that
+#define MUX_PORT_BASE GPIO_PORTE_BASE
+#define A GPIO_PIN_1
+#define B GPIO_PIN_2
+#define C GPIO_PIN_3
+
+extern void init_mux();
+extern void output_state();
 
 #endif

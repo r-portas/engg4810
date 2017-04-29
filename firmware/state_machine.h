@@ -1,5 +1,6 @@
-#ifndef SD_CARD_H
-#define SD_CARD_H
+#ifndef STATE_MACHINE_H
+#define STATE_MACHINE_H
+
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -19,11 +20,15 @@
 #include "driverlib/uart.h"
 #include "driverlib/rom_map.h"
 #include "driverlib/ssi.h"
-#include "inc/hw_ssi.h"
 #include "utils/uartstdio.h"
 #include "utils/fatfs/src/ff.h"
 #include "utils/fatfs/src/diskio.h"
+#include "led.h"
 
-extern void init_sd_card() ;
+extern enum state_t state;
+extern void state_machine();
+
+
+
 
 #endif

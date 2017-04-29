@@ -19,6 +19,6 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
-void initUart();
+void init_uart();
 
 #endif

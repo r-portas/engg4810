@@ -55,7 +55,6 @@
                                  SDC_SSI_FSS)
 
 // asserts the CS pin to the card
-
 void SELECT (void)
 {
     GPIOPinWrite(SDC_GPIO_PORT_BASE, SDC_SSI_FSS, 0);

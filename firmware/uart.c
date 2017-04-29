@@ -1,6 +1,6 @@
 #include "uart.h"
 
-void initUart() {
+void init_uart() {
 
     //
     // Enable the GPIO Peripheral used by the UART.

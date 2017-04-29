@@ -3,8 +3,8 @@
 #define LCD_H
 
 
-#define FALSE 0
-#define TRUE 1
+#define lcd_false  0
+#define lcd_true   1
 
 /*
  *
@@ -32,12 +32,14 @@
 #define CMD_PERIPH SYSCTL_PERIPH_GPIOE
 #define Delay(num) SysCtlDelay(num)
 
+// pa5, pa6, pa7
 
-extern void initLCD();
+extern void init_LCD();
 extern void storeSpecialChar();
 extern void sendSpecialChar();
 extern void sendByte(char byteToSend, int isData);
+extern void printLCD(char *text);
+extern void clearLCD();
 
-// TODO: Check for extra functions
 
 #endif
