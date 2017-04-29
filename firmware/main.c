@@ -32,6 +32,27 @@
 #include "adc.h"
 #include "timer_updates.h"
 
+void roy_adc() {
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI1);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+
+    GPIOPinConfigure(GPIO_PF0_SSI1RX);
+    GPIOPinConfigure(GPIO_PF1_SSI1TX);
+    GPIOPinConfigure(GPIO_PF2_SSI1CLK);
+    GPIOPinConfigure(GPIO_PF3_SSI1FSS);
+
+    GPIOPinTypeSSI(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 |
+                   GPIO_PIN_3);
+
+    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_SSI1)) {
+    }
+
+    SSIConfigSetExpClk(SSI1_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
+                       SSI_MODE_MASTER, 1000000, 8);
+    SSIEnable(SSI1_BASE);
+
+    SSIDataPut(SSI1_BASE, 'r');
+}
 
 void hardware_init() {
    init_LCD();
@@ -50,15 +71,21 @@ int main() {
     SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     // Initialize the hardware module
-    hardware_init();
+    // hardware_init();
     // don't play with the watch dog timer
+    roy_adc();
     while(1) {
-        clearLCD();
+        // clearLCD();
         //storeSpecialChar();
         //sendSpecialChar();
         //sendByte(0x00, lcd_true);
         //printLCD("HELLO !!! ");
-        adc_read();
-        //Delay(1000000);
+        // adc_read();
+        Delay(1000000);
+        SSIDataPut(SSI1_BASE, 'a');
+        SSIDataPut(SSI1_BASE, 'b');
+        while(SSIBusy(SSI1_BASE))
+        {
+        }
     }
 }
