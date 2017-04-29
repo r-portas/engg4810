@@ -36,13 +36,12 @@ void roy_adc() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI1);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 
-    GPIOPinConfigure(GPIO_PF0_SSI1RX);
+    /* GPIOPinConfigure(GPIO_PF0_SSI1RX); */
     GPIOPinConfigure(GPIO_PF1_SSI1TX);
     GPIOPinConfigure(GPIO_PF2_SSI1CLK);
-    GPIOPinConfigure(GPIO_PF3_SSI1FSS);
+    /* GPIOPinConfigure(GPIO_PF3_SSI1FSS); */
 
-    GPIOPinTypeSSI(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 |
-                   GPIO_PIN_3);
+    GPIOPinTypeSSI(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2);
 
     while (!SysCtlPeripheralReady(SYSCTL_PERIPH_SSI1)) {
     }
