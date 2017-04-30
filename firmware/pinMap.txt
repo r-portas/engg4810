@@ -8,7 +8,7 @@ ADC pin map
 LCD pin Map
  * Pin Connections:
  * PE4  -> RS
- * PE5  -> EN
+ * PE5  -> EN 
  * PD0  -> D4
  * PD1  -> D5
  * PD2  -> D6
@@ -19,13 +19,13 @@ LCD pin Map
  PA2 (clk)     SCLK (CLK)
  PA3 (cmd)     CS (DAT3)
  PA4 (rx)      D0 (DAT0) 
- PA5 (tx)      DI (CMD)
+ PA5 (tx)      DI (CMD)  
  
 testing pins
 PF4 --> testing pin 
 
 buttons for sampling control
-
+ 
 
 
 Sampling Notes:

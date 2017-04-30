@@ -40,15 +40,16 @@ void auto_range(float voltage) {
 
 void adc_read() {
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3 , GPIO_PIN_3);
-    SysCtlDelay(45);
+    SysCtlDelay(8);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3 , 0);
-    SysCtlDelay(85);
+    SysCtlDelay(20);
     SSIDataPut(SSI1_BASE, 'D');
     while(SSIBusy(SSI1_BASE))
     {
 
     }
     SSIDataGet(SSI1_BASE, &pui32DataRx[0]);
+    // UARTprintf("data %d\n", pui32DataRx[0]);
     /*long long  final = (pui32DataRx[0] + 55);
     float voltage = (float)final/65536.00;
     voltage = voltage * 4.8;
@@ -102,5 +103,4 @@ void roy_adc() {
     SSIConfigSetExpClk(SSI1_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
                        SSI_MODE_MASTER, 1000000, 16);
     SSIEnable(SSI1_BASE);
-
 }

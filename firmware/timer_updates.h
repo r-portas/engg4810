@@ -11,4 +11,5 @@
 #include "driverlib/systick.h"
 
 void initTimer(void);
+void sd_timer(void);
 #endif

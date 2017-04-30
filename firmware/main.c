@@ -31,28 +31,25 @@
 #include "mux.h"
 #include "adc.h"
 #include "timer_updates.h"
-
 void hardware_init() {
    initTimer();
    init_LCD();
    init_uart();
-   init_sd_card();
-   init_interrupt_button();
-   init_mux();
+   //init_sd_card();
+   //init_interrupt_button();
+   //init_mux();
    roy_adc();
 }
 
-// call adc read in a timer
+// one reading per clock tick
+// call ADC read in a timer
 int main() {
-    // set the clock frequency
-    SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
+    // set the clock frequency and the clock divider
+    SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
-    // Initialize the hardware module
-    // hardware_init();
-    // don't play with the watch dog timer
     hardware_init();
     while(1) {
-        adc_read();
+        // adc_read();
         //storeSpecialChar();
         //sendSpecialChar();
         //sendByte(0x00, lcd_true);
