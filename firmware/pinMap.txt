@@ -1,0 +1,44 @@
+ADC pin map
+	TIVA 	CONTROL 	ADC 
+	PF0     RX         pin 7 (dout) 
+	PF1     TX         
+	PF2     CLK        pin 8 (sclk)
+	PF3 	FSS        pin 6 (convst)
+	
+LCD pin Map
+ * Pin Connections:
+ * PE4  -> RS
+ * PE5  -> EN
+ * PD0  -> D4
+ * PD1  -> D5
+ * PD2  -> D6
+ * PD3  -> D7
+ 
+ 
+ SD card pin map
+ PA2 (clk)     SCLK (CLK)
+ PA3 (cmd)     CS (DAT3)
+ PA4 (rx)      D0 (DAT0) 
+ PA5 (tx)      DI (CMD)
+ 
+testing pins
+PF4 --> testing pin 
+
+buttons for sampling control
+
+
+
+Sampling Notes:
+SET AT 10Hz
+** tested ***
+count 5 -> 2 Hz
+count 10 -> 1 Hz
+count 20 -> 0.5 Hz (1 m / 2 sec) 
+count 50 -> 0.2 Hz (1 m / 5 sec)
+count 100 -> 0.1 Hz (1 m / 10 sec) (100mHz)
+count 600 -> 16.67 mhz (1m / 60 sec) 
+
+** not tested ***
+count 1200 -> 
+count 3000 -> 
+count 6000 -> 

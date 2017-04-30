@@ -1,6 +1,5 @@
 #include "adc.h"
 #include "mux.h"
-
 uint32_t DataRx[1000];
 #define NUM_SSI_DATA            3
 uint32_t pui32DataRx[NUM_SSI_DATA];
@@ -39,20 +38,18 @@ void auto_range(float voltage) {
     }
 }
 
-
-
 void adc_read() {
-    GPIOPinWrite(ADC_GPIO_PORT_BASE, CS_PIN , CS_PIN);
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3 , GPIO_PIN_3);
     SysCtlDelay(45);
-    GPIOPinWrite(ADC_GPIO_PORT_BASE, CS_PIN , 0);
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3 , 0);
     SysCtlDelay(85);
-    SSIDataPut(ADC_SSI_BASE, 'D');
-    while(SSIBusy(ADC_SSI_BASE))
+    SSIDataPut(SSI1_BASE, 'D');
+    while(SSIBusy(SSI1_BASE))
     {
 
     }
-    SSIDataGet(ADC_SSI_BASE, &pui32DataRx[0]);
-    long long  final = (pui32DataRx[0] + 55);
+    SSIDataGet(SSI1_BASE, &pui32DataRx[0]);
+    /*long long  final = (pui32DataRx[0] + 55);
     float voltage = (float)final/65536.00;
     voltage = voltage * 4.8;
     voltage = update_voltage(voltage);
@@ -61,6 +58,7 @@ void adc_read() {
     int num = vol / 1000;
     int left = vol - (num * 1000);
     UARTprintf("\r    raw %d vol %d.%d RANGE %d   \r", pui32DataRx[0], num, left, range);
+    */
 }
 
 void init_adc() {
@@ -73,7 +71,6 @@ void init_adc() {
     //SSIClockSourceSet(SYSCTL_PERIPH_SSI0, SSI_CLOCK_SYSTEM);
     SysCtlPeripheralEnable(ADC_GPIO_SYSCTL_PERIPH);
     GPIOPinTypeSSI(ADC_GPIO_PORT_BASE, TX_PIN | RX_PIN | ADC_SCLK_PIN);
-
     // Configure the CS pin as output to select CS
     GPIOPinTypeGPIOOutput(ADC_GPIO_PORT_BASE, GPIO_PIN_3);
 
@@ -84,4 +81,26 @@ void init_adc() {
 
     // Link clock and enable SSI for conversion
     SSIEnable(ADC_SSI_BASE);
+}
+
+
+void roy_adc() {
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI1);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+
+    GPIOPinConfigure(GPIO_PF0_SSI1RX);
+    GPIOPinConfigure(GPIO_PF1_SSI1TX);
+    GPIOPinConfigure(GPIO_PF2_SSI1CLK);
+
+
+    GPIOPinTypeSSI(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_1);
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_4);
+    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_SSI1)) {
+    }
+
+    SSIConfigSetExpClk(SSI1_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
+                       SSI_MODE_MASTER, 1000000, 16);
+    SSIEnable(SSI1_BASE);
+
 }

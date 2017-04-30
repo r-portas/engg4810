@@ -74,7 +74,7 @@ void init_LCD(void)
     SysCtlPeripheralEnable(CMD_PERIPH);
     GPIOPinTypeGPIOOutput(DATA_PORT,  ALLDATAPINS);
     GPIOPinTypeGPIOOutput(CMD_PORT, ALLCONTROLPINS);
-    GPIOPinWrite(DATA_PORT, ALLDATAPINS ,0);
+    GPIOPinWrite(DATA_PORT, ALLDATAPINS , 0);
     GPIOPinWrite(CMD_PORT, ALLCONTROLPINS ,0);
 
     // wait for the LCM to warm up and reach

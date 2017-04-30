@@ -9,7 +9,6 @@ enum state_t {
     ADC
 } state = LCD;
 
-
 void state_machine() {
     switch (state) {
         case LCD:
