@@ -35,12 +35,11 @@ void hardware_init() {
    initTimer();
    init_LCD();
    init_uart();
-   //init_sd_card();
-   //init_interrupt_button();
+   //init_sd_card();            // dont have this plugged in
+   init_interrupt_button();
    //init_mux();
    roy_adc();
 }
-
 // one reading per clock tick
 // call ADC read in a timer
 int main() {

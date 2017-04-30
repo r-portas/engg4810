@@ -25,6 +25,9 @@ testing pins
 PF4 --> testing pin 
 
 buttons for sampling control
+Inc PE0
+Dec PE1
+
  
 
 

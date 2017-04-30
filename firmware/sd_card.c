@@ -53,4 +53,5 @@ void init_sd_card() {
     }
     make_file();
     write_file();
+    UARTprintf("exiting\n");
 }

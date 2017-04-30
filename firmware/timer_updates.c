@@ -20,15 +20,14 @@ void SysTickInt(void)
   count_ticks++;
   disk_timerproc();
   if (count_ticks == 1) {
+      // for debugging
       count_ticks = 0;
       millis ^= 1;
-   // toggle the pin
       if (millis == 0) {
           GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
       } else {
           GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
       }
-      UARTprintf("from interrupt\n");
       adc_read();
   }
 }
