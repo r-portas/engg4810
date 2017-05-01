@@ -1,6 +1,7 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -23,21 +24,6 @@
 #include "utils/fatfs/src/ff.h"
 #include "utils/fatfs/src/diskio.h"
 
-
-extern int mux_state;
-#define Button_PERIPH SYSCTL_PERIPH_GPIOE
-#define ButtonBase GPIO_PORTE_BASE
-#define Button GPIO_PIN_0
-#define ButtonInt GPIO_INT_PIN_0
-
-extern void init_interrupt_button();
-
-// NOTES
-// leave 4 pins for the mux and name them here
-
-
-// 4 pins for the different modes for the measurements
-
-
-// 3 pins for the sd card samling and stuff
+extern void init_buttons();
+extern void check_buttons();
 #endif

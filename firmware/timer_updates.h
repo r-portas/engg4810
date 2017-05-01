@@ -10,6 +10,9 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/systick.h"
 
+void init_timers(void);
+extern int sampling_index;
 void initTimer(void);
-void sd_timer(void);
+void ButtonInterrupt(void);
+
 #endif

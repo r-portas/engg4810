@@ -22,7 +22,6 @@
 #include "driverlib/systick.h"
 #include "utils/fatfs/src/ff.h"
 #include "utils/fatfs/src/diskio.h"
-
 #include "lcd.h"
 #include "led.h"
 #include "uart.h"
@@ -31,27 +30,24 @@
 #include "mux.h"
 #include "adc.h"
 #include "timer_updates.h"
+
 void hardware_init() {
-   initTimer();
    init_LCD();
    init_uart();
+   init_buttons();
    //init_sd_card();            // dont have this plugged in
-   init_interrupt_button();
-   //init_mux();
    roy_adc();
+   init_timers();
+   UARTprintf("Initialized\n");
 }
-// one reading per clock tick
-// call ADC read in a timer
+
+// one reading per clock tick// call ADC read in a timer
 int main() {
     // set the clock frequency and the clock divider
     SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
     while(1) {
-        // adc_read();
-        //storeSpecialChar();
-        //sendSpecialChar();
-        //sendByte(0x00, lcd_true);
-        //printLCD("HELLO !!! ");
+
     }
 }

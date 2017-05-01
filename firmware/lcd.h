@@ -41,5 +41,4 @@ extern void sendByte(char byteToSend, int isData);
 extern void printLCD(char *text);
 extern void clearLCD();
 
-
 #endif

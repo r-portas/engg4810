@@ -49,7 +49,7 @@ void adc_read() {
 
     }
     SSIDataGet(SSI1_BASE, &pui32DataRx[0]);
-    // UARTprintf("data %d\n", pui32DataRx[0]);
+    //UARTprintf("data %d\n", pui32DataRx[0]);
     /*long long  final = (pui32DataRx[0] + 55);
     float voltage = (float)final/65536.00;
     voltage = voltage * 4.8;
