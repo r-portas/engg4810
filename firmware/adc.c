@@ -1,5 +1,7 @@
 #include "adc.h"
 #include "mux.h"
+#include "lcd.h"
+
 uint32_t DataRx[1000];
 #define NUM_SSI_DATA            3
 uint32_t pui32DataRx[NUM_SSI_DATA];
@@ -38,6 +40,7 @@ void auto_range(float voltage) {
     }
 }
 
+long debug_count = 0;
 void adc_read() {
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3 , GPIO_PIN_3);
     SysCtlDelay(8);

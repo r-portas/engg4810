@@ -2,18 +2,19 @@
 #include "uart.h"
 #include "adc.h"
 #include "button.h"
+#include "lcd.h"
 #include "inc/hw_ints.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/timer.h"
 #include "utils/fatfs/src/ff.h"
 #include "utils/fatfs/src/diskio.h"
-
 volatile uint32_t millis = 0;
 volatile int count_ticks = 0;
 long button_tick = 0;
 // change values on button read
-
+int sample_index = 0;
+int sample_rate[] = {5,10,50,100, 600, 1200, 3000, 6000};
 
 void SysTickInt(void)
 {
@@ -22,7 +23,7 @@ void SysTickInt(void)
   TimerIntClear(TIMER5_BASE, status);
   count_ticks++;
   disk_timerproc();
-  if (count_ticks == 1) {
+  if (count_ticks == sample_rate[sample_index]) {
       // for debugging
       count_ticks = 0;
       millis ^= 1;
@@ -32,9 +33,8 @@ void SysTickInt(void)
           GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
       }
       adc_read();
-  }
+     }
 }
-
 
 
 void buttonInterrupt() {
@@ -57,7 +57,6 @@ void initTimer()
   TimerIntEnable(TIMER5_BASE, TIMER_TIMA_TIMEOUT);
   TimerEnable(TIMER5_BASE, TIMER_A);
 }
-
 
 void ButtonInterrupt()
 {

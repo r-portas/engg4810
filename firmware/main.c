@@ -35,10 +35,9 @@ void hardware_init() {
    init_LCD();
    init_uart();
    init_buttons();
-   //init_sd_card();            // dont have this plugged in
+   init_sd_card();
    roy_adc();
    init_timers();
-   UARTprintf("Initialized\n");
 }
 
 // one reading per clock tick// call ADC read in a timer
@@ -48,6 +47,8 @@ int main() {
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
     while(1) {
-
+       //clearLCD();
+       //printLCD("HELLO 4!!! ");
+       //Delay(1000000);
     }
 }

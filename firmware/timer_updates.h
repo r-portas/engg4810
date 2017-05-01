@@ -14,5 +14,6 @@ void init_timers(void);
 extern int sampling_index;
 void initTimer(void);
 void ButtonInterrupt(void);
+extern int sample_index;
 
 #endif

@@ -96,10 +96,8 @@ void init_LCD(void)
     cursorOffLCD();       // Cursor invisible
     sendByte(0x06, lcd_false); // Set insert mode
     clearLCD();
-
     storeSpecialChar();
 }
-
 
 // Print the text on the screen
 void printLCD(char *text)
