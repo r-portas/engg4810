@@ -12,6 +12,7 @@
 volatile uint32_t millis = 0;
 volatile int count_ticks = 0;
 long button_tick = 0;
+
 // change values on button read
 int sample_index = 0;
 int sample_rate[] = {5,10,50,100, 600, 1200, 3000, 6000};
@@ -36,13 +37,21 @@ void SysTickInt(void)
      }
 }
 
-
+uint32_t lcd_tick = 0;
 void buttonInterrupt() {
    button_tick++;
+   lcd_tick++;
     if (button_tick == 12000) {
         check_buttons();
         button_tick = 0;
     }
+    if (lcd_tick > 1000000) {
+       UARTprintf("Writing to LCD\n");
+       clearLCD();
+       printLCD("hello");
+       lcd_tick = 0;
+    }
+
 }
 
 void initTimer()

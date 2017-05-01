@@ -47,7 +47,7 @@ int main() {
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
     while(1) {
-       //clearLCD();
+        //clearLCD();
        //printLCD("HELLO 4!!! ");
        //Delay(1000000);
     }
