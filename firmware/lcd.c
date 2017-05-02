@@ -82,7 +82,6 @@ void init_LCD(void)
     // up much faster than the LCM.
 
     Delay(10000);
-
     // initialize the LCM module
     // Set 4-bit input
     //

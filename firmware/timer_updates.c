@@ -16,6 +16,8 @@ long button_tick = 0;
 // change values on button read
 int sample_index = 0;
 int sample_rate[] = {5,10,50,100, 600, 1200, 3000, 6000};
+int test_count = 0;
+
 
 void SysTickInt(void)
 {
@@ -24,6 +26,7 @@ void SysTickInt(void)
   TimerIntClear(TIMER5_BASE, status);
   count_ticks++;
   disk_timerproc();
+  //if (count_ticks == 100) {
   if (count_ticks == sample_rate[sample_index]) {
       // for debugging
       count_ticks = 0;
@@ -34,6 +37,8 @@ void SysTickInt(void)
           GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
       }
       adc_read();
+      test_count++;
+      UARTprintf("DO NOT DELETE: test count %d\n", test_count);
      }
 }
 
@@ -41,17 +46,30 @@ uint32_t lcd_tick = 0;
 void buttonInterrupt() {
    button_tick++;
    lcd_tick++;
-    if (button_tick == 12000) {
+   if (button_tick == 12000) {
         check_buttons();
         button_tick = 0;
     }
-    if (lcd_tick > 1000000) {
-       UARTprintf("Writing to LCD\n");
+    if (lcd_tick > 25000) {
+       UARTprintf("Writing to LCD, state %d\n", my_state);
        clearLCD();
-       printLCD("hello");
-       lcd_tick = 0;
-    }
+       /*if (my_state == STATE_MEASURE) {
+           char buffer[20];
+           sprintf(buffer, "test %d   ", test_count);
+           printLCD(buffer);
+           lcd_tick = 0;
+       } else
+       */
+       if (my_state == NONE) {
+           printLCD(message[msg_count]);
+           lcd_tick = 0;
+       }
+       if (my_state == STATE_SELECTION) {
+           printLCD(msgUpdate[msg_count]);
+           lcd_tick = 0;
+       }
 
+    }
 }
 
 void initTimer()
