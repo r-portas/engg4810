@@ -17,6 +17,12 @@
  * PD3  -> D7
  *
 */
+
+// Others
+
+//A -> pwm
+//K -> ground
+
 #define RS GPIO_PIN_4 // Pin 5
 #define EN GPIO_PIN_5 // Pin 6
 #define D4 GPIO_PIN_0 // Pin 23

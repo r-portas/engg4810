@@ -38,6 +38,7 @@ void hardware_init() {
    init_sd_card();
    roy_adc();
    init_timers();
+   UARTprintf("Initialized **DO NOT DELETE\n") ;
 }
 
 // one reading per clock tick// call ADC read in a timer
@@ -48,7 +49,7 @@ int main() {
     hardware_init();
     while(1) {
         //clearLCD();
-       //printLCD("HELLO 4!!! ");
-       //Delay(1000000);
+       // printLCD("HELLO 4!!! ");
+       // Delay(1000000);
     }
 }
