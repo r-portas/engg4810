@@ -10,6 +10,11 @@ Vue.component('data-card', {
       </div>
 
       <div class="mdl-card__supporting-text">
+        <button v-on:click="togglePause" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+          Toggle Pause
+        </button> 
+        <br>
+
         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="auto">
           <input type="radio" id="auto" class="mdl-radio__button" value="auto" v-model="rangeOption">
           <span class="mdl-radio__label">Auto</span>
@@ -48,6 +53,8 @@ Vue.component('data-card', {
           <input v-model="randomSwitch" type="checkbox" id="random-switch" class="mdl-switch__input">
           <span class="mdl-switch__label">Random data</span>
         </label>
+
+        <delete-dialog :bus="bus"></delete-dialog>
       </div>
     </div>
   `,
@@ -72,6 +79,10 @@ Vue.component('data-card', {
 
     stopRandomData() {
       this.bus.$emit('stop-random-data');
+    },
+
+    togglePause() {
+      this.bus.$emit('toggle-pause');
     },
   },
 
