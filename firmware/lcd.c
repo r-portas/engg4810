@@ -7,7 +7,10 @@
 #include "driverlib/rom_map.h"
 #include "lcd.h"
 
-
+/**
+ * APPROVED SOFTWARE LIBRARY FROM FOLLOWING:
+https://github.com/yuvadm/tiva-c/commit/7f4da522479c0f00126219f0c23b804c3a93d7a6
+**/
 
 // Pulse the EN bit LOW - HIGH - LOW
 // To signal the LCD to accept the data/cmd

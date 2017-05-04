@@ -1,3 +1,7 @@
+PORT A {(2,3,4,5), (6,7)} * USED
+PORT C {4,5,6,7} * USED
+PORT B {0,1} , FREE { **
+
 ADC pin map
 	TIVA 	CONTROL 	ADC 
 	PF0     RX         pin 7 (dout) 
@@ -22,35 +26,31 @@ LCD pin Map
  
 PWM pins 
 PF4 --> buzzer
-    --> LCD 
+PB1 --> LCD 
+
+LED blinking pins
+PA6
+PA7
 
 
 UART Pins
 PB0 	RX
 PB1		TX 
 
-buttons for sampling control
+
+TOM PINS
+PC4 
+PC5
+PC6
+PC7
+PB6
+PB7
+PB4
+PB5
+
+
+Buttons for sampling control
 Inc PE0 
 Dec PE1  
-Enter  
-Back
-SD card 
-
-
-
-
-
-Sampling Notes:
-SET AT 10Hz
-** tested ***
-count 5 -> 2 Hz
-count 10 -> 1 Hz
-count 20 -> 0.5 Hz (1 m / 2 sec) 
-count 50 -> 0.2 Hz (1 m / 5 sec)
-count 100 -> 0.1 Hz (1 m / 10 sec) (100mHz)
-count 600 -> 16.67 mhz (1m / 60 sec) 
-
-** not tested ***
-count 1200 -> 
-count 3000 -> 
-count 6000 -> 
+Enter PE2 
+Back PE 3 

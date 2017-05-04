@@ -6,6 +6,11 @@
 #define lcd_false  0
 #define lcd_true   1
 
+/**
+ * APPROVED SOFTWARE LIBRARY FROM FOLLOWING:
+https://github.com/yuvadm/tiva-c/commit/7f4da522479c0f00126219f0c23b804c3a93d7a6
+**/
+
 /*
  *
  * Pin Connections:
