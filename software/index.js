@@ -35,10 +35,11 @@ io.on('connection', (socket) => {
         console.log(err);
         return;
       }
-      
+
       socket.emit('portslist', ports);
     });
   });
+
 
   /**
    * A range is changing the measurement mode
@@ -46,7 +47,9 @@ io.on('connection', (socket) => {
   socket.on('set-range', (newRange) => {
     console.log(`Sending '${newRange}' over serial`);
     if (serialDevice != null) {
-      serialDevice.write(`${newRange}\n`);
+      if (serialDevice.isOpen()) {
+        serialDevice.write(`${newRange}\n`);
+      }
     }
   });
 
@@ -72,6 +75,17 @@ io.on('connection', (socket) => {
 
     serialDevice.on('close', () => {
       socket.emit('devicedisconnected');
+    });
+
+    /**
+     * Disconnect all serial communications
+     */
+    socket.on('device-disconnect', () => {
+      if (serialDevice != null) {
+        if (serialDevice.isOpen()) {
+          serialDevice.close();
+        }
+      }
     });
   });
 });

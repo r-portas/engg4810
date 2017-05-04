@@ -24,8 +24,11 @@
                 <div class="mdl-layout__header-row">
                     <!-- Title -->
 
-                    <span v-if="isConnected" class="mdl-layout-title">Multimeter (connected to {{deviceName}})</span>
-                    <span v-else class="mdl-layout-title">Multimeter (disconnected)</span>
+                    <span v-if="isConnected" class="mdl-layout-title">Connected to {{deviceName}}</span>
+                    <span v-else class="mdl-layout-title">Disconnected</span>
+
+                    <span v-if="isPaused" class="mdl-layout-title">(paused)</span>
+
                 </div>
 
                 <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
@@ -73,6 +76,7 @@
         <script src="js/components/settings.js"></script>
         <script src="js/components/data-card.js"></script>
         <script src="js/components/data-view.js"></script>
+        <script src="js/components/delete-dialog.js"></script>
         <script src="js/components/collision-card.js"></script>
 
         <script src="js/collision.js"></script>

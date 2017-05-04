@@ -62,6 +62,10 @@ Vue.component('settings', {
           </tbody>
         </table>
 
+        <button v-on:click="disconnect" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+          Disconnect Serial
+        </button>
+
       </div>
     </div>
   `,
@@ -205,8 +209,18 @@ Vue.component('settings', {
       this.ports = ports;
     },
 
+    /**
+     * Sets the port to connect to
+     */
     setPort(port) {
       this.bus.$emit('setport', port);
+    },
+
+    /**
+     * Disconnects the serial devices
+     */
+    disconnect() {
+      this.bus.$emit('device-disconnect');
     },
   },
 

@@ -22,6 +22,9 @@ new Vue({
       // True if we are connected to the multimeter
       isConnected: false,
 
+      // True if the logging is paused
+      isPaused: false,
+
       // The name of the device
       deviceName: '',
 
@@ -49,9 +52,12 @@ new Vue({
     },
 
     addEntry(date, value) {
-      const isoString = date.toISOString();
-      const parseTime = d3.isoParse;
-      this.data.push({ date: parseTime(isoString), value });
+      // Only add data if we aren't paused
+      if (this.isPaused === false) {
+        const isoString = date.toISOString();
+        const parseTime = d3.isoParse;
+        this.data.push({ date: parseTime(isoString), value });
+      }
     },
 /**
      * Checks if the current tab is active
@@ -68,8 +74,6 @@ new Vue({
     },
 
     startRandomData() {
-
-
       this.intervalRef = setInterval(() => {
         this.date.add(1, 'hours');
         const rand = Math.floor((Math.random() * 20) + 1) - 10;
@@ -106,6 +110,23 @@ new Vue({
       console.log(data);
     },
 
+    /**
+     * Deletes the data stored in the application
+     */
+    deleteData() {
+      this.data = [];
+    },
+
+    /**
+     * Toggles the pause mode
+     */
+    togglePause() {
+      if (this.isPaused) {
+        this.isPaused = false;
+      } else {
+        this.isPaused = true;
+      }
+    },
   },
 
   computed: {
@@ -134,6 +155,8 @@ new Vue({
     this.socket.on('devicedisconnected', this.setDisconnected);
     this.socket.on('devicedata', this.processData);
 
+    this.bus.$on('toggle-pause', this.togglePause);
+    this.bus.$on('delete-data', this.deleteData);
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
 
@@ -148,8 +171,13 @@ new Vue({
       this.socket.emit('setport', port);
     });
 
+    this.bus.$on('device-disconnect', () => {
+      this.socket.emit('device-disconnect');
+    });
+
     this.bus.$on('get-ports', () => {
       this.socket.emit('getports');
     });
+
   },
 });
