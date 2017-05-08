@@ -38,11 +38,31 @@ void SysTickInt(void)
       }
       adc_read();
       test_count++;
-      UARTprintf("DO NOT DELETE: test count %d\n", test_count);
+      //UARTprintf("DO NOT DELETE: test count %d\n", test_count);
      }
 }
 
 uint32_t lcd_tick = 0;
+/** Updates the lcd**/
+void update_lcd() {
+    if (my_state == STATE_MEASURE) {
+       char buffer[20];
+       sprintf(buffer, "test %d   ", test_count);
+       printLCD(buffer);
+       lcd_tick = 0;
+    }
+    if (my_state == NONE) {
+       printLCD(message[msg_count]);
+       lcd_tick = 0;
+    }
+
+    if (my_state == STATE_SELECTION) {
+       printLCD(msgUpdate[msg_count]);
+       lcd_tick = 0;
+    }
+}
+
+
 void buttonInterrupt() {
    button_tick++;
    lcd_tick++;
@@ -51,26 +71,14 @@ void buttonInterrupt() {
         button_tick = 0;
     }
     if (lcd_tick > 25000) {
-       UARTprintf("Writing to LCD, state %d\n", my_state);
+      // UARTprintf("Writing to LCD, state %d\n", my_state);
        clearLCD();
-       /*if (my_state == STATE_MEASURE) {
-           char buffer[20];
-           sprintf(buffer, "test %d   ", test_count);
-           printLCD(buffer);
-           lcd_tick = 0;
-       } else
-       */
-       if (my_state == NONE) {
-           printLCD(message[msg_count]);
-           lcd_tick = 0;
-       }
-       if (my_state == STATE_SELECTION) {
-           printLCD(msgUpdate[msg_count]);
-           lcd_tick = 0;
-       }
-
+       update_lcd();
     }
 }
+
+
+
 
 void initTimer()
 {
@@ -97,7 +105,6 @@ void ButtonInterrupt()
   TimerIntEnable(TIMER4_BASE, TIMER_TIMA_TIMEOUT);
   TimerEnable(TIMER4_BASE, TIMER_A);
 }
-
 
 void init_timers() {
     initTimer();

@@ -57,6 +57,9 @@ void check_buttons() {
             my_mode = (msg_count + 12);
             //msg_count = 0;  // reset
         }
+        if (my_state == STATE_SELECTION) {
+            my_state = STATE_MEASURE;
+        }
      }
 
     /** Response to the back button **/
