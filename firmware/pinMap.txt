@@ -10,13 +10,13 @@ ADC pin map
 	PF3 	FSS        pin 6 (convst)
 	
 LCD pin Map
- * Pin Connections:
+ * Pin Connections: 
  * PE4  -> RS
  * PE5  -> EN  
  * PD0  -> D4 
  * PD1  -> D5
  * PD2  -> D6
- * PD3  -> D7
+ * PD3  -> D7 
  
  SD card pin map
  PA2 (clk)     SCLK (CLK)
