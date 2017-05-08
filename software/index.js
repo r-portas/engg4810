@@ -69,8 +69,9 @@ io.on('connection', (socket) => {
       });
 
     serialDevice.on('data', (data) => {
-      console.log(`Receiving '${data}' over serial`);
-      socket.emit('devicedata', data);
+      const trimmed = data.trim();
+      console.log(`Receiving '${trimmed}' over serial`);
+      socket.emit('devicedata', trimmed);
     });
 
     serialDevice.on('close', () => {
