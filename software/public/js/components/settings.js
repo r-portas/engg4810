@@ -12,7 +12,7 @@ Vue.component('settings', {
         <h5>Export Mask</h5>
 
         <button v-on:click="exportMasks()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
-          Export data
+          Export masks
         </button> 
 
         <h5>Export Data</h5>
@@ -163,9 +163,24 @@ Vue.component('settings', {
     exportData() {
       const csv = this.data.map((d) => {
         const date = d.date.toISOString();
-        const val = this.checkOverlimit(d.value);
-        return `${date},${val}`;
-      }).join('\n');
+        const currentMode = d.currentMode;
+        let meas = '';
+        switch (currentMode) {
+          case 'voltage':
+            meas = 'V';
+            break;
+          case 'current':
+            meas = 'A';
+            break;
+          case 'resistance':
+            meas = 'Ohm';
+            break;
+          default:
+            meas = 'N/A';
+            break;
+        }
+        const val = this.checkOverlimit(currentMode, d.value);
+        return `${date},${val},${meas}`; }).join('\n');
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       saveAs(blob, 'data.csv');
