@@ -87,7 +87,12 @@ Vue.component('chart', {
      */
     getData() {
       // Return at most 'dataLimit' elements from the end of data
-      const limitedData = this.data.slice(Math.max(this.scrollIndex - this.dataLimit, 0));
+
+      const beginIndex = Math.max(this.scrollIndex - this.dataLimit, 0);
+      const endIndex = Math.min(this.dataLimit, this.data.length) + beginIndex;
+
+      const limitedData = this.data.slice(beginIndex, endIndex);
+      console.log(limitedData);
 
       const translated = limitedData.map((item) => {
         const translatedItem = {
@@ -625,7 +630,6 @@ Vue.component('chart', {
     },
 
     scrollIndex() {
-      console.log('Scroll index changed');
       this.drawChart();
     },
 
