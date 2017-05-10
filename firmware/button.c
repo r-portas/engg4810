@@ -15,7 +15,6 @@ void msg_count_check() {
     } else if (msg_count > 3) {
         msg_count = 3;
     }
-
 }
 
 
@@ -24,7 +23,8 @@ void check_buttons() {
     if (GPIOPinRead(GPIO_PORTE_BASE, GPIO_PIN_0) == GPIO_PIN_0) {
         UARTprintf("Up pressed\n");
         if (my_state == STATE_MEASURE) {
-            //sample_index++;
+            sample_index++;
+            // check for memory error
         }
         if (my_state == NONE) {
             // increment message count
@@ -36,9 +36,10 @@ void check_buttons() {
     if (GPIOPinRead(GPIO_PORTE_BASE, GPIO_PIN_1) == GPIO_PIN_1) {
         UARTprintf("Down pressed\n");
         if (my_state == STATE_MEASURE) {
-            msg_count--;
-            msg_count_check();
-            //sample_index--;
+            //msg_count--;
+            //msg_count_check();
+            sample_index--;
+            // check for memory error
         }
         if (my_state == NONE) {
             // increment msg count
@@ -74,6 +75,8 @@ void check_buttons() {
     } else if (sample_index > 4) {
         sample_index = 4;
     }
+
+
 }
 
 void init_buttons() {

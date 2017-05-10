@@ -18,9 +18,8 @@
 #include "driverlib/systick.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
-
 // Change between external and internal uart
-#define EXTERNAL_UART 1
+#define EXTERNAL_UART 0
 
 void init_uart();
 

@@ -38,7 +38,7 @@ PB0 	RX
 PB1		TX 
 
 
-TOM PINS
+TOM PINS (some are locked) 
 PC4 
 PC5
 PC6

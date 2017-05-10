@@ -27,14 +27,13 @@
 #define STATE_SELECTION 9
 #define STATE_SD    10
 #define STATE_MEASURE   11
-
+#define ASK_SAMPLES 8
 
 
 #define VOLTMETER   12
 #define AMPMETER    13
 #define OHMETER     14
 #define LOGIC       15
-
 #define NONE        16
 
 /** external variables*/
@@ -46,4 +45,5 @@ extern int my_state;
 
 extern void init_buttons();
 extern void check_buttons();
+
 #endif

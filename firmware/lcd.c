@@ -54,6 +54,21 @@ void cursorOffLCD(void) {
 }
 
 
+void position_cursor(int x, int y) {
+    int address;
+   if (x == 0) {
+       address = 0;
+   } else if (x == 1) {
+       address = 0x40;
+   } else {
+       address = 0;
+   }
+
+   address |= y;
+   sendByte(0x80 | address, lcd_false);
+}
+
+
 
 // clear the LCD
 void clearLCD(void)

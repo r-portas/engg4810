@@ -40,5 +40,6 @@
 extern void init_adc();
 extern void adc_read();
 extern void roy_adc();
+extern int display_val;
 
 #endif

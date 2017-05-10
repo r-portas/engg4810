@@ -5,11 +5,10 @@
 #include "inc/hw_gpio.h"
 #include "inc/hw_memmap.h"
 
-uint32_t DataRx[1000];
-uint32_t data_count = 0;
 float voltage = 0.00;
 int range = 2;
 extern int mux_state;
+int display_val = 0;
 
 float update_voltage(float voltage) {
     switch(range){
@@ -43,8 +42,12 @@ void auto_range(float voltage) {
 }
 
 long debug_count = 0;
+uint32_t data_buff[1000];
+int sample_count = 0;
+uint32_t data_count = 0;
+
+
 void adc_read() {
-    uint32_t test_adc = 0;
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3 , GPIO_PIN_3);
     SysCtlDelay(6);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3 , 0);
@@ -54,23 +57,29 @@ void adc_read() {
     {
 
     }
-    SSIDataGet(SSI1_BASE, &test_adc);
+    SSIDataGet(SSI1_BASE, &data_buff[sample_count]);
     while(SSIBusy(SSI1_BASE))
     {
 
     }
-    UARTprintf("data %d\n", test_adc);
+    UARTprintf("data %d\n", data_buff[sample_count]);
+    display_val =  data_buff[sample_count];
     data_count++;
-    /*long long  final = (pui32DataRx[0] + 55);
-    float voltage = (float)final/65536.00;
-    voltage = voltage * 4.8;
-    voltage = update_voltage(voltage);
-    auto_range(voltage);
-    long long vol = (voltage * 1000);
-    int num = vol / 1000;
-    int left = vol - (num * 1000);
-    UARTprintf("\r    raw %d vol %d.%d RANGE %d   \r", pui32DataRx[0], num, left, range);
-    */
+    sample_count++;
+
+}
+void convert_display() {
+      long long  final = (pui32DataRx[0] + 55);
+      float voltage = (float)final/65536.00;
+      voltage = voltage * 4.8;
+      // updates the voltage
+      voltage = update_voltage(voltage);
+      // auto range the voltage
+      auto_range(voltage);
+      long long vol = (voltage * 1000);
+      int num = vol / 1000;
+      int left = vol - (num * 1000);
+      UARTprintf("\r    raw %d vol %d.%d RANGE %d   \r", pui32DataRx[0], num, left, range);
 }
 
 void init_adc() {
