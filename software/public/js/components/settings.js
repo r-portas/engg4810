@@ -12,7 +12,7 @@ Vue.component('settings', {
         <h5>Export Mask</h5>
 
         <button v-on:click="exportMasks()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
-          Export data
+          Export masks
         </button> 
 
         <h5>Export Data</h5>
@@ -75,6 +75,12 @@ Vue.component('settings', {
   data() {
     return {
       ports: [],
+      voltageRange: [-12, 12],
+      currentRange: [-200, 200],
+      resistanceRange: [0, 1000000],
+      logicRange: [-0.5, 1.5],
+
+      overlimitIdentifier: 'OL',
     };
   },
 
@@ -85,6 +91,31 @@ Vue.component('settings', {
      */
     getPorts() {
       this.bus.$emit('get-ports');
+    },
+
+    checkOverlimit(measurement, y) {
+      switch (measurement) {
+        case 'voltage':
+          if (y < this.voltageRange[0] || y > this.voltageRange[1]) {
+            return this.overlimitIdentifier;
+          }
+          break;
+        case 'current':
+          if (y < this.currentRange[0] || y > this.currentRange[1]) {
+            return this.overlimitIdentifier;
+          }
+          break;
+        case 'resistance':
+          if (y < this.resistanceRange[0] || y > this.resistanceRange[1]) {
+            return this.overlimitIdentifier;
+          }
+          break;
+        default:
+          break;
+      }
+
+      // Return the original value for the measurement
+      return y;
     },
 
     createMasksCsv(masks) {
@@ -105,9 +136,15 @@ Vue.component('settings', {
           break;
       }
 
-      let csv = masks.topMasks.map((m) => { return `${m.mask},${m.x},${m.y},${meas}`; }).join('\n');
+      let csv = masks.topMasks.map((m) => {
+        return `${m.mask},${m.x},${m.y},${meas}`;
+      }).join('\n');
+
       csv += '\n';
-      csv += masks.bottomMasks.map((m) => { return `${m.mask},${m.x},${m.y},${meas}`; }).join('\n');
+
+      csv += masks.bottomMasks.map((m) => {
+        return `${m.mask},${m.x},${m.y},${meas}`;
+      }).join('\n');
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       saveAs(blob, 'data.csv');
@@ -126,8 +163,24 @@ Vue.component('settings', {
     exportData() {
       const csv = this.data.map((d) => {
         const date = d.date.toISOString();
-        return `${date},${d.value}`;
-      }).join('\n');
+        const currentMode = d.currentMode;
+        let meas = '';
+        switch (currentMode) {
+          case 'voltage':
+            meas = 'V';
+            break;
+          case 'current':
+            meas = 'A';
+            break;
+          case 'resistance':
+            meas = 'Ohm';
+            break;
+          default:
+            meas = 'N/A';
+            break;
+        }
+        const val = this.checkOverlimit(currentMode, d.value);
+        return `${date},${val},${meas}`; }).join('\n');
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       saveAs(blob, 'data.csv');

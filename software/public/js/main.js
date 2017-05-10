@@ -28,7 +28,11 @@ new Vue({
       // The name of the device
       deviceName: '',
 
+
       data: [],
+
+      // The current mode
+      currentMode: '',
 
       currentTab: 'Chart',
       tabs: {
@@ -56,10 +60,10 @@ new Vue({
       if (this.isPaused === false) {
         const isoString = date.toISOString();
         const parseTime = d3.isoParse;
-        this.data.push({ date: parseTime(isoString), value });
+        this.data.push({ date: parseTime(isoString), value, currentMode: this.currentMode });
       }
     },
-/**
+    /**
      * Checks if the current tab is active
      */
     checkTabActive(tabName) {
@@ -76,7 +80,7 @@ new Vue({
     startRandomData() {
       this.intervalRef = setInterval(() => {
         this.date.add(1, 'hours');
-        const rand = Math.floor((Math.random() * 20) + 1) - 10;
+        const rand = Math.floor((Math.random() * 40) + 1) - 20;
         this.addEntry(this.date, rand);
       }, 1000);
     },
@@ -160,7 +164,9 @@ new Vue({
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
 
+    // TODO: Refactor this when firmware is done
     this.bus.$on('set-range', (newRange) => {
+      this.currentMode = newRange;
       this.socket.emit('set-range', newRange);
     });
 

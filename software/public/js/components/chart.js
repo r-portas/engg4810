@@ -87,7 +87,11 @@ Vue.component('chart', {
      */
     getData() {
       // Return at most 'dataLimit' elements from the end of data
-      const limitedData = this.data.slice(Math.max(this.scrollIndex - this.dataLimit, 0));
+
+      const beginIndex = Math.max(this.scrollIndex - this.dataLimit, 0);
+      const endIndex = Math.min(this.dataLimit, this.data.length) + beginIndex;
+
+      const limitedData = this.data.slice(beginIndex, endIndex);
 
       const translated = limitedData.map((item) => {
         const translatedItem = {
@@ -111,9 +115,6 @@ Vue.component('chart', {
     checkProximity(x, y, point) {
       const p = 20;
 
-      console.log('Checking');
-      console.log(point);
-      console.log(`(${x}, ${y})`);
       if ((x - p) < point.x && point.x < (x + p)) {
         if ((y - p) < point.y && point.y < (y + p)) {
           return true;
@@ -127,15 +128,15 @@ Vue.component('chart', {
      * Deletes the masks at the specified x, y point
      */
     deleteMask(x, y) {
-      for (let i = 0; i < this.topMasks.length; i++) {
+      for (let i = 0; i < this.topMasks.length; i += 1) {
         const point = this.topMasks[i];
         if (this.checkProximity(x, y, point)) {
           this.topMasks.splice(i, 1);
           this.bus.$emit('show-snackbar', 'Mask point deleted');
         }
       }
-      
-      for (let i = 0; i < this.bottomMasks.length; i++) {
+
+      for (let i = 0; i < this.bottomMasks.length; i += 1) {
         const point = this.bottomMasks[i];
         if (this.checkProximity(x, y, point)) {
           this.bottomMasks.splice(i, 1);
@@ -174,8 +175,6 @@ Vue.component('chart', {
       x.domain(d3.extent(data, (d) => { return d.date; }));
       // y.domain(d3.extent(this.data, (d) => { return d.value; }));
 
-      // TODO: This is gonna cause issues with the masks
-      // TUTOR QUESTION
       // y.domain([0, 15]);
 
       switch (this.selectedRange) {
@@ -315,10 +314,14 @@ Vue.component('chart', {
             .attr('y1', scope.height)
             .attr('y2', y(d.value));
 
+          const sampleNum = scope.data.indexOf(d) + 1;
+          const date = moment(d.date).format('LT');
+          const tooltipText = `${d.value}, ${sampleNum}, ${date}`;
+
           scope.g.select('text.description')
-            .attr('x', x(d.date) + 10)
+            .attr('x', x(d.date) - 50)
             .attr('y', y(d.value) - 10)
-            .text(d.value);
+            .html(tooltipText);
         }
       });
 
@@ -403,10 +406,6 @@ Vue.component('chart', {
      * Draws a single mask
      */
     drawSingleMask(maskData, cssSelector, lineColor, fillColor, moveMaskFunction) {
-
-      if (maskData.length === 0) {
-      }
-
       const mask = d3.line()
         .x((d) => { return d.x; })
         .y((d) => { return d.y; })
@@ -542,7 +541,6 @@ Vue.component('chart', {
       this.bottomMasks = [];
 
       masks.forEach((mask) => {
-        console.log(this.topMasks);
         if (mask.mask === 'high') {
           this.topMasks.push(mask);
         } else if (mask.mask === 'low') {
@@ -625,7 +623,6 @@ Vue.component('chart', {
     },
 
     scrollIndex() {
-      console.log('Scroll index changed');
       this.drawChart();
     },
 
