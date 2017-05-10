@@ -41,6 +41,8 @@ void SysTickInt(void)
           GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
       }
       adc_read();
+      write_file();
+      update_hardware();
       test_count++;
      }
 }
@@ -52,6 +54,7 @@ void update_lcd() {
     // measurement state
     if (my_state == STATE_MEASURE) {
        char buffer[20];
+       //sprintf(buffer, "test %d.%d", num, left);
        sprintf(buffer, "test %d", display_val);
        printLCD(buffer);
        position_cursor(1,0);
@@ -76,7 +79,6 @@ void update_lcd() {
         lcd_tick = 0;
     }
 }
-
 
 void buttonInterrupt() {
    button_tick++;

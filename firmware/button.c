@@ -32,20 +32,21 @@ void check_buttons() {
             msg_count_check();
         }
     }
+
     /** Respond to the Down button ***/
     if (GPIOPinRead(GPIO_PORTE_BASE, GPIO_PIN_1) == GPIO_PIN_1) {
         UARTprintf("Down pressed\n");
         if (my_state == STATE_MEASURE) {
             //msg_count--;
-            //msg_count_check();
+            msg_count_check();
             sample_index--;
+            UARTprintf("sample index %d", sample_index);
             // check for memory error
         }
         if (my_state == NONE) {
             // increment msg count
             msg_count--;
             msg_count_check();
-
         }
     }
 
@@ -67,6 +68,7 @@ void check_buttons() {
     if (GPIOPinRead(GPIO_PORTE_BASE, GPIO_PIN_3) == GPIO_PIN_3) {
         UARTprintf("Back pressed\n");
         msg_count = 0;
+        my_mode = 0;
         my_state = NONE;    // go back regardless of the state
     }
     // loop back the index
@@ -76,7 +78,7 @@ void check_buttons() {
         sample_index = 4;
     }
 
-
+   // UARTprintf("after check \n");
 }
 
 void init_buttons() {

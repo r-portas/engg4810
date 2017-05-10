@@ -65,11 +65,17 @@ void adc_read() {
     UARTprintf("data %d\n", data_buff[sample_count]);
     display_val =  data_buff[sample_count];
     data_count++;
+    // wrap around
+    if (data_count == 98) {
+        data_count = 0;
+    }
     sample_count++;
-
 }
+
+
+/*
 void convert_display() {
-      long long  final = (pui32DataRx[0] + 55);
+      long long final = (pui32DataRx[0] + 55);
       float voltage = (float)final/65536.00;
       voltage = voltage * 4.8;
       // updates the voltage
@@ -80,7 +86,7 @@ void convert_display() {
       int num = vol / 1000;
       int left = vol - (num * 1000);
       UARTprintf("\r    raw %d vol %d.%d RANGE %d   \r", pui32DataRx[0], num, left, range);
-}
+}*/
 
 void init_adc() {
     // configure the clock for ADC
@@ -94,7 +100,6 @@ void init_adc() {
     GPIOPinTypeSSI(ADC_GPIO_PORT_BASE, TX_PIN | RX_PIN | ADC_SCLK_PIN);
     // Configure the CS pin as output to select CS
     GPIOPinTypeGPIOOutput(ADC_GPIO_PORT_BASE, GPIO_PIN_3);
-
     // Configure the clock settings
     // SPI mode, master mode, 1MHz SSI frequency, and 8-bit data
     SSIConfigSetExpClk(ADC_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,

@@ -41,5 +41,7 @@ extern void init_adc();
 extern void adc_read();
 extern void roy_adc();
 extern int display_val;
+extern uint32_t data_buff[1000];
+extern int sample_count;
 
 #endif

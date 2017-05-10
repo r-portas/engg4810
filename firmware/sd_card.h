@@ -25,5 +25,6 @@
 #include "utils/fatfs/src/diskio.h"
 
 extern void init_sd_card() ;
+extern void write_file();
 
 #endif

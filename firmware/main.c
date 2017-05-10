@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include "inc/hw_sysctl.h"
@@ -29,11 +28,13 @@
 #include "button.h"
 #include "mux.h"
 #include "adc.h"
+#include "controls.h"
 #include "timer_updates.h"
 
 void hardware_init() {
    init_LCD();
    init_uart();
+   init_hardware_control();
    init_buttons();
    init_sd_card();
    roy_adc();
@@ -47,8 +48,7 @@ int main() {
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
     while(1) {
-       // clearLCD();
-       // printLCD("HELLO 4!!! ");
-       // Delay(1000000);
+
+        // do nothing
     }
 }
