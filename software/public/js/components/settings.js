@@ -173,7 +173,7 @@ Vue.component('settings', {
             meas = 'A';
             break;
           case 'resistance':
-            meas = 'Ohm';
+            meas = 'R';
             break;
           default:
             meas = 'N/A';
@@ -246,13 +246,30 @@ Vue.component('settings', {
 
     parseDataLine(line) {
       // Check for line errors
-      if (line.length !== 2) {
+      if (line.length !== 3) {
         return null;
+      }
+      let meas = '';
+
+      switch (line[2]) {
+        case 'V':
+          meas = 'voltage';
+          break;
+        case 'A':
+          meas = 'current';
+          break;
+        case 'R':
+          meas = 'resistance';
+          break;
+        default:
+          meas = 'N/A';
+          break;
       }
 
       const parsed = {
         date: moment(line[0]),
         value: parseFloat(line[1]),
+        currentMode: meas,
       };
 
       return parsed;
