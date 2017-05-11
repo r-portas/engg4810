@@ -1,12 +1,13 @@
 #include "sd_card.h"
 #include "utils/fatfs/src/diskio.h"
-
+int sd_close = 0;
 // internal variables
-static FIL fil;
+
+FIL fil;
 FRESULT res;
 
 void make_file() {
-    res = f_open(&fil, "samples1.txt", FA_CREATE_ALWAYS|FA_WRITE);
+    res = f_open(&fil, "test1.txt", FA_CREATE_ALWAYS|FA_WRITE);
     if(res != FR_OK)
     {
         UARTprintf("Error creating file data.txt: %d\n", res);
@@ -17,18 +18,35 @@ void make_file() {
     }
 }
 
+/** write to the sd card**/
 void write_file() {
+    IntMasterDisable();
     int bytes_written = 0;
-    char *new_data = "HELLO!!";
-    int len = strlen(new_data);
-    // Write something
-    f_write(&fil, new_data, len , &bytes_written);
-    UARTprintf("Written %d bytes\n", bytes_written);
-    //f_close(&fil);
+
+    //FILINFO fileInfo;
+    //f_stat(&fil, &fileInfo);
+
+    //if (&fileInfo == FR_OK) {
+        // Write something
+        f_write(&fil, "ABC", 3, &bytes_written);
+        //fprintf(&fil, "hello\n");
+        UARTprintf("bytes %d", bytes_written);
+        f_sync(&fil);
+    //}
+    IntMasterEnable();
+}
+
+/** close the sd card **/
+void close_file() {
+    IntMasterDisable();
+    res = f_close(&fil);
+    f_mount(0, NULL);
+    // flush the data
+    UARTprintf("res %d", res);
+    IntMasterEnable();
 }
 
 void init_sd_card() {
-    char *string = "hello";
     SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI0);
     static FATFS fs;
     res = f_mount(0, &fs);
@@ -54,7 +72,9 @@ void init_sd_card() {
         errd = disk_initialize(0);
         UARTprintf("\nInitialising disk 0. Status = %i\n", errd);
     }
+
     make_file();
     write_file();
-    UARTprintf("exiting\n");
+    write_file();
+    //close_file();
 }

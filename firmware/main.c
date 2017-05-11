@@ -40,7 +40,6 @@ void hardware_init() {
    roy_adc();
    init_timers();
 }
-
 // one reading per clock tick// call ADC read in a timer
 int main() {
     // set the clock frequency and the clock divider
@@ -48,7 +47,6 @@ int main() {
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
     while(1) {
-
         // do nothing
     }
 }

@@ -1,9 +1,10 @@
 #include "button.h"
 #include "mux.h"
 #include "timer_updates.h"
+#include "adc.h"
 
-char *message[] = {"Voltmeter -> ", "Ampmeter -> " , "Ohmeter -> ", "Logic ->"};
-char *msgUpdate [] = {"Mode:Voltmeter", "Mode:Ampmeter" , "Mode:Ohmmeter" , "Mode:Logic"};
+char *message[] = {"Voltmeter -> ", "Ampmeter -> " , "Ohmeter -> ", "Continuity ->"};
+char *msgUpdate [] = {"Mode:Voltmeter", "Mode:Ampmeter" , "Mode:Ohmmeter" , "Mode:Continuity"};
 
 int msg_count = 0;
 int my_mode = 0;
@@ -17,6 +18,34 @@ void msg_count_check() {
     }
 }
 
+// update the internal state for the tiva
+void update_mode() {
+    switch(my_state) {
+        case NONE:
+            my_state = STATE_SELECTION;
+            my_mode = (msg_count + 12);
+            break;
+        case STATE_SELECTION:
+            my_state = STATE_MEASURE;
+            break;
+        case STATE_MEASURE:
+            // going into sd and ask samples
+            if (sd_state == 1) {
+                sd_state = 0;
+                close_file();
+            } else if (sample_count > 0) {
+                my_state = ASK_SAMPLES;
+            }
+            break;
+        case ASK_SAMPLES:
+            my_state = STATE_MEASURE;
+            sd_state = 1;
+            // adc would be measuring
+            // udpdate the sample count
+            // updathe sd state variables
+            break;
+    }
+}
 
 void check_buttons() {
     /** Respond to the Up button ***/
@@ -31,6 +60,11 @@ void check_buttons() {
             msg_count++;
             msg_count_check();
         }
+
+        if (my_state == ASK_SAMPLES) {
+            // increase the sampling rate
+            // update the sample index
+        }
     }
 
     /** Respond to the Down button ***/
@@ -38,7 +72,8 @@ void check_buttons() {
         UARTprintf("Down pressed\n");
         if (my_state == STATE_MEASURE) {
             //msg_count--;
-            msg_count_check();
+            UARTprintf("state measure\n");
+            //msg_count_check();
             sample_index--;
             UARTprintf("sample index %d", sample_index);
             // check for memory error
@@ -48,20 +83,16 @@ void check_buttons() {
             msg_count--;
             msg_count_check();
         }
+
+        /*  if (my_state == ASK_SAMPLE) {
+            // decrease the sample rate
+        }*/
     }
 
     /** Respond to the Enter button ***/
     if (GPIOPinRead(GPIO_PORTE_BASE, GPIO_PIN_2) == GPIO_PIN_2) {
         UARTprintf("Enter pressed\n");
-        if (my_state == NONE) {
-            // start reading the data
-            my_state = STATE_SELECTION;
-            my_mode = (msg_count + 12);
-            //msg_count = 0;  // reset
-        }
-        if (my_state == STATE_SELECTION) {
-            my_state = STATE_MEASURE;
-        }
+        update_mode();
      }
 
     /** Response to the back button **/

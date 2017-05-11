@@ -17,4 +17,11 @@ extern int sampling_index;
 void initTimer(void);
 void ButtonInterrupt(void);
 extern int sample_index;
+
+// sd card storage
+extern int sd_samples;
+extern int sd_state;
+extern int sd_sample_index;
+extern int buzzer_state;
+
 #endif

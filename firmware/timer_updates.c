@@ -23,7 +23,39 @@ char *sample_msg[] = {"2 read /s", "1 read/ s", "1 read/ 2s", "1 read/ 5s",
 char *ask_prompt = "Select samples : ";
 char *ask_samples[] = {"1", "2", "3,", "4", "5", "10", "15", "20", "50", "100", "200", "500" , "1000"};
 int test_count = 0;
+
 int sd_samples = 0;
+int sd_state = 0;
+int sd_sample_index = 0;
+int samples_written = 0;
+volatile int buzzer_ticks = 0;
+int buzzer_state = 0;
+int ac_read = 1;
+int zero_crossing[100];
+int zero_count = 0;
+
+//data_buff[sample_count];
+void find_zero_crossings() {
+    int i = 0;
+    for (i = 0; i < sample_count; i++) {
+        //UARTprintf("%d %d\n", data_buff[i], i);
+        if ((data_buff[i] <= 0) && (data_buff[i + 1] > 0))
+            // storing the positions of the sample count
+          // UARTprintf("get in here\n");
+           zero_crossing[zero_count] = i;
+    }
+    // find the number corresponding to the count
+    int start = zero_crossing[0];
+    int end = zero_crossing[1];
+    int count = start - end; // n values
+    float volts = 0.00;
+    for (i = start; i  < end; i++) {
+        UARTprintf("getting voltage\n i : %d", i);
+        float this_volt = get_voltage(data_buff[i]);
+        volts = volts + ((this_volt) * (this_volt));
+    }
+    UARTprintf("voltage %d %d", volts, count);
+}
 
 void SysTickInt(void)
 {
@@ -31,20 +63,30 @@ void SysTickInt(void)
   status = TimerIntStatus(TIMER5_BASE, true);
   TimerIntClear(TIMER5_BASE, status);
   count_ticks++;
+  buzzer_ticks++;
   disk_timerproc(); // timer to keep the sd card going
-  if (count_ticks == sample_rate[sample_index]) {
-      count_ticks = 0;
-      millis ^= 1;
-      if (millis == 0) {
-          GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
-      } else {
-          GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
+  // DO NOT REMOVE PRINT STATEMENT FOR DEBUGGING
+  // UARTprintf("check %d -> %d\n", count_ticks, sample_rate[sample_index]);
+      if (count_ticks > sample_rate[sample_index]) {
+          count_ticks = 0;
+          if (!ac_read) {
+              adc_read();
+              if (sd_state == 1) {
+                   UARTprintf("Writing file interrupt\n");
+                   write_file();
+                   UARTprintf("Finished writting file in interrupt\n");
+                   samples_written++;
+                   // have written  the required samples
+                   /*if (samples_written == sample_rate[sample_index = '0']) {
+                      sd_state = 0;
+                   }*/
+              }
+              update_hardware();
+              test_count++;
+          } else if (ac_read) {
+              find_zero_crossings();
+          }
       }
-      adc_read();
-      write_file();
-      update_hardware();
-      test_count++;
-     }
 }
 
 uint32_t lcd_tick = 0;
@@ -59,6 +101,9 @@ void update_lcd() {
        printLCD(buffer);
        position_cursor(1,0);
        printLCD(sample_msg[sample_index]);
+       if (sd_state == 1) {
+           printLCD(" SD : %");
+       }
        lcd_tick = 0;
     }
     // default state
@@ -80,10 +125,14 @@ void update_lcd() {
     }
 }
 
+int ac_tick = 0;
 void buttonInterrupt() {
    button_tick++;
    lcd_tick++;
-   if (button_tick == 12000) {
+   buzzer_ticks++;
+   ac_tick++;
+   // should be going super fast
+   if (button_tick == 6000) {
         check_buttons();
         button_tick = 0;
     }
@@ -92,10 +141,25 @@ void buttonInterrupt() {
        clearLCD();
        update_lcd();
     }
+
+    // update this number
+    if ((buzzer_ticks > 50) && (buzzer_state == 1)) {
+        millis ^= 1;
+        if (millis == 0) {
+                 GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
+             } else {
+                 GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
+             }
+        buzzer_ticks = 0;
+    }
+
+    if (ac_read) {
+       // if (ac_tick > 1) {
+         //   ac_tick = 0;
+         adc_read();
+       // }
+    }
 }
-
-
-
 
 void initTimer()
 {

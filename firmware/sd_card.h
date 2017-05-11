@@ -26,5 +26,7 @@
 
 extern void init_sd_card() ;
 extern void write_file();
+extern void close_file();
+extern int sd_close;
 
 #endif

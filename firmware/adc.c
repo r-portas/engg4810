@@ -42,10 +42,9 @@ void auto_range(float voltage) {
 }
 
 long debug_count = 0;
-uint32_t data_buff[1000];
+uint32_t data_buff[2000];
 int sample_count = 0;
 uint32_t data_count = 0;
-
 
 void adc_read() {
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3 , GPIO_PIN_3);
@@ -62,17 +61,16 @@ void adc_read() {
     {
 
     }
-    UARTprintf("data %d\n", data_buff[sample_count]);
+    /** KEEP THE FORMAT FOR ROY **/
+    UARTprintf("\n r %d %d \n", data_buff[sample_count], sample_count);
     display_val =  data_buff[sample_count];
-    data_count++;
+    sample_count++;
     // wrap around
-    if (data_count == 98) {
-        data_count = 0;
+    if (sample_count > 2000) {
+        sample_count = 0;
     }
     sample_count++;
 }
-
-
 /*
 void convert_display() {
       long long final = (pui32DataRx[0] + 55);
@@ -109,11 +107,11 @@ void init_adc() {
     SSIEnable(ADC_SSI_BASE);
 }
 
+
+/** Unlock the pin 0 on port F **/
 void unlock_portF_pins() {
     HWREG(GPIO_PORTF_BASE+GPIO_O_LOCK) = GPIO_LOCK_KEY;
     HWREG(GPIO_PORTF_BASE+GPIO_O_CR)  |= GPIO_PIN_0;
-    //SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C2);
-    //while(!(SysCtlPeripheralReady(SYSCTL_PERIPH_I2C2)));
 }
 
 void roy_adc() {
