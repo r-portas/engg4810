@@ -39,6 +39,6 @@ extern void sendSpecialChar();
 extern void sendByte(char byteToSend, int isData);
 extern void printLCD(char *text);
 extern void clearLCD();
-
+extern void position_cursor(int x, int y);
 
 #endif

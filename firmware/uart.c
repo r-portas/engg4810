@@ -1,10 +1,6 @@
 #include "uart.h"
 
 void init_uart() {
-
-
-
-
     if (EXTERNAL_UART) {
         //
         // Enable the GPIO Peripheral used by the UART.
@@ -61,6 +57,4 @@ void init_uart() {
         //
         UARTStdioConfig(0, 9600, 16000000);
     }
-
-
 }

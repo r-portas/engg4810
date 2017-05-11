@@ -6,7 +6,7 @@ static FIL fil;
 FRESULT res;
 
 void make_file() {
-    res = f_open(&fil, "data.txt", FA_CREATE_ALWAYS|FA_WRITE);
+    res = f_open(&fil, "samples1.txt", FA_CREATE_ALWAYS|FA_WRITE);
     if(res != FR_OK)
     {
         UARTprintf("Error creating file data.txt: %d\n", res);
@@ -19,13 +19,16 @@ void make_file() {
 
 void write_file() {
     int bytes_written = 0;
+    char *new_data = "HELLO!!";
+    int len = strlen(new_data);
     // Write something
-    f_write(&fil, "HELLO!", 6 , &bytes_written);
+    f_write(&fil, new_data, len , &bytes_written);
     UARTprintf("Written %d bytes\n", bytes_written);
-    f_close(&fil);
+    //f_close(&fil);
 }
 
 void init_sd_card() {
+    char *string = "hello";
     SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI0);
     static FATFS fs;
     res = f_mount(0, &fs);

@@ -25,4 +25,3 @@ void initInterrupts() {
             GPIO_FALLING_EDGE);
     GPIOIntEnable(INTERRUPT_PORT, INTERRUPT_PINS);
 }
-
