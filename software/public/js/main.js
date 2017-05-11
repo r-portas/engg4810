@@ -111,7 +111,26 @@ new Vue({
      * Processes serial input
      */
     processData(data) {
-      console.log(data);
+      // console.log(data);
+
+      const command = data[0];
+      switch (command) {
+        case 'r':
+          this.currentMode = 'resistance';
+          break;
+
+        default:
+          console.log(`Got invalid command ${command}`);
+          break;
+      }
+
+      const value = parseFloat(data.split(' ')[1]);
+      console.log(data.split(' ')[1]);
+      const date = moment();
+
+      if (!isNaN(value)) {
+        this.addEntry(date, value);
+      }
     },
 
     /**

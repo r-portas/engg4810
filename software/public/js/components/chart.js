@@ -35,7 +35,8 @@ Vue.component('chart', {
       dataLimit: 10,
       voltageRange: [-12, 12],
       currentRange: [-200, 200],
-      resistanceRange: [0, 1000000],
+      //resistanceRange: [0, 1000000],
+      resistanceRange: [0, 100000],
       logicRange: [-0.5, 1.5],
 
       selectedRange: 'voltage',

@@ -92,3 +92,5 @@ io.on('connection', (socket) => {
 });
 
 http.listen(port, () => console.log(`Multimeter running on port ${port}`));
+
+module.exports = app;
