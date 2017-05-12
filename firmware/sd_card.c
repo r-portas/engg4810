@@ -23,16 +23,12 @@ void write_file() {
     IntMasterDisable();
     int bytes_written = 0;
 
-    //FILINFO fileInfo;
-    //f_stat(&fil, &fileInfo);
+    // Write something
+    f_write(&fil, "ABC\n", 4, &bytes_written);
+    //fprintf(&fil, "hello\n");
+    UARTprintf("bytes %d", bytes_written);
+    f_sync(&fil);
 
-    //if (&fileInfo == FR_OK) {
-        // Write something
-        f_write(&fil, "ABC", 3, &bytes_written);
-        //fprintf(&fil, "hello\n");
-        UARTprintf("bytes %d", bytes_written);
-        f_sync(&fil);
-    //}
     IntMasterEnable();
 }
 

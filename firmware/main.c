@@ -48,5 +48,9 @@ int main() {
     hardware_init();
     while(1) {
         // do nothing
+        UARTprintf(".\n");
+        buttonInterrupt();
+        //write_file();
+        SysCtlDelay(100);
     }
 }
