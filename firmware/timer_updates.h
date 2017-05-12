@@ -21,6 +21,14 @@ extern int sample_index;
 // sd card storage
 extern int sd_samples;
 extern int sd_state;
+
+extern int sd_sample_index;
+extern int sd_samples_ask;
+extern int sd_state;
+extern int samples_written;
+extern char *ask_samples[];
+extern int sample_list[];
+
 extern int sd_sample_index;
 extern int buzzer_state;
 
