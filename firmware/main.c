@@ -47,6 +47,7 @@ int main() {
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
     while(1) {
+        UARTprintf("hello\n");
         // do nothing
     }
 }
