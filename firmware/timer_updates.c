@@ -64,7 +64,9 @@ void SysTickInt(void)
   TimerIntClear(TIMER5_BASE, status);
   count_ticks++;
   buzzer_ticks++;
-  disk_timerproc(); // timer to keep the sd card going
+  // ???: Why is this here?
+  // disk_timerproc(); // timer to keep the sd card going
+  
   // DO NOT REMOVE PRINT STATEMENT FOR DEBUGGING
   // UARTprintf("check %d -> %d\n", count_ticks, sample_rate[sample_index]);
       if (count_ticks > sample_rate[sample_index]) {
