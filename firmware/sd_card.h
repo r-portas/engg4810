@@ -24,8 +24,10 @@
 #include "utils/fatfs/src/ff.h"
 #include "utils/fatfs/src/diskio.h"
 
-extern void init_sd_card() ;
+extern void init_sd_card();
 extern void write_file();
+extern void write_line(char* line);
+extern void write_log_line(float reading, char mode);
 extern void close_file();
 extern int sd_close;
 
