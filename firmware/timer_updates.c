@@ -30,7 +30,7 @@ int sd_sample_index = 0;
 int samples_written = 0;
 volatile int buzzer_ticks = 0;
 int buzzer_state = 0;
-int ac_read = 1;
+int ac_read = 0;
 int zero_crossing[100];
 int zero_count = 0;
 
@@ -64,7 +64,9 @@ void SysTickInt(void)
   TimerIntClear(TIMER5_BASE, status);
   count_ticks++;
   buzzer_ticks++;
-  disk_timerproc(); // timer to keep the sd card going
+  // ???: Why is this here?
+  // disk_timerproc(); // timer to keep the sd card going
+  
   // DO NOT REMOVE PRINT STATEMENT FOR DEBUGGING
   // UARTprintf("check %d -> %d\n", count_ticks, sample_rate[sample_index]);
       if (count_ticks > sample_rate[sample_index]) {
@@ -132,15 +134,18 @@ void buttonInterrupt() {
    buzzer_ticks++;
    ac_tick++;
    // should be going super fast
-   if (button_tick == 6000) {
-        check_buttons();
-        button_tick = 0;
-    }
-    if (lcd_tick > 25000) {
+   /* if (button_tick == 6000) { */
+    check_buttons();
+        /* button_tick = 0; */
+    /* } */
+
+
+   // Should not be in a interrupt
+    /* if (lcd_tick > 25000) { */
       // UARTprintf("Writing to LCD, state %d\n", my_state);
-       clearLCD();
-       update_lcd();
-    }
+   clearLCD();
+   update_lcd();
+    /* } */
 
     // update this number
     if ((buzzer_ticks > 50) && (buzzer_state == 1)) {
@@ -174,20 +179,20 @@ void initTimer()
   TimerEnable(TIMER5_BASE, TIMER_A);
 }
 
-void ButtonInterrupt()
-{
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER4);
-  TimerConfigure(TIMER4_BASE, TIMER_CFG_PERIODIC);   // 32 bits Time
-  unsigned long ulPeriod;
-  unsigned int Hz = 1;   // frequency in Hz
-  ulPeriod = (SysCtlClockGet() / Hz)/ 2;
-  TimerLoadSet(TIMER4_BASE, TIMER_A, ulPeriod -1);
-  TimerIntRegister(TIMER4_BASE, TIMER_A, buttonInterrupt);    // Registering  isr
-  TimerIntEnable(TIMER4_BASE, TIMER_TIMA_TIMEOUT);
-  TimerEnable(TIMER4_BASE, TIMER_A);
-}
+/* void ButtonInterrupt() */
+/* { */
+/*   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER4); */
+/*   TimerConfigure(TIMER4_BASE, TIMER_CFG_PERIODIC);   // 32 bits Time */
+/*   unsigned long ulPeriod; */
+/*   unsigned int Hz = 1;   // frequency in Hz */
+/*   ulPeriod = (SysCtlClockGet() / Hz)/ 2; */
+/*   TimerLoadSet(TIMER4_BASE, TIMER_A, ulPeriod -1); */
+/*   TimerIntRegister(TIMER4_BASE, TIMER_A, buttonInterrupt);    // Registering  isr */
+/*   TimerIntEnable(TIMER4_BASE, TIMER_TIMA_TIMEOUT); */
+/*   TimerEnable(TIMER4_BASE, TIMER_A); */
+/* } */
 
 void init_timers() {
     initTimer();
-    ButtonInterrupt();
+    /* ButtonInterrupt(); */
 }
