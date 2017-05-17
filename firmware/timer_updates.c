@@ -32,7 +32,7 @@ int sd_samples_ask = 0;
 int sd_state = 0;
 int samples_written = 0;
 
-
+int my_flag = 0;
 
 volatile int buzzer_ticks = 0;
 int buzzer_state = 0;
@@ -49,7 +49,6 @@ int rms_flag = 0;
 
 
 void toggle_pin();
-
 void SysTickInt(void)
 {
   uint32_t status = 0;
@@ -67,6 +66,8 @@ void SysTickInt(void)
   if (count_ticks > 1000) {
       lcd_flag = 1;
       count_ticks = 0;
+      my_flag = 1;
+     // write_file();
   }
 }
 
@@ -153,7 +154,7 @@ void update_buffer_rms() {
 void buttonInterrupt() {
    button_tick++;
    buzzer_ticks++;
-   //toggle_pin();
+   toggle_pin();
    // should be going super fast
    if (button_tick > 1000) {
        check_buttons();
@@ -166,6 +167,10 @@ void buttonInterrupt() {
        lcd_flag = 0;
     }
 
+    if (my_flag) {
+        write_file();
+        my_flag = 0;
+    }
     // update this number
     /*if(sd_state) {
         write_file();
@@ -179,6 +184,7 @@ void buttonInterrupt() {
 
 void initTimer()
 {
+
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
   TimerConfigure(TIMER5_BASE, TIMER_CFG_PERIODIC);   // 32 bits Time
   unsigned long ulPeriod;
@@ -188,6 +194,7 @@ void initTimer()
   TimerIntRegister(TIMER5_BASE, TIMER_A, SysTickInt);    // Registering  isr
   TimerIntEnable(TIMER5_BASE, TIMER_TIMA_TIMEOUT);
   TimerEnable(TIMER5_BASE, TIMER_A);
+
 }
 
 void init_timers() {

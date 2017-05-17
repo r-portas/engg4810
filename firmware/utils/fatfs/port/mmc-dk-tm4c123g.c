@@ -694,7 +694,6 @@ void disk_timerproc (void)
 //    BYTE n, s;
     BYTE n;
 
-
     n = Timer1;                        /* 100Hz decrement timer */
     if (n) Timer1 = --n;
     n = Timer2;

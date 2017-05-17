@@ -32,12 +32,13 @@
 #include "timer_updates.h"
 
 int sd_flag = 0;
+
 void hardware_init() {
    init_LCD();
    init_uart();
    init_hardware_control();
    init_buttons();
-  // init_sd_card();
+   //init_sd_card();
    roy_adc();
    init_timers();
 }
@@ -49,18 +50,9 @@ int main() {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
-
     float reading = 0.5;
     char mode = 'V';
-
     while(1) {
-        // do nothing
-        UARTprintf(".\n");
-        write_log_line(reading, mode);
-        reading += 0.5;
-
-        //buttonInterrupt();
-        //write_file();
-        SysCtlDelay(100000);
+       buttonInterrupt();
     }
 }
