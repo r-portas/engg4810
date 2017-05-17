@@ -45,10 +45,22 @@ void hardware_init() {
 // one reading per clock tick// call ADC read in a timer
 int main() {
     // set the clock frequency and the clock divider
-    SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
+    // SYSCTL_SYSDIV_2_5 < 80mz clock
+    SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
+
+    float reading = 0.5;
+    char mode = 'V';
+
     while(1) {
-         buttonInterrupt();
+        // do nothing
+        UARTprintf(".\n");
+        write_log_line(reading, mode);
+        reading += 0.5;
+
+        //buttonInterrupt();
+        //write_file();
+        SysCtlDelay(100000);
     }
 }
