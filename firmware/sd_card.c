@@ -3,12 +3,10 @@
 #include "timer_updates.h"
 int sd_close = 0;
 // internal variables
-
 FIL fil;
 FRESULT res;
-
 void make_file() {
-    res = f_open(&fil, "S1.txt", FA_CREATE_ALWAYS|FA_WRITE);
+    res = f_open(&fil, "test_F1.txt", FA_CREATE_ALWAYS|FA_WRITE);
     if(res != FR_OK)
     {
         UARTprintf("Error creating file data.txt: %d\n", res);
@@ -21,11 +19,13 @@ void make_file() {
 
 /** write to the sd card**/
 void write_file() {
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
     IntMasterDisable();
     int bytes_written = 0;
     f_write(&fil, "ABC", 2 , &bytes_written);
     f_sync(&fil);
     IntMasterEnable();
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
 }
 
 void init_sd_card() {

@@ -62,7 +62,6 @@ void adc_read() {
 
     }
     /** KEEP THE FORMAT FOR ROY **/
-    //UARTprintf("\n r %d %d \n", data_buff[sample_count], sample_count);
     display_val =  data_buff[sample_count];
     sample_count++;
     // wrap around

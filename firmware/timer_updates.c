@@ -45,6 +45,11 @@ int ac_set = 1;
 float running_volt = 0.00;
 int n  = 0;
 float final_2;
+int rms_flag = 0;
+
+
+void toggle_pin();
+
 void SysTickInt(void)
 {
   uint32_t status = 0;
@@ -55,39 +60,38 @@ void SysTickInt(void)
   disk_timerproc(); // timer to keep the sd card going
   if (ac_set) {
       adc_read();
+      rms_flag = 1;
       // get voltage for the running average
-      float raw_volt = get_voltage(display_val);
-      running_volt = running_volt + (raw_volt * raw_volt);
-      n++;
-      //float final = ((sqrt(running_volt)));
-      final_2 = sqrt((running_volt/n));
-      //UARTprintf("running float %d %d %d %d", (int)raw_volt, (int)running_volt, n, (int)final_2);
+      // UARTprintf("running float %d %d %d %d", (int)raw_volt, (int)running_volt, n, (int)final_2);
   }
-  if (count_ticks > sample_rate[sample_index]) {
-  /*    count_ticks = 0;
-      adc_read();
-      update_hardware();
+  if (count_ticks > 1000) {
       lcd_flag = 1;
-      */
-       final_2 = final_2 * 1000;
-       int num1 = final_2 / 1000;
-       int left1 = final_2 - (num * 1000);
-       UARTprintf("vol %d.%d \r",num1, left1);
-       running_volt = 0.0;
-      n = 0;
-
+      count_ticks = 0;
   }
 }
 
+int num1= 0;
+int left1 = 0;
 uint32_t lcd_tick = 0;
 extern int display_val;
 /** Updates the lcd**/
 void update_lcd() {
+    char buffer[20];
     // measurement state
     if (my_state == STATE_MEASURE) {
-       char buffer[20];
+       if (ac_set) {
+         final_2 = sqrt((running_volt/n));
+         final_2 = final_2 * 1000;
+         num1 = final_2 / 1000;
+         left1 = final_2 - (num1 * 1000);
+         //UARTprintf("vol %d . %d \r",num1, left1);
+         sprintf(buffer, "vol %d.%d",num1, left1);
+         UARTprintf("\n r %d %d \n", data_buff[sample_count], sample_count);
+         running_volt = 0.0;
+         n = 0;
+       }
        //sprintf(buffer, "test %d.%d", num, left);
-       sprintf(buffer, "test %d", display_val);
+       //sprintf(buffer, "test %d", display_val);
        printLCD(buffer);
        position_cursor(1,0);
        printLCD(sample_msg[sample_index]);
@@ -129,26 +133,48 @@ void play_buzzer() {
     }
 }
 
+
+void toggle_pin() {
+    millis ^= 1;
+  if (millis == 0) {
+           GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
+       } else {
+           GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
+       }
+}
+
+void update_buffer_rms() {
+    // update the rms value here
+   float raw_volt = get_voltage(display_val);
+   running_volt = running_volt + (raw_volt * raw_volt);
+   n++;
+}
+
 void buttonInterrupt() {
    button_tick++;
    buzzer_ticks++;
+   //toggle_pin();
    // should be going super fast
-   if (button_tick > 7000) {
+   if (button_tick > 1000) {
        check_buttons();
        button_tick = 0;
    }
-
    // Should not be in a interrupt
     if (lcd_flag) {
        clearLCD();
        update_lcd();
        lcd_flag = 0;
     }
+
     // update this number
     /*if(sd_state) {
         write_file();
     }*/
 
+    if (rms_flag) {
+        update_buffer_rms();
+        rms_flag = 0;
+    }
 }
 
 void initTimer()
@@ -156,7 +182,7 @@ void initTimer()
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
   TimerConfigure(TIMER5_BASE, TIMER_CFG_PERIODIC);   // 32 bits Time
   unsigned long ulPeriod;
-  unsigned int Hz = 1000;   // frequency in Hz
+  unsigned int Hz = 3000;   // frequency in Hz
   ulPeriod = (SysCtlClockGet() / Hz)/ 2;
   TimerLoadSet(TIMER5_BASE, TIMER_A, ulPeriod -1);
   TimerIntRegister(TIMER5_BASE, TIMER_A, SysTickInt);    // Registering  isr
