@@ -31,15 +31,17 @@
 #include "controls.h"
 #include "timer_updates.h"
 
+int sd_flag = 0;
 void hardware_init() {
    init_LCD();
    init_uart();
    init_hardware_control();
    init_buttons();
-   init_sd_card();
+  // init_sd_card();
    roy_adc();
    init_timers();
 }
+
 // one reading per clock tick// call ADC read in a timer
 int main() {
     // set the clock frequency and the clock divider

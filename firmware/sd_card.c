@@ -1,8 +1,8 @@
 #include "sd_card.h"
 #include "utils/fatfs/src/diskio.h"
+#include "timer_updates.h"
 int sd_close = 0;
 // internal variables
-
 FIL fil;
 FATFS fs;
 FRESULT res;
@@ -29,7 +29,6 @@ void write_line(char* line) {
 
     // Write something
     f_write(&fil, line, strlen(line), &bytes_written);
-    //fprintf(&fil, "hello\n");
     UARTprintf("bytes %d\n", bytes_written);
     f_sync(&fil);
 
@@ -62,6 +61,7 @@ void write_log_line(float reading, char mode) {
 
 /** write to the sd card**/
 void write_file() {
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
     IntMasterDisable();
     int bytes_written = 0;
 
@@ -70,25 +70,14 @@ void write_file() {
     //fprintf(&fil, "hello\n");
     UARTprintf("bytes %d\n", bytes_written);
     f_sync(&fil);
-
     IntMasterEnable();
-}
-
-/** close the sd card **/
-void close_file() {
-    IntMasterDisable();
-    res = f_close(&fil);
-    f_mount(0, NULL);
-    // flush the data
-    UARTprintf("res %d", res);
-    IntMasterEnable();
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
 }
 
 void init_sd_card() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI0);
     res = f_mount(0, &fs);
     uint32_t count = 8 * 512;
-
     if(res != FR_OK)
     {
        UARTprintf("f_mount error\n"); //no error message here
@@ -110,9 +99,7 @@ void init_sd_card() {
         errd = disk_initialize(0);
         UARTprintf("\nInitialising disk 0. Status = %i\n", errd);
     }
-
     make_file();
     write_file();
     write_file();
-    //close_file();
 }

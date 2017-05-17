@@ -10,11 +10,16 @@ int msg_count = 0;
 int my_mode = 0;
 int my_state    = NONE;
 
-void msg_count_check() {
+void count_check() {
     if (msg_count < 0) {
         msg_count = 0;
     } else if (msg_count > 3) {
         msg_count = 3;
+    }
+    if (sample_index < 0) {
+        sample_index = 0;
+    } else if (sample_index > 3) {
+        sample_index = 3;
     }
 }
 
@@ -32,7 +37,6 @@ void update_mode() {
             // going into sd and ask samples
             if (sd_state == 1) {
                 sd_state = 0;
-                close_file();
             } else if (sample_count > 0) {
                 my_state = ASK_SAMPLES;
             }
@@ -47,23 +51,37 @@ void update_mode() {
     }
 }
 
+void update_sd_count() {
+    // loop
+    if (sd_sample_index < 0) {
+        sd_sample_index = 0;
+    } else  if (sd_sample_index > 8) {
+        sd_sample_index = 8;
+    }
+    // update the count
+    sd_samples_ask = sample_list[sd_sample_index];
+    UARTprintf("samples asked %d  | %d | %d \n", sd_samples_ask, ask_samples[sd_sample_index], sd_sample_index);
+}
+
 void check_buttons() {
     /** Respond to the Up button ***/
     if (GPIOPinRead(GPIO_PORTE_BASE, GPIO_PIN_0) == GPIO_PIN_0) {
         UARTprintf("Up pressed\n");
         if (my_state == STATE_MEASURE) {
             sample_index++;
+            count_check();
             // check for memory error
         }
         if (my_state == NONE) {
             // increment message count
             msg_count++;
-            msg_count_check();
+            count_check();
         }
 
         if (my_state == ASK_SAMPLES) {
-            // increase the sampling rate
-            // update the sample index
+            sd_sample_index++;
+            update_sd_count();
+
         }
     }
 
@@ -75,18 +93,20 @@ void check_buttons() {
             UARTprintf("state measure\n");
             //msg_count_check();
             sample_index--;
+            count_check();
             UARTprintf("sample index %d", sample_index);
             // check for memory error
         }
         if (my_state == NONE) {
             // increment msg count
             msg_count--;
-            msg_count_check();
+            count_check();
         }
 
-        /*  if (my_state == ASK_SAMPLE) {
-            // decrease the sample rate
-        }*/
+        if (my_state == ASK_SAMPLES) {
+            sd_sample_index--;
+            update_sd_count();
+        }
     }
 
     /** Respond to the Enter button ***/
@@ -102,14 +122,13 @@ void check_buttons() {
         my_mode = 0;
         my_state = NONE;    // go back regardless of the state
     }
+
     // loop back the index
     if (sample_index < 0) {
         sample_index = 0;
     } else if (sample_index > 4) {
         sample_index = 4;
     }
-
-   // UARTprintf("after check \n");
 }
 
 void init_buttons() {
