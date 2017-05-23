@@ -27,6 +27,8 @@ char *ask_samples[] = {"1", "2", "3,", "4", "5", "10", "15", "20", "50", "100", 
 int sample_list[] = {1,2,3,4,5,10,15,20,50,100,200,500,1000};
 int test_count = 0;
 
+int sd_samples = 0;
+
 int sd_sample_index = 0;
 int sd_samples_ask = 0;
 int sd_state = 0;
@@ -52,22 +54,25 @@ void toggle_pin();
 
 void SysTickInt(void)
 {
-  uint32_t status = 0;
-  status = TimerIntStatus(TIMER5_BASE, true);
-  TimerIntClear(TIMER5_BASE, status);
-  count_ticks++;
-  buzzer_ticks++;
-  disk_timerproc(); // timer to keep the sd card going
-  if (ac_set) {
+    IntMasterDisable();
+    uint32_t status = 0;
+    status = TimerIntStatus(TIMER5_BASE, true);
+    TimerIntClear(TIMER5_BASE, status);
+    count_ticks++;
+    buzzer_ticks++;
+    disk_timerproc(); // timer to keep the sd card going
+
+    if (ac_set) {
       adc_read();
       rms_flag = 1;
       // get voltage for the running average
       // UARTprintf("running float %d %d %d %d", (int)raw_volt, (int)running_volt, n, (int)final_2);
-  }
-  if (count_ticks > 1000) {
+    }
+    if (count_ticks > 1000) {
       lcd_flag = 1;
       count_ticks = 0;
-  }
+    }
+    IntMasterEnable();
 }
 
 int num1= 0;
@@ -179,15 +184,18 @@ void buttonInterrupt() {
 
 void initTimer()
 {
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
-  TimerConfigure(TIMER5_BASE, TIMER_CFG_PERIODIC);   // 32 bits Time
-  unsigned long ulPeriod;
-  unsigned int Hz = 3000;   // frequency in Hz
-  ulPeriod = (SysCtlClockGet() / Hz)/ 2;
-  TimerLoadSet(TIMER5_BASE, TIMER_A, ulPeriod -1);
-  TimerIntRegister(TIMER5_BASE, TIMER_A, SysTickInt);    // Registering  isr
-  TimerIntEnable(TIMER5_BASE, TIMER_TIMA_TIMEOUT);
-  TimerEnable(TIMER5_BASE, TIMER_A);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_TIMER5))
+    {
+    }
+    TimerConfigure(TIMER5_BASE, TIMER_CFG_SPLIT_PAIR | TIMER_CFG_B_PERIODIC);   // 32 bits Time
+    unsigned long ulPeriod;
+    unsigned int Hz = 3000;   // frequency in Hz
+    ulPeriod = (SysCtlClockGet() / Hz)/ 2;
+    TimerLoadSet(TIMER5_BASE, TIMER_B, ulPeriod -1);
+    TimerIntRegister(TIMER5_BASE, TIMER_B, SysTickInt);    // Registering  isr
+    TimerIntEnable(TIMER5_BASE, TIMER_TIMB_TIMEOUT);
+    TimerEnable(TIMER5_BASE, TIMER_BOTH);
 }
 
 void init_timers() {

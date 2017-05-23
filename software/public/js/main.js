@@ -183,6 +183,15 @@ new Vue({
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
 
+    // Logging
+    this.bus.$on('start-log', (data) => {
+      this.socket.emit('start-log', data);
+    });
+
+    this.socket.$on('logging-finished', () => {
+      this.bus.$emit('logging-finished');
+    });
+
     // TODO: Refactor this when firmware is done
     this.bus.$on('set-range', (newRange) => {
       this.currentMode = newRange;
@@ -203,6 +212,5 @@ new Vue({
     this.bus.$on('get-ports', () => {
       this.socket.emit('getports');
     });
-
   },
 });
