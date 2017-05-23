@@ -177,6 +177,7 @@ int main() {
 
 
     while(1) {
+        UARTprintf("hello\n");
         // do nothing
         //UARTprintf(".\n");
         // write_log_line(reading, mode);
