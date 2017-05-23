@@ -40,7 +40,7 @@ void hardware_init() {
    //init_buttons();
    //init_sd_card();
    //roy_adc();
-   init_timers();
+   // init_timers();
 }
 
 #define SHCP GPIO_PIN_6
@@ -146,7 +146,7 @@ int main() {
     // SYSCTL_SYSDIV_2_5 < 80mz clock
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
-    //hardware_init();
+    hardware_init();
 
     // Positive rail, load switch high
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
@@ -177,9 +177,8 @@ int main() {
 
 
     while(1) {
-        UARTprintf("hello\n");
         // do nothing
-        //UARTprintf(".\n");
+        // UARTprintf(".\n");
         // write_log_line(reading, mode);
         //reading += 0.5;
 
@@ -187,6 +186,8 @@ int main() {
 
         //write_file();
         // SysCtlDelay(100000);
-        SysCtlDelay(100000);
+        read_uart();
+
+        SysCtlDelay(1000);
     }
 }

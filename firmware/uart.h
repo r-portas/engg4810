@@ -22,5 +22,6 @@
 #define EXTERNAL_UART 0
 
 void init_uart();
+void read_uart();
 
 #endif
