@@ -10,7 +10,7 @@ Vue.component('data-card', {
       </div>
 
       <div class="mdl-card__supporting-text">
-        <button v-on:click="togglePause" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+        <button v-on:click="togglePause" class="settings-btn mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
           Toggle Pause
         </button> 
         <br>
@@ -45,7 +45,7 @@ Vue.component('data-card', {
         </label> 
         <br>
 
-        <button v-on:click="clearMasks" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+        <button v-on:click="clearMasks" class="settings-btn mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
           Clear Masks
         </button> 
 

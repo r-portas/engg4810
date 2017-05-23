@@ -21,11 +21,11 @@ Vue.component('sd-log-card', {
           <label class="mdl-textfield__label" for="sampleRate">Sample rate</label>
         </div>
 
-        <button :disabled="isLogging" v-on:click="startLog" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+        <button :disabled="isLogging" v-on:click="startLog" class="log-btn mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
           Start Logging 
         </button>
 
-        <button :disabled="!isLogging" v-on:click="stopLog" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+        <button :disabled="!isLogging" v-on:click="stopLog" class="log-btn mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
           Stop Logging 
         </button>
         
