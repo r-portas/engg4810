@@ -6,6 +6,8 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/rom_map.h"
 #include "lcd.h"
+#include "uart.h"
+#include "utils/uartstdio.h"
 
 
 
@@ -29,7 +31,7 @@ void setCmd() {
 // Set the RS to HIGH
 // Indicating incoming data
 void setData() {
-    GPIOPinWrite(CMD_PORT, RS,RS);
+    GPIOPinWrite(CMD_PORT, RS, RS);
 }
 
 

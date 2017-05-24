@@ -34,13 +34,13 @@
 
 int sd_flag = 0;
 void hardware_init() {
-   //init_LCD();
+   init_LCD();
    init_uart();
    //init_hardware_control();
    //init_buttons();
    //init_sd_card();
    //roy_adc();
-   // init_timers();
+   init_timers();
 }
 
 #define SHCP GPIO_PIN_6
@@ -140,7 +140,8 @@ void set_frontend_state(uint8_t val) {
 }
 
 
-// one reading per clock tick// call ADC read in a timer
+// one reading per clock tick
+// call ADC read in a timer
 int main() {
     // set the clock frequency and the clock divider
     // SYSCTL_SYSDIV_2_5 < 80mz clock
@@ -152,6 +153,10 @@ int main() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
     GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE,  GPIO_PIN_5);
     GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_5 , GPIO_PIN_5);
+
+    // Turn LCD on
+    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE,  GPIO_PIN_2);
+    GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2 , GPIO_PIN_2);
 
     // LEDs
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
@@ -187,7 +192,8 @@ int main() {
         //write_file();
         // SysCtlDelay(100000);
         read_uart();
+        printLCD("TEST");
 
-        SysCtlDelay(1000);
+        SysCtlDelay(10000);
     }
 }
