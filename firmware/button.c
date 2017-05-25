@@ -13,13 +13,13 @@ int my_state    = NONE;
 void count_check() {
     if (msg_count < 0) {
         msg_count = 0;
-    } else if (msg_count > 3) {
-        msg_count = 3;
+    } else if (msg_count > 4) {
+        msg_count = 4;
     }
     if (sample_index < 0) {
         sample_index = 0;
-    } else if (sample_index > 3) {
-        sample_index = 3;
+    } else if (sample_index > 4) {
+        sample_index = 4;
     }
 }
 

@@ -37,11 +37,11 @@ int sd_flag = 0;
 void hardware_init() {
    init_LCD();
    init_uart();
-   //init_hardware_control();
-   //init_buttons();
+   init_hardware_control();
+   init_buttons();
    //init_sd_card();
    roy_adc();
-   //init_timers();
+   init_timers();
 }
 
 #define SHCP GPIO_PIN_6
@@ -135,11 +135,8 @@ void set_frontend_state(uint8_t val) {
     SysCtlDelay(100);
     GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
 
-
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
-
 }
-
 
 // one reading per clock tick
 // call ADC read in a timer
@@ -147,8 +144,7 @@ int main() {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
-
-
+    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
     // Rail load switch high
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
     GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE,  GPIO_PIN_5);
@@ -167,12 +163,10 @@ int main() {
     GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7 , GPIO_PIN_7);
 
     setup_frontend();
-
-    /*
     GPIOPinWrite(GPIO_PORTC_BASE, DS , DS);
     GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
-    */
+
 
     // Voltage measure, 12v mode
     //set_frontend_state( 0b11000000 );
@@ -198,22 +192,20 @@ int main() {
     char mode = 'V';
 
 
-    UARTprintf("Starting");
+    //UARTprintf("Starting");
     while(1) {
         // do nothing
         // UARTprintf(".\n");
         // write_log_line(reading, mode);
         //reading += 0.5;
-
-        // buttonInterrupt();
-
+        buttonInterrupt();
         //write_file();
         // SysCtlDelay(100000);
         // read_uart();
 
         //printLCD("TEST");
-        adc_read();
+        //adc_read();
 
-        SysCtlDelay(10000);
+        //SysCtlDelay(10000);
     }
 }

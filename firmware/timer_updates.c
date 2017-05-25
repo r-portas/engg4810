@@ -16,7 +16,7 @@ long button_tick = 0;
 
 // change values on button read
 int sample_index = 0;
-int sample_rate[] = {5, 10, 50, 100, 600, 1200, 3000, 6000};
+int sample_rate[] = {1500, 3000, 6000, 15000, 180000, 360000, 900000, 1800000};
 char *sample_msg[] = {"2 read /s", "1 read/ s", "1 read/ 2s", "1 read/ 5s",
                     "1 read/ min", "1 read/ 2 min" , "1 read/5 min",
                     "1 read/ 10min" };
@@ -24,7 +24,7 @@ char *sample_msg[] = {"2 read /s", "1 read/ s", "1 read/ 2s", "1 read/ 5s",
 
 char *ask_prompt = "Select samples : ";
 char *ask_samples[] = {"1", "2", "3,", "4", "5", "10", "15", "20", "50", "100", "200", "500" , "1000"};
-int sample_list[] = {1,2,3,4,5,10,15,20,50,100,200,500,1000};
+int sample_list[] = { 1, 2, 3, 4, 5, 10, 15, 20, 50, 100, 200, 500, 1000};
 int test_count = 0;
 
 int sd_samples = 0;
@@ -43,14 +43,16 @@ int zero_crossing[100];
 int zero_count = 0;
 extern sd_flag;
 int lcd_flag = 0;
-int ac_set = 1;
+int ac_set = 0;
 float running_volt = 0.00;
 int n  = 0;
 float final_2;
 int rms_flag = 0;
-
-
 void toggle_pin();
+int lcd_ticks = 0;
+
+int time_count = 0;
+int time_sample = 0;
 void SysTickInt(void)
 {
     IntMasterDisable();
@@ -59,23 +61,28 @@ void SysTickInt(void)
     TimerIntClear(TIMER5_BASE, status);
     count_ticks++;
     buzzer_ticks++;
+    lcd_ticks++;
     disk_timerproc(); // timer to keep the sd card going
-
-    if (ac_set) {
+    if (ac_set == 1) {
       adc_read();
       rms_flag = 1;
+      toggle_pin();
       // get voltage for the running average
       // UARTprintf("running float %d %d %d %d", (int)raw_volt, (int)running_volt, n, (int)final_2);
-  } else {
+    } else if (ac_set == 0) {
+        if (count_ticks > 900000) {
+             count_ticks = 0;
+             toggle_pin();
+              adc_read();
+        }
       // do nothing (or dont read)
   }
 
   /** update the lcd every so often **/
-  if (count_ticks > 1000) {
+  if (lcd_ticks > 1000) {
       lcd_flag = 1;
-      count_ticks = 0;
+      lcd_ticks = 0;
       my_flag = 1;
-     // write_file();
   }
     IntMasterEnable();
 }
@@ -164,7 +171,7 @@ void update_buffer_rms() {
 void buttonInterrupt() {
    button_tick++;
    buzzer_ticks++;
-   toggle_pin();
+   //toggle_pin();
    // should be going super fast
    if (button_tick > 1000) {
        check_buttons();
@@ -194,11 +201,12 @@ void buttonInterrupt() {
 
 void initTimer()
 {
-
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
-while(!SysCtlPeripheralReady(SYSCTL_PERIPH_TIMER5))
-{
-}
+  while(!SysCtlPeripheralReady(SYSCTL_PERIPH_TIMER5))
+  {
+
+
+  }
   TimerConfigure(TIMER5_BASE, TIMER_CFG_PERIODIC);   // 32 bits Time
   unsigned long ulPeriod;
   unsigned int Hz = 3000;   // frequency in Hz
