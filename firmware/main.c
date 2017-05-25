@@ -43,15 +43,11 @@ void hardware_init() {
    init_timers();
 }
 
-// one reading per clock tick// call ADC read in a timer
+
 int main() {
-    // set the clock frequency and the clock divider
-    // SYSCTL_SYSDIV_2_5 < 80mz clock
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
-    float reading = 0.5;
-    char mode = 'V';
     while(1) {
        buttonInterrupt();
     }

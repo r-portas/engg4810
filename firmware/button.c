@@ -3,7 +3,7 @@
 #include "timer_updates.h"
 #include "adc.h"
 
-char *message[] = {"Voltmeter -> ", "Ampmeter -> " , "Ohmeter -> ", "Continuity ->"};
+char *message[] = {"Voltmeter >> ", "Ampmeter >> " , "Ohmeter >> ", "Continuity >>", "Logic >>", "AC >>"};
 char *msgUpdate [] = {"Mode:Voltmeter", "Mode:Ampmeter" , "Mode:Ohmmeter" , "Mode:Continuity"};
 
 int msg_count = 0;

@@ -29,7 +29,7 @@ void setCmd() {
 // Set the RS to HIGH
 // Indicating incoming data
 void setData() {
-    GPIOPinWrite(CMD_PORT, RS,RS);
+    GPIOPinWrite(CMD_PORT, RS, RS);
 }
 
 
@@ -67,8 +67,6 @@ void position_cursor(int x, int y) {
    address |= y;
    sendByte(0x80 | address, lcd_false);
 }
-
-
 
 // clear the LCD
 void clearLCD(void)

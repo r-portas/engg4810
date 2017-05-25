@@ -62,7 +62,11 @@ void SysTickInt(void)
       rms_flag = 1;
       // get voltage for the running average
       // UARTprintf("running float %d %d %d %d", (int)raw_volt, (int)running_volt, n, (int)final_2);
+  } else {
+      // do nothing (or dont read)
   }
+
+  /** update the lcd every so often **/
   if (count_ticks > 1000) {
       lcd_flag = 1;
       count_ticks = 0;
@@ -79,6 +83,7 @@ extern int display_val;
 void update_lcd() {
     char buffer[20];
     // measurement state
+    //printLCD("hello");
     if (my_state == STATE_MEASURE) {
        if (ac_set) {
          final_2 = sqrt((running_volt/n));

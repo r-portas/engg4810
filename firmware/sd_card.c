@@ -39,12 +39,10 @@ void make_file() {
 void write_line(char* line) {
     IntMasterDisable();
     int bytes_written = 0;
-
     // Write something
     f_write(&fil, line, strlen(line), &bytes_written);
     UARTprintf("bytes %d\n", bytes_written);
     f_sync(&fil);
-
     IntMasterEnable();
 }
 
