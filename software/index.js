@@ -40,6 +40,17 @@ io.on('connection', (socket) => {
     });
   });
 
+  // Logging
+  socket.on('start-log', (data) => {
+    const line = `l ${data.sampleRate} ${data.sampleNum}`;
+    console.log(`Sending ${line} over serial`);
+    if (serialDevice != null) {
+      if (serialDevice.isOpen()) {
+        serialDevice.write(`${line}\n`);
+      }
+    }
+  });
+
 
   /**
    * A range is changing the measurement mode
@@ -72,6 +83,11 @@ io.on('connection', (socket) => {
       const trimmed = data.trim();
       console.log(`Receiving '${trimmed}' over serial`);
       socket.emit('devicedata', trimmed);
+    });
+
+    // fl is logging-finished
+    serialDevice.on('lf', () => {
+      socket.emit('logging-finished');
     });
 
     serialDevice.on('close', () => {

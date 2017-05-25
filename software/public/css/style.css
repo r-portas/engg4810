@@ -35,3 +35,8 @@ body {
 .ports-table {
     margin: 10px;
 }
+
+.settings-btn,
+.log-btn {
+    margin: 5px;
+}

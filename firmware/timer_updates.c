@@ -27,6 +27,8 @@ char *ask_samples[] = {"1", "2", "3,", "4", "5", "10", "15", "20", "50", "100", 
 int sample_list[] = {1,2,3,4,5,10,15,20,50,100,200,500,1000};
 int test_count = 0;
 
+int sd_samples = 0;
+
 int sd_sample_index = 0;
 int sd_samples_ask = 0;
 int sd_state = 0;
@@ -51,13 +53,15 @@ int rms_flag = 0;
 void toggle_pin();
 void SysTickInt(void)
 {
-  uint32_t status = 0;
-  status = TimerIntStatus(TIMER5_BASE, true);
-  TimerIntClear(TIMER5_BASE, status);
-  count_ticks++;
-  buzzer_ticks++;
-  disk_timerproc(); // timer to keep the sd card going
-  if (ac_set) {
+    IntMasterDisable();
+    uint32_t status = 0;
+    status = TimerIntStatus(TIMER5_BASE, true);
+    TimerIntClear(TIMER5_BASE, status);
+    count_ticks++;
+    buzzer_ticks++;
+    disk_timerproc(); // timer to keep the sd card going
+
+    if (ac_set) {
       adc_read();
       rms_flag = 1;
       // get voltage for the running average
@@ -73,6 +77,7 @@ void SysTickInt(void)
       my_flag = 1;
      // write_file();
   }
+    IntMasterEnable();
 }
 
 int num1= 0;
@@ -191,6 +196,9 @@ void initTimer()
 {
 
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
+while(!SysCtlPeripheralReady(SYSCTL_PERIPH_TIMER5))
+{
+}
   TimerConfigure(TIMER5_BASE, TIMER_CFG_PERIODIC);   // 32 bits Time
   unsigned long ulPeriod;
   unsigned int Hz = 3000;   // frequency in Hz
@@ -199,7 +207,6 @@ void initTimer()
   TimerIntRegister(TIMER5_BASE, TIMER_A, SysTickInt);    // Registering  isr
   TimerIntEnable(TIMER5_BASE, TIMER_TIMA_TIMEOUT);
   TimerEnable(TIMER5_BASE, TIMER_A);
-
 }
 
 void init_timers() {

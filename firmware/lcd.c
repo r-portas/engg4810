@@ -6,6 +6,8 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/rom_map.h"
 #include "lcd.h"
+#include "uart.h"
+#include "utils/uartstdio.h"
 
 
 

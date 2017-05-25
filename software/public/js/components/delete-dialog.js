@@ -1,11 +1,11 @@
-/* global Vue */
+/* global Vue dialogPolyfill */
 
 Vue.component('delete-dialog', {
   template: `
     <div>
 
       <!-- A button to show the modal -->
-      <button v-on:click="openModal" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Delete data</button>
+      <button v-on:click="openModal" type="button" class="settings-btn mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Delete data</button>
 
       <dialog class="mdl-dialog" ref="dialog">
         <div class="mdl-dialog__content">
@@ -46,5 +46,6 @@ Vue.component('delete-dialog', {
 
   mounted() {
     this.dialog = this.$refs.dialog;
+    dialogPolyfill.registerDialog(this.dialog);
   },
 });

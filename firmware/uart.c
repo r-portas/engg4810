@@ -58,3 +58,68 @@ void init_uart() {
         UARTStdioConfig(0, 9600, 16000000);
     }
 }
+
+char input[30];
+int inputIndex = 0;
+
+void process_command() {
+    switch(input[0]) {
+        case 'l':
+            // Start logging
+            break;
+        case 'v':
+            // Change to voltage mode
+            UARTprintf("MULTIMETER VOLTAGE\n");
+            break;
+        case 'c':
+            // Change to current mode
+            UARTprintf("MULTIMETER CURRENT\n");
+            break;
+        case 'r':
+            // Change to current mode
+            UARTprintf("MULTIMETER RESISTANCE\n");
+            break;
+        default:
+            // Probably an error
+            break;
+    }
+}
+
+void read_uart() {
+    int32_t inputChar;
+
+    if (EXTERNAL_UART) {
+        if (UARTCharsAvail(UART1_BASE) == false) {
+            return;
+        }
+        inputChar = UARTCharGetNonBlocking(UART1_BASE);
+    } else {
+        if (UARTCharsAvail(UART0_BASE) == false) {
+            return;
+        }
+        inputChar = UARTCharGetNonBlocking(UART0_BASE);
+    }
+
+    if (inputChar != -1) {
+        // We have a valid character
+        char validChar = (char)inputChar;
+        input[inputIndex] = validChar;
+        inputIndex++;
+
+        // Check if we have a end of line
+        if (validChar == '\n') {
+            // Add EOL
+            input[inputIndex+1] = '\0';
+            // Process string
+            UARTprintf(input);
+            process_command();
+            inputIndex = 0;
+        }
+    }
+    
+    if (inputIndex >= 30) {
+        // Reset, in case of error
+        inputIndex = 0;
+    }
+}
+
