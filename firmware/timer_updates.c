@@ -73,12 +73,10 @@ void SysTickInt(void)
         if (count_ticks > 900000) {
              count_ticks = 0;
              toggle_pin();
-              adc_read();
+             adc_read();
         }
-      // do nothing (or dont read)
-  }
-
-  /** update the lcd every so often **/
+    }
+  /** update the lcd every so often 0.5 sec**/
   if (lcd_ticks > 1000) {
       lcd_flag = 1;
       lcd_ticks = 0;
@@ -173,7 +171,7 @@ void buttonInterrupt() {
    buzzer_ticks++;
    //toggle_pin();
    // should be going super fast
-   if (button_tick > 1000) {
+   if (button_tick > 5) {
        check_buttons();
        button_tick = 0;
    }
