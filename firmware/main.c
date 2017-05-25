@@ -39,8 +39,8 @@ void hardware_init() {
    //init_hardware_control();
    //init_buttons();
    //init_sd_card();
-   //roy_adc();
-   init_timers();
+   roy_adc();
+   //init_timers();
 }
 
 #define SHCP GPIO_PIN_6
@@ -149,7 +149,8 @@ int main() {
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
 
-    // Positive rail, load switch high
+
+    // Rail load switch high
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
     GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE,  GPIO_PIN_5);
     GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_5 , GPIO_PIN_5);
@@ -157,6 +158,7 @@ int main() {
     // Turn LCD on
     GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE,  GPIO_PIN_2);
     GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2 , GPIO_PIN_2);
+
 
     // LEDs
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
@@ -173,14 +175,31 @@ int main() {
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
     */
 
-    set_frontend_state( 0b11000000 );
+    // Voltage measure, 12v mode
+    //set_frontend_state( 0b11000000 );
+
+    // Voltage measure, 5v mode
+    // set_frontend_state( 0b11000100 );
+
+    // Voltage measure, 1v mode
+    //set_frontend_state( 0b11000010 );
+
+    // Logic Probe
+    // sset_frontend_state( 0b11100000 );
+
+    // Current measure, 200ma range
+    // set_frontend_state( 0b11010110 );
+
+    // Current measure, 10ma range
+    set_frontend_state( 0b11010001 );
+
     // set_frontend_state( 0b00000000 );
 
     float reading = 0.5;
     char mode = 'V';
 
 
-
+    UARTprintf("Starting");
     while(1) {
         // do nothing
         // UARTprintf(".\n");
@@ -191,8 +210,10 @@ int main() {
 
         //write_file();
         // SysCtlDelay(100000);
-        read_uart();
-        printLCD("TEST");
+        // read_uart();
+
+        //printLCD("TEST");
+        adc_read();
 
         SysCtlDelay(10000);
     }
