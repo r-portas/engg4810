@@ -1,6 +1,19 @@
 #include "sd_card.h"
 #include "utils/fatfs/src/diskio.h"
 #include "timer_updates.h"
+#include "timer_updates.h"
+#include "uart.h"
+#include "adc.h"
+#include "button.h"
+#include "lcd.h"
+#include "inc/hw_ints.h"
+#include "driverlib/interrupt.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/timer.h"
+#include "utils/fatfs/src/ff.h"
+#include "utils/fatfs/src/diskio.h"
+#include "math.h"
+
 int sd_close = 0;
 // internal variables
 FIL fil;
@@ -26,12 +39,10 @@ void make_file() {
 void write_line(char* line) {
     IntMasterDisable();
     int bytes_written = 0;
-
     // Write something
     f_write(&fil, line, strlen(line), &bytes_written);
     UARTprintf("bytes %d\n", bytes_written);
     f_sync(&fil);
-
     IntMasterEnable();
 }
 
@@ -42,36 +53,32 @@ void write_line(char* line) {
 void write_log_line(float reading, char mode) {
     IntMasterDisable();
     int bytes_written = 0;
-
     char output[64];
-
     snprintf(output, 64, "%i,%f,%c\n", sampleNum, reading, mode);
-
     sampleNum++;
-
     // Write something
     UARTprintf(output);
     f_write(&fil, output, strlen(output), &bytes_written);
-    //fprintf(&fil, "hello\n");
     UARTprintf("bytes %d\n", bytes_written);
     f_sync(&fil);
-
     IntMasterEnable();
 }
 
 /** write to the sd card**/
 void write_file() {
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
-    IntMasterDisable();
+    //toggle_pin();
+    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
+    //IntMasterDisable();
+    TimerDisable(TIMER5_BASE, TIMER_A);
     int bytes_written = 0;
-
     // Write something
     f_write(&fil, "ABC\n", 4, &bytes_written);
     //fprintf(&fil, "hello\n");
     UARTprintf("bytes %d\n", bytes_written);
     f_sync(&fil);
-    IntMasterEnable();
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
+    TimerEnable(TIMER5_BASE, TIMER_A);
+    // IntMasterEnable();
+    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
 }
 
 void init_sd_card() {
@@ -100,6 +107,4 @@ void init_sd_card() {
         UARTprintf("\nInitialising disk 0. Status = %i\n", errd);
     }
     make_file();
-    write_file();
-    write_file();
 }

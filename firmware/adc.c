@@ -4,6 +4,10 @@
 #include "inc/hw_types.h"
 #include "inc/hw_gpio.h"
 #include "inc/hw_memmap.h"
+#include "driverlib/timer.h"
+
+
+
 
 float voltage = 0.00;
 int range = 2;
@@ -71,6 +75,7 @@ void adc_read() {
     }
     sample_count++;
 }
+
 /*
 void convert_display() {
       long long final = (pui32DataRx[0] + 55);

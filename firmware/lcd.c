@@ -70,8 +70,6 @@ void position_cursor(int x, int y) {
    sendByte(0x80 | address, lcd_false);
 }
 
-
-
 // clear the LCD
 void clearLCD(void)
 {
