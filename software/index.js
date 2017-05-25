@@ -51,6 +51,17 @@ io.on('connection', (socket) => {
     }
   });
 
+  /**
+   * A range is changing the measurement mode
+   */
+  socket.on('sampling-rate', (sampleRate) => {
+    console.log(`Sending '${sampleRate}' over serial`);
+    if (serialDevice != null) {
+      if (serialDevice.isOpen()) {
+        serialDevice.write(`${sampleRate}\n`);
+      }
+    }
+  });
 
   /**
    * A range is changing the measurement mode
