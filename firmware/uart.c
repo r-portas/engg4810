@@ -66,26 +66,26 @@ void process_command() {
     switch(input[0]) {
         case 'l':
             // Change to logic level
-            UARTprintf("LOGIC LEVEL VOLTAGE\n");
+            // UARTprintf("LOGIC LEVEL VOLTAGE\n");
             my_state = LOGIC;
             break;
         case 'v':
             // Change to voltage mode
-            UARTprintf("MULTIMETER VOLTAGE\n");
+            // UARTprintf("MULTIMETER VOLTAGE\n");
             my_state = VOLTMETER;
             break;
         case 'c':
             // Change to current mode
-            UARTprintf("MULTIMETER CURRENT\n");
+            // UARTprintf("MULTIMETER CURRENT\n");
             my_state = AMPMETER;
             break;
         case 'r':
             // Change to current mode
-            UARTprintf("MULTIMETER RESISTANCE\n");
+            // UARTprintf("MULTIMETER RESISTANCE\n");
             my_state = OHMETER;
             break;
         case 's':
-            UARTprintf("SD Card log\n");
+            // UARTprintf("SD Card log\n");
             break;
         default:
             // Probably an error
@@ -119,7 +119,7 @@ void read_uart() {
             // Add EOL
             input[inputIndex+1] = '\0';
             // Process string
-            UARTprintf(input);
+            // UARTprintf(input);
             process_command();
             inputIndex = 0;
         }
