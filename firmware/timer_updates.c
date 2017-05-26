@@ -19,8 +19,7 @@ int sample_index = 0;
 int sample_rate[] = {1500, 3000, 6000, 15000, 180000, 360000, 900000, 1800000};
 char *sample_msg[] = {"2 read /s", "1 read/ s", "1 read/ 2s", "1 read/ 5s",
                     "1 read/ min", "1 read/ 2 min" , "1 read/5 min",
-                    "1 read/ 10min" };
-
+                    "1 read/10 min" };
 
 char *ask_prompt = "Select samples : ";
 char *ask_samples[] = {"1", "2", "3,", "4", "5", "10", "15", "20", "50", "100", "200", "500" , "1000"};
@@ -43,14 +42,14 @@ int zero_crossing[100];
 int zero_count = 0;
 extern sd_flag;
 int lcd_flag = 0;
-int ac_set = 0;
+int ac_set = 1;
 float running_volt = 0.00;
 int n  = 0;
 float final_2;
 int rms_flag = 0;
 void toggle_pin();
 int lcd_ticks = 0;
-
+int button_flag = 0;
 int time_count = 0;
 int time_sample = 0;
 void SysTickInt(void)
@@ -59,18 +58,20 @@ void SysTickInt(void)
     uint32_t status = 0;
     status = TimerIntStatus(TIMER5_BASE, true);
     TimerIntClear(TIMER5_BASE, status);
+
     count_ticks++;
     buzzer_ticks++;
     lcd_ticks++;
+    button_tick++;
     disk_timerproc(); // timer to keep the sd card going
+
     if (ac_set == 1) {
       adc_read();
       rms_flag = 1;
       toggle_pin();
-      // get voltage for the running average
-      // UARTprintf("running float %d %d %d %d", (int)raw_volt, (int)running_volt, n, (int)final_2);
+
     } else if (ac_set == 0) {
-        if (count_ticks > 900000) {
+        if (count_ticks > 1500) {
              count_ticks = 0;
              toggle_pin();
              adc_read();
@@ -81,6 +82,11 @@ void SysTickInt(void)
       lcd_flag = 1;
       lcd_ticks = 0;
       my_flag = 1;
+  }
+  /** checks the button every so often **/
+  if (button_tick > 1200) {
+      button_tick = 0;
+      button_flag = 1;
   }
     IntMasterEnable();
 }
@@ -93,7 +99,7 @@ extern int display_val;
 void update_lcd() {
     char buffer[20];
     // measurement state
-    //printLCD("hello");
+    // printLCD("hello");
     if (my_state == STATE_MEASURE) {
        if (ac_set) {
          final_2 = sqrt((running_volt/n));
@@ -167,13 +173,13 @@ void update_buffer_rms() {
 }
 
 void buttonInterrupt() {
-   button_tick++;
+   //button_tick++;
    buzzer_ticks++;
-   //toggle_pin();
-   // should be going super fast
-   if (button_tick > 5) {
+
+   /** check for button press **/
+   if (button_flag) {
        check_buttons();
-       button_tick = 0;
+       button_flag = 0;
    }
    // Should not be in a interrupt
     if (lcd_flag) {
@@ -186,10 +192,6 @@ void buttonInterrupt() {
         write_file();
         my_flag = 0;
     }
-    // update this number
-    /*if(sd_state) {
-        write_file();
-    }*/
 
     if (rms_flag) {
         update_buffer_rms();

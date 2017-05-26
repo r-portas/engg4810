@@ -13,7 +13,7 @@ LCD pin Map
  * Pin Connections: 
  * PE4  -> RS
  * PE5  -> EN  
- * PD0  -> D4 
+ * PD0  -> D4  
  * PD1  -> D5
  * PD2  -> D6
  * PD3  -> D7 

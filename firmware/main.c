@@ -154,7 +154,6 @@ int main() {
     GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE,  GPIO_PIN_2);
     GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2 , GPIO_PIN_2);
 
-
     // LEDs
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
     GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE,  GPIO_PIN_6);
