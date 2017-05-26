@@ -64,6 +64,18 @@ io.on('connection', (socket) => {
   });
 
   /**
+   * Set the brightness of the LCD display
+   */
+  socket.on('set-brightness', (brightness) => {
+    console.log(`Sending '${brightness}' over serial`);
+    if (serialDevice != null) {
+      if (serialDevice.isOpen()) {
+        serialDevice.write(`${brightness}\n`);
+      }
+    }
+  });
+
+  /**
    * A range is changing the measurement mode
    */
   socket.on('set-range', (newRange) => {

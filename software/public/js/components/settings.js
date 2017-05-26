@@ -1,4 +1,4 @@
-/* global Vue, Papa, moment, Blob, saveAs */
+/* global Vue, Papa, moment, Blob, saveAs, collision */
 
 Vue.component('settings', {
   template: `
@@ -207,7 +207,25 @@ Vue.component('settings', {
     maskCallback(results) {
       const parsed = results.data.map(this.parseMaskLine).filter(n => n != null);
 
-      this.bus.$emit('set-masks', parsed);
+      const topMasks = [];
+      const bottomMasks = [];
+
+      parsed.forEach((mask) => {
+        if (mask.mask === 'high') {
+          topMasks.push(mask);
+        } else if (mask.mask === 'low') {
+          bottomMasks.push(mask);
+        } else {
+          console.log(`Tried to parse mask '${mask.mask}'`);
+        }
+      });
+      const collisions = collision.checkCollision([], topMasks, bottomMasks);
+
+      if (collisions.length === 0) {
+        this.bus.$emit('set-masks', parsed);
+      } else {
+        alert('Invalid mask file!');
+      }
     },
 
     parseMaskLine(line) {

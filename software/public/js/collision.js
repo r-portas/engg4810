@@ -130,6 +130,22 @@ const collision = {
     };
   },
 
+  checkContinue(item, lastItem) {
+    if (lastItem === null) {
+      return null;
+    }
+
+    console.log(item);
+    console.log(lastItem);
+    console.log(`${item.point1.x}, ${lastItem.maskItem.point2.x}`);
+
+    if (item.minX === lastItem.maskItem.point2.x) {
+      console.log('Has intercept!');
+      return true;
+    }
+    return false;
+  },
+
   /**
    * Checks if the data has collisions against the mask
    */
@@ -137,6 +153,7 @@ const collision = {
     const topMaskSegments = this.convertArrayToSegments(topMask);
     const bottomMaskSegments = this.convertArrayToSegments(bottomMask);
     const dataSegments = this.convertArrayToSegments(data);
+    let lastCollisionItem = null;
 
     // Store a list of collisions
     const collisions = [];
@@ -144,10 +161,14 @@ const collision = {
     for (let i = 0; i < dataSegments.length; i += 1) {
       const dataItem = dataSegments[i];
 
+
       for (let j = 0; j < topMaskSegments.length; j += 1) {
         const topMaskItem = topMaskSegments[j];
         if (this.checkIntersect(dataItem, topMaskItem)) {
-          collisions.push(this.createCollisionObject('Top Mask', dataItem, topMaskItem));
+          if (this.checkContinue(topMaskItem, lastCollisionItem)) {
+          } else {
+            collisions.push(this.createCollisionObject('Top Mask', dataItem, topMaskItem));
+          }
         }
       }
 
@@ -156,6 +177,10 @@ const collision = {
         if (this.checkIntersect(dataItem, bottomMaskItem)) {
           collisions.push(this.createCollisionObject('Bottom Mask', dataItem, bottomMaskItem));
         }
+      }
+
+      if (collisions.length > 0) {
+        lastCollisionItem = collisions[collisions.length - 1];
       }
     }
 

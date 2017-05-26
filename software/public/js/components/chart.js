@@ -328,7 +328,7 @@ Vue.component('chart', {
         }).left;
 
         const mouse = d3.mouse(this);
-        const x0 = x.invert(mouse[0]);
+        const x0 = x.invert(mouse[0] - scope.margin.left);
 
         const i = bisectDate(scope.data, x0, 1);
         if (i < scope.data.length) {
@@ -358,8 +358,8 @@ Vue.component('chart', {
           const tooltipText = `(Reading: ${d.value}, SampleNum: ${sampleNum}, Date: ${date})`;
 
           scope.g.select('text.description')
-            .attr('x', x(d.date) - 50)
-            .attr('y', y(d.value) - 10)
+            .attr('x', x(d.date) - scope.margin.left)
+            .attr('y', y(d.value) - scope.margin.top)
             .html(tooltipText);
         }
       });

@@ -111,23 +111,52 @@ new Vue({
     processData(data) {
       // console.log(data);
 
+      const oldMode = this.currentMode;
+
+      if (data[0] === '$') {
+        // An LCD display
+        this.bus.$emit('lcd-text', data);
+        return;
+      }
+
       const command = data[0];
       switch (command) {
         case 'r':
           this.currentMode = 'resistance';
           break;
 
+        case 'v':
+          this.currentMode = 'voltage';
+          break;
+
+        case 'c':
+          this.currentMode = 'current';
+          break;
+
+        case '!':
+          // Mode not set yet
+          break;
+
+        case '$':
+          this.bus.$emit('lcd-text', data);
+          break;
+
+        case '#':
+          const value = parseFloat(data.split(' ')[1]);
+          // const sampleNum = parseFloat(data.split(' ')[2]);
+          const date = moment();
+
+          if (!isNaN(value)) {
+            this.addEntry(date, value);
+          }
+          break;
+
         default:
-          console.log(`Got invalid command ${command}`);
           break;
       }
 
-      const value = parseFloat(data.split(' ')[1]);
-      console.log(data.split(' ')[1]);
-      const date = moment();
-
-      if (!isNaN(value)) {
-        this.addEntry(date, value);
+      if (oldMode !== this.currentMode) {
+        this.bus.$emit('set-range', this.currentMode);
       }
     },
 
@@ -182,6 +211,10 @@ new Vue({
     this.bus.$on('delete-data', this.deleteData);
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
     this.bus.$on('set-data', this.setData);
+
+    this.bus.$on('set-brightness', (data) => {
+      this.socket.emit('set-brightness', data);
+    });
 
     // Logging
     this.bus.$on('start-log', (data) => {
