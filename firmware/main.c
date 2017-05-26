@@ -164,7 +164,7 @@ int main() {
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
 
     // Voltage measure, 12v mode
-    //set_frontend_state( 0b11000000 );
+    set_frontend_state( 0b11000000 );
 
     // Voltage measure, 5v mode
     // set_frontend_state( 0b11000100 );
@@ -185,25 +185,13 @@ int main() {
     // set_frontend_state( 0b00001000 );
 
     // Ohmmeter, 1M range
-    set_frontend_state(0b10001000);
+    //set_frontend_state(0b10001000);
     // set_frontend_state( 0b00000000 );
     float reading = 0.5;
     char mode = 'V';
     //UARTprintf("Starting");
     while(1) {
-        // do nothing
-        // UARTprintf(".\n");
-        // write_log_line(reading, mode);
-        //reading += 0.5;
         buttonInterrupt();
-        //write_file();
-        // SysCtlDelay(100000);
         read_uart();
-
-        //printLCD("TEST");
-        //adc_read();
-
-        //SysCtlDelay(10000);
     }
 }
-

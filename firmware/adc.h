@@ -43,5 +43,7 @@ extern void roy_adc();
 extern int display_val;
 extern uint32_t data_buff[2000];
 extern int sample_count;
+extern void send_pc();
+
 
 #endif

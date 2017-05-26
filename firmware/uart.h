@@ -18,13 +18,16 @@
 #include "driverlib/systick.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
-
+#include "timer_updates.h"
 #include "button.h"
-
+#include "adc.h"
+#include "controls.h"
+#include "timer_updates.h"
 // Change between external and internal uart
 #define EXTERNAL_UART 0
 
 void init_uart();
 void read_uart();
+void send_pc();
 
 #endif

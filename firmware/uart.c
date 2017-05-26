@@ -130,3 +130,34 @@ void read_uart() {
         inputIndex = 0;
     }
 }
+
+/** r c v **/
+static char get_mode_char() {
+    if (my_mode == VOLTMETER) {
+        return 'v';
+    } else if (my_mode == AMPMETER) {
+        return 'c';
+    } else if (my_mode == OHMETER) {
+        return 'r';
+    } else {
+        return '!';
+    }
+}
+
+/** Formatting for pc communication **/
+void send_pc() {
+    char mode_send = get_mode_char();
+    UARTprintf("\n %c %d %d \n", mode_send, data_buff[sample_count], sample_count);
+    // mode followed by the sampling rate
+    if (my_state == STATE_MEASURE) {
+        if (ac_set) {
+            UARTprintf("\n $ &#177; AC %d.%d %c <br> %s\n", num1, left1, char_my_mode, sample_msg[sample_index]);
+        } else {
+            UARTprintf("\n $ &#177; DC %d.%d %c <br> %s\n", num1, left1, char_my_mode, sample_msg[sample_index]);
+        }
+    } else if (my_state == NONE) {
+        UARTprintf("\n $ %s\n", message[msg_count]);
+    } else if (my_state == STATE_SELECTION) {
+        UARTprintf("\n $ %s\n", msgUpdate[msg_count]);
+    }
+}

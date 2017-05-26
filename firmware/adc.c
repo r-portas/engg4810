@@ -5,6 +5,7 @@
 #include "inc/hw_gpio.h"
 #include "inc/hw_memmap.h"
 #include "driverlib/timer.h"
+#include "button.h"
 
 
 
@@ -35,7 +36,6 @@ void auto_range(float voltage) {
         range = 2;
         GPIOPinWrite(MUX_PORT_BASE, B , 0);
         GPIOPinWrite(MUX_PORT_BASE, C , C);
-
     }
     // 5 VOLTS
     if ((range == 2) && (voltage < 0.9)) {
@@ -66,7 +66,6 @@ void adc_read() {
 
     }
     /** KEEP THE FORMAT FOR ROY **/
-    //UARTprintf("\n r %d %d \n", data_buff[sample_count], sample_count);
     display_val =  data_buff[sample_count];
     sample_count++;
     // wrap around
@@ -75,21 +74,6 @@ void adc_read() {
     }
     sample_count++;
 }
-
-/*
-void convert_display() {
-      long long final = (pui32DataRx[0] + 55);
-      float voltage = (float)final/65536.00;
-      voltage = voltage * 4.8;
-      // updates the voltage
-      voltage = update_voltage(voltage);
-      // auto range the voltage
-      auto_range(voltage);
-      long long vol = (voltage * 1000);
-      int num = vol / 1000;
-      int left = vol - (num * 1000);
-      UARTprintf("\r    raw %d vol %d.%d RANGE %d   \r", pui32DataRx[0], num, left, range);
-}*/
 
 void init_adc() {
     // configure the clock for ADC

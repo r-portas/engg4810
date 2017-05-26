@@ -2,7 +2,7 @@ PORT A {(2,3,4,5), (6,7)} * USED
 PORT C {4,5,6,7} * USED
 PORT B {0,1} , FREE { **
 
-ADC pin map
+ADC pin map  
 	TIVA 	CONTROL 	ADC 
 	PF0     RX         pin 7 (dout) 
 	PF1     TX         
@@ -26,7 +26,7 @@ LCD pin Map
  
 PWM pins 
 PF4 --> buzzer
-PB1 --> LCD 
+PB2 --> LCD 
 
 LED blinking pins
 PA6 

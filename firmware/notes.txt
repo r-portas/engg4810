@@ -3,8 +3,6 @@
 variables to control the sd card state/ writting
 int sd_state
 int sd_count
-
-
 Button/ Enter Press in Measurement state // toggles the sd card reading (if set high)
 										//  Print ask sample count
 										//  if sample count selected by user (up / down) and enter

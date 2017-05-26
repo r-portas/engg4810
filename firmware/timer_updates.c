@@ -25,9 +25,7 @@ char *ask_prompt = "Select samples : ";
 char *ask_samples[] = {"1", "2", "3,", "4", "5", "10", "15", "20", "50", "100", "200", "500" , "1000"};
 int sample_list[] = { 1, 2, 3, 4, 5, 10, 15, 20, 50, 100, 200, 500, 1000};
 int test_count = 0;
-
 int sd_samples = 0;
-
 int sd_sample_index = 0;
 int sd_samples_ask = 0;
 int sd_state = 0;
@@ -52,6 +50,31 @@ int lcd_ticks = 0;
 int button_flag = 0;
 int time_count = 0;
 int time_sample = 0;
+int pc_tick = 0;
+int pc_flag = 0;
+int light_tick = 0;
+int lcd_on_flag = 0;
+int lcd_off_flag = 0;
+int char_my_mode = 0;
+
+
+
+/** update the modes print on LCD **/
+static void print_mode() {
+    if (my_mode == VOLTMETER) {
+        printLCD(" V ");
+        char_my_mode = 'V';
+    } else if (my_mode == AMPMETER) {
+        printLCD (" A ");
+        char_my_mode = 'A';
+    } else if (my_mode == OHMETER) {
+        printLCD (" O ");
+        char_my_mode = 'O';
+    } else if (my_mode == LOGIC) {
+        printLCD (" L ");
+        char_my_mode = 'L';
+    }
+}
 
 void SysTickInt(void)
 {
@@ -64,6 +87,8 @@ void SysTickInt(void)
     buzzer_ticks++;
     lcd_ticks++;
     button_tick++;
+    pc_tick++;
+    light_tick++;
     disk_timerproc(); // timer to keep the sd card going
 
     if (ac_set == 1) {
@@ -79,15 +104,30 @@ void SysTickInt(void)
         }
     }
   /** update the lcd every so often 0.5 sec**/
-  if (lcd_ticks > 1000) {
-      lcd_flag = 1;
-      lcd_ticks = 0;
-      my_flag = 1;
-  }
+      if (lcd_ticks > 1000) {
+          lcd_flag = 1;
+          lcd_ticks = 0;
+          my_flag = 1;
+      }
   /** checks the button every so often **/
   if (button_tick > 1200) {
       button_tick = 0;
       button_flag = 1;
+  }
+
+  if (pc_tick > 1000) {
+      pc_tick = 0;
+      pc_flag = 1;
+  }
+
+  /** for the light pwm  **/
+  if (light_tick < 750) {
+      lcd_on_flag = 1;
+  } else if (light_tick > 750) {
+      lcd_off_flag = 1;
+  }
+  if (light_tick > 1000) {
+      light_tick = 0;
   }
   IntMasterEnable();
 }
@@ -126,8 +166,8 @@ void update_lcd() {
        } else {
            printLCD("DC");
        }
+       print_mode();
        printLCD(buffer);
-       //printLCD("text");
        position_cursor(1,0);
        printLCD(sample_msg[sample_index]);
        if (sd_state == 1) {
@@ -146,7 +186,7 @@ void update_lcd() {
        lcd_tick = 0;
     }
     // ask samples
-    if (my_state == ASK_SAMPLES){
+    if (my_state == ASK_SAMPLES) {
         printLCD(ask_prompt);
         position_cursor(1,0);
         printLCD(ask_samples[sd_sample_index]);
@@ -210,6 +250,11 @@ void buttonInterrupt() {
         update_buffer_rms();
         rms_flag = 0;
     }
+
+    if (pc_flag) {
+        send_pc();
+        pc_flag = 0;
+    }
 }
 
 void initTimer()
@@ -217,7 +262,6 @@ void initTimer()
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
   while(!SysCtlPeripheralReady(SYSCTL_PERIPH_TIMER5))
   {
-
 
   }
   TimerConfigure(TIMER5_BASE, TIMER_CFG_PERIODIC);   // 32 bits Time

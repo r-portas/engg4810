@@ -16,7 +16,6 @@ float get_voltage(int final) {
     long long vol = (voltage * 1000);
     int num1 = vol / 1000;
     int left1 = vol - (num * 1000);
-    //UARTprintf("\r   vol %d.%d \r",num1, left1);
     return voltage;
 }
 
@@ -26,7 +25,6 @@ void convert_ohm_1k(float voltage) {
     long long vol = (ohm * 1000);
     num = vol / 1000;
     left = vol - (num * 1000);
-    //UARTprintf("\r ohm  %d.%d \r",num, left);
 }
 
 /** convert the raw reading for 1M range **/
@@ -35,7 +33,6 @@ void convert_ohm_1M(float voltage) {
    long long ohm_c = (ohm * 1000);
    num = ohm_c / 1000;
    left = ohm_c - (num * 1000);
-   //UARTprintf("\r ohm  %d.%d \r", num, left);
 }
 
 float convert_logic(float voltage) {
@@ -63,8 +60,6 @@ void update_hardware() {
             buzzer_state = 0;
         }
     }
-    // get the ADC read value
-    // convert to OHM
 }
 
 /** control to be interfaced with the hardware part of the circuit**/

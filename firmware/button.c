@@ -42,6 +42,7 @@ void update_mode() {
                 my_state = ASK_SAMPLES;
             }
             break;
+
         case ASK_SAMPLES:
             my_state = STATE_MEASURE;
             sd_state = 1;

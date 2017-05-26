@@ -74,7 +74,7 @@ void write_file() {
     // Write something
     f_write(&fil, "ABC\n", 4, &bytes_written);
     //fprintf(&fil, "hello\n");
-    UARTprintf("bytes %d\n", bytes_written);
+    //UARTprintf("bytes %d\n", bytes_written);
     f_sync(&fil);
     TimerEnable(TIMER5_BASE, TIMER_A);
     // IntMasterEnable();
