@@ -53,6 +53,17 @@ int button_flag = 0;
 int time_count = 0;
 int time_sample = 0;
 
+static void print_mode() {
+    if (my_mode == VOLTMETER) {
+        printLCD(" V ");
+    } else if (my_mode == AMPMETER) {
+        printLCD (" A ");
+    } else if (my_mode == OHMETER) {
+        printLCD (" O ");
+    }
+
+}
+
 void SysTickInt(void)
 {
     IntMasterDisable();
@@ -126,6 +137,7 @@ void update_lcd() {
        } else {
            printLCD("DC");
        }
+       print_mode();
        printLCD(buffer);
        //printLCD("text");
        position_cursor(1,0);

@@ -191,19 +191,9 @@ int main() {
     char mode = 'V';
     //UARTprintf("Starting");
     while(1) {
-        // do nothing
-        // UARTprintf(".\n");
-        // write_log_line(reading, mode);
-        //reading += 0.5;
+
         buttonInterrupt();
-        //write_file();
-        // SysCtlDelay(100000);
         read_uart();
-
-        //printLCD("TEST");
-        //adc_read();
-
-        //SysCtlDelay(10000);
     }
 }
 

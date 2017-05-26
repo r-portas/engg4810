@@ -67,22 +67,22 @@ void process_command() {
         case 'l':
             // Change to logic level
             UARTprintf("LOGIC LEVEL VOLTAGE\n");
-            my_state = LOGIC;
+            my_mode = LOGIC;
             break;
         case 'v':
             // Change to voltage mode
             UARTprintf("MULTIMETER VOLTAGE\n");
-            my_state = VOLTMETER;
+            my_mode = VOLTMETER;
             break;
         case 'c':
             // Change to current mode
             UARTprintf("MULTIMETER CURRENT\n");
-            my_state = AMPMETER;
+            my_mode = AMPMETER;
             break;
         case 'r':
             // Change to current mode
             UARTprintf("MULTIMETER RESISTANCE\n");
-            my_state = OHMETER;
+            my_mode = OHMETER;
             break;
         case 's':
             UARTprintf("SD Card log\n");
