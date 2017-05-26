@@ -111,8 +111,8 @@ void init_LCD(void)
     cursorOffLCD();       // Cursor invisible
     sendByte(0x06, lcd_false); // Set insert mode
     clearLCD();
-
     storeSpecialChar();
+    Delay(10000);
 }
 
 
@@ -154,4 +154,15 @@ void storeSpecialChar() {
 
 void sendSpecialChar() {
     sendByte(0x80, lcd_false);
+}
+
+/** reset the back Light **/
+void reset_backlight() {
+
+}
+
+/** Init the back Light **/
+void init_backlight() {
+
+
 }

@@ -29,8 +29,8 @@ PF4 --> buzzer
 PB1 --> LCD 
 
 LED blinking pins
-PA6
-PA7
+PA6 
+PA7 
 
 UART Pins 
 PB0 	RX

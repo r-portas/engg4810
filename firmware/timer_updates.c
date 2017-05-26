@@ -52,6 +52,7 @@ int lcd_ticks = 0;
 int button_flag = 0;
 int time_count = 0;
 int time_sample = 0;
+
 void SysTickInt(void)
 {
     IntMasterDisable();
@@ -71,7 +72,7 @@ void SysTickInt(void)
       toggle_pin();
 
     } else if (ac_set == 0) {
-        if (count_ticks > 1500) {
+        if (count_ticks > sample_rate[0]) {
              count_ticks = 0;
              toggle_pin();
              adc_read();
@@ -88,18 +89,17 @@ void SysTickInt(void)
       button_tick = 0;
       button_flag = 1;
   }
-    IntMasterEnable();
+  IntMasterEnable();
 }
 
 int num1= 0;
 int left1 = 0;
 uint32_t lcd_tick = 0;
 extern int display_val;
+char buffer[20];
+
 /** Updates the lcd**/
 void update_lcd() {
-    char buffer[20];
-    // measurement state
-    // printLCD("hello");
     if (my_state == STATE_MEASURE) {
        if (ac_set) {
          final_2 = sqrt((running_volt/n));
@@ -107,14 +107,27 @@ void update_lcd() {
          num1 = final_2 / 1000;
          left1 = final_2 - (num1 * 1000);
          //UARTprintf("vol %d . %d \r",num1, left1);
-         sprintf(buffer, "vol %d.%d",num1, left1);
-         UARTprintf("\n r %d %d \n", data_buff[sample_count], sample_count);
+         sprintf(buffer, " %d.%d",num1, left1);
          running_volt = 0.0;
          n = 0;
+       } else {
+           float final = get_voltage(display_val);
+           final = final * 1000;
+           num1 = final / 1000;
+           left1 = final - (num1 * 1000);
+           sprintf(buffer, " %d.%d", num1, left1);
        }
-       //sprintf(buffer, "test %d.%d", num, left);
-       //sprintf(buffer, "test %d", display_val);
+
+       sendSpecialChar();
+       sendByte(0x00, lcd_true);
+       if (ac_set) {
+           printLCD("AC");
+
+       } else {
+           printLCD("DC");
+       }
        printLCD(buffer);
+       //printLCD("text");
        position_cursor(1,0);
        printLCD(sample_msg[sample_index]);
        if (sd_state == 1) {

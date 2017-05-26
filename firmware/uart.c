@@ -122,4 +122,3 @@ void read_uart() {
         inputIndex = 0;
     }
 }
-

@@ -138,13 +138,10 @@ void set_frontend_state(uint8_t val) {
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
 }
 
-// one reading per clock tick
-// call ADC read in a timer
 int main() {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
-    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
     // Rail load switch high
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
     GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE,  GPIO_PIN_5);
@@ -165,7 +162,6 @@ int main() {
     GPIOPinWrite(GPIO_PORTC_BASE, DS , DS);
     GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
-
 
     // Voltage measure, 12v mode
     //set_frontend_state( 0b11000000 );
@@ -189,14 +185,10 @@ int main() {
     // set_frontend_state( 0b00001000 );
 
     // Ohmmeter, 1M range
-    set_frontend_state( 0b10001000 );
-
+    set_frontend_state(0b10001000);
     // set_frontend_state( 0b00000000 );
-
     float reading = 0.5;
     char mode = 'V';
-
-
     //UARTprintf("Starting");
     while(1) {
         // do nothing
@@ -214,3 +206,4 @@ int main() {
         //SysCtlDelay(10000);
     }
 }
+

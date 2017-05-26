@@ -4,11 +4,12 @@
 #include "adc.h"
 
 char *message[] = {"Voltmeter >> ", "Ampmeter >> " , "Ohmeter >> ", "Continuity >>", "Logic >>", "AC >>"};
-char *msgUpdate [] = {"Mode:Voltmeter", "Mode:Ampmeter" , "Mode:Ohmmeter" , "Mode:Continuity"};
+char *msgUpdate [] = {"Voltmeter AC|DC ", "Ampmeter AC | DC" , "Mode:Ohmmeter" , "Mode: Continuity", "Mode: Logic"};
 
 int msg_count = 0;
 int my_mode = 0;
 int my_state    = NONE;
+extern int ac_set;
 
 void count_check() {
     if (msg_count < 0) {
@@ -44,9 +45,6 @@ void update_mode() {
         case ASK_SAMPLES:
             my_state = STATE_MEASURE;
             sd_state = 1;
-            // adc would be measuring
-            // udpdate the sample count
-            // updathe sd state variables
             break;
     }
 }
@@ -72,16 +70,19 @@ void check_buttons() {
             count_check();
             // check for memory error
         }
+        /** select AC **/
+        if (my_state == STATE_SELECTION) {
+            ac_set = 1;
+        }
+
         if (my_state == NONE) {
             // increment message count
             msg_count++;
             count_check();
         }
-
         if (my_state == ASK_SAMPLES) {
             sd_sample_index++;
             update_sd_count();
-
         }
     }
 
@@ -102,7 +103,10 @@ void check_buttons() {
             msg_count--;
             count_check();
         }
-
+        /** go to DC mode **/
+        if (my_state == STATE_SELECTION) {
+            ac_set = 0;
+        }
         if (my_state == ASK_SAMPLES) {
             sd_sample_index--;
             update_sd_count();
