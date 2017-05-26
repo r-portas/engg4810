@@ -25,9 +25,7 @@ char *ask_prompt = "Select samples : ";
 char *ask_samples[] = {"1", "2", "3,", "4", "5", "10", "15", "20", "50", "100", "200", "500" , "1000"};
 int sample_list[] = { 1, 2, 3, 4, 5, 10, 15, 20, 50, 100, 200, 500, 1000};
 int test_count = 0;
-
 int sd_samples = 0;
-
 int sd_sample_index = 0;
 int sd_samples_ask = 0;
 int sd_state = 0;
@@ -54,17 +52,27 @@ int time_count = 0;
 int time_sample = 0;
 int pc_tick = 0;
 int pc_flag = 0;
+int light_tick = 0;
+int lcd_on_flag = 0;
+int lcd_off_flag = 0;
+int char_my_mode = 0;
+
+
 
 /** update the modes print on LCD **/
 static void print_mode() {
     if (my_mode == VOLTMETER) {
         printLCD(" V ");
+        char_my_mode = 'V';
     } else if (my_mode == AMPMETER) {
         printLCD (" A ");
+        char_my_mode = 'A';
     } else if (my_mode == OHMETER) {
         printLCD (" O ");
+        char_my_mode = 'O';
     } else if (my_mode == LOGIC) {
         printLCD (" L ");
+        char_my_mode = 'L';
     }
 }
 
@@ -80,6 +88,7 @@ void SysTickInt(void)
     lcd_ticks++;
     button_tick++;
     pc_tick++;
+    light_tick++;
     disk_timerproc(); // timer to keep the sd card going
 
     if (ac_set == 1) {
@@ -110,6 +119,11 @@ void SysTickInt(void)
       pc_tick = 0;
       pc_flag = 1;
   }
+
+  /*
+  if (light_tick > 5000) {
+      lcd_high_flag = 1;
+  }*/
   IntMasterEnable();
 }
 
@@ -244,7 +258,6 @@ void initTimer()
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
   while(!SysCtlPeripheralReady(SYSCTL_PERIPH_TIMER5))
   {
-
 
   }
   TimerConfigure(TIMER5_BASE, TIMER_CFG_PERIODIC);   // 32 bits Time

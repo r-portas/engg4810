@@ -155,7 +155,6 @@ void sendSpecialChar() {
     sendByte(0x80, lcd_false);
 }
 
-
 void back_light_off() {
     GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2 , 0);
 }

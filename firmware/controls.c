@@ -60,8 +60,6 @@ void update_hardware() {
             buzzer_state = 0;
         }
     }
-    // get the ADC read value
-    // convert to OHM
 }
 
 /** control to be interfaced with the hardware part of the circuit**/

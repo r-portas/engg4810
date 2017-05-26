@@ -29,7 +29,11 @@ extern int sd_state;
 extern int samples_written;
 extern char *ask_samples[];
 extern int sample_list[];
-
+extern int num1;
+extern int left1;
+extern int ac_set;
+extern int char_my_mode;
+extern char *sample_msg[];
 extern int sd_sample_index;
 extern int buzzer_state;
 

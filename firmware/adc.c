@@ -75,40 +75,6 @@ void adc_read() {
     sample_count++;
 }
 
-/** r c v **/
-
-static char get_mode_char() {
-    if (my_mode == VOLTMETER) {
-        return 'v';
-    } else if (my_mode == AMPMETER) {
-        return 'c';
-    } else if (my_mode == OHMETER) {
-        return 'r';
-    } else {
-        return '!';
-    }
-}
-
-void send_pc() {
-    char mode_send = get_mode_char();
-    UARTprintf("\n %c %d %d \n", mode_send, data_buff[sample_count], sample_count);
-}
-
-/*
-void convert_display() {
-      long long final = (pui32DataRx[0] + 55);
-      float voltage = (float)final/65536.00;
-      voltage = voltage * 4.8;
-      // updates the voltage
-      voltage = update_voltage(voltage);
-      // auto range the voltage
-      auto_range(voltage);
-      long long vol = (voltage * 1000);
-      int num = vol / 1000;
-      int left = vol - (num * 1000);
-      UARTprintf("\r    raw %d vol %d.%d RANGE %d   \r", pui32DataRx[0], num, left, range);
-}*/
-
 void init_adc() {
     // configure the clock for ADC
     // enable the SSI and GPIO port
