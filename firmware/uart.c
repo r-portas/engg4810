@@ -65,19 +65,27 @@ int inputIndex = 0;
 void process_command() {
     switch(input[0]) {
         case 'l':
-            // Start logging
+            // Change to logic level
+            UARTprintf("LOGIC LEVEL VOLTAGE\n");
+            my_state = LOGIC;
             break;
         case 'v':
             // Change to voltage mode
             UARTprintf("MULTIMETER VOLTAGE\n");
+            my_state = VOLTMETER;
             break;
         case 'c':
             // Change to current mode
             UARTprintf("MULTIMETER CURRENT\n");
+            my_state = AMPMETER;
             break;
         case 'r':
             // Change to current mode
             UARTprintf("MULTIMETER RESISTANCE\n");
+            my_state = OHMETER;
+            break;
+        case 's':
+            UARTprintf("SD Card log\n");
             break;
         default:
             // Probably an error

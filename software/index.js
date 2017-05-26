@@ -42,7 +42,7 @@ io.on('connection', (socket) => {
 
   // Logging
   socket.on('start-log', (data) => {
-    const line = `l ${data.sampleRate} ${data.sampleNum}`;
+    const line = `s ${data.sampleRate} ${data.sampleNum}`;
     console.log(`Sending ${line} over serial`);
     if (serialDevice != null) {
       if (serialDevice.isOpen()) {

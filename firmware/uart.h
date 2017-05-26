@@ -18,6 +18,9 @@
 #include "driverlib/systick.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
+
+#include "button.h"
+
 // Change between external and internal uart
 #define EXTERNAL_UART 0
 
