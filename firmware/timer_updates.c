@@ -52,7 +52,10 @@ int lcd_ticks = 0;
 int button_flag = 0;
 int time_count = 0;
 int time_sample = 0;
+int pc_tick = 0;
+int pc_flag = 0;
 
+/** update the modes print on LCD **/
 static void print_mode() {
     if (my_mode == VOLTMETER) {
         printLCD(" V ");
@@ -60,8 +63,9 @@ static void print_mode() {
         printLCD (" A ");
     } else if (my_mode == OHMETER) {
         printLCD (" O ");
+    } else if (my_mode == LOGIC) {
+        printLCD (" L ");
     }
-
 }
 
 void SysTickInt(void)
@@ -75,6 +79,7 @@ void SysTickInt(void)
     buzzer_ticks++;
     lcd_ticks++;
     button_tick++;
+    pc_tick++;
     disk_timerproc(); // timer to keep the sd card going
 
     if (ac_set == 1) {
@@ -90,15 +95,20 @@ void SysTickInt(void)
         }
     }
   /** update the lcd every so often 0.5 sec**/
-  if (lcd_ticks > 1000) {
-      lcd_flag = 1;
-      lcd_ticks = 0;
-      my_flag = 1;
-  }
+      if (lcd_ticks > 1000) {
+          lcd_flag = 1;
+          lcd_ticks = 0;
+          my_flag = 1;
+      }
   /** checks the button every so often **/
   if (button_tick > 1200) {
       button_tick = 0;
       button_flag = 1;
+  }
+
+  if (pc_tick > 1000) {
+      pc_tick = 0;
+      pc_flag = 1;
   }
   IntMasterEnable();
 }
@@ -221,6 +231,11 @@ void buttonInterrupt() {
     if (rms_flag) {
         update_buffer_rms();
         rms_flag = 0;
+    }
+
+    if (pc_flag) {
+        send_pc();
+        pc_flag = 0;
     }
 }
 

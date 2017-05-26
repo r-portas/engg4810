@@ -5,6 +5,7 @@
 #include "inc/hw_gpio.h"
 #include "inc/hw_memmap.h"
 #include "driverlib/timer.h"
+#include "button.h"
 
 
 
@@ -75,8 +76,23 @@ void adc_read() {
     sample_count++;
 }
 
+/** r c v **/
+
+static char get_mode_char() {
+    if (my_mode == VOLTMETER) {
+        return 'v';
+    } else if (my_mode == AMPMETER) {
+        return 'c';
+    } else if (my_mode == OHMETER) {
+        return 'r';
+    } else {
+        return '!';
+    }
+}
+
 void send_pc() {
-    UARTprintf("\n r %d %d \n", data_buff[sample_count], sample_count);
+    char mode_send = get_mode_char();
+    UARTprintf("\n %c %d %d \n", mode_send, data_buff[sample_count], sample_count);
 }
 
 /*
