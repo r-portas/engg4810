@@ -144,20 +144,27 @@ static char get_mode_char() {
     }
 }
 
+void send_mode() {
+    char mode_send = get_mode_char();
+
+    UARTprintf("%c\n", mode_send);
+}
+
 /** Formatting for pc communication **/
 void send_pc() {
-    char mode_send = get_mode_char();
-    UARTprintf("\n %c %d %d \n", mode_send, data_buff[sample_count], sample_count);
+
+    UARTprintf("# %d %d \n", data_buff[sample_count], sample_count);
+
     // mode followed by the sampling rate
     if (my_state == STATE_MEASURE) {
         if (ac_set) {
-            UARTprintf("\n $ &#177; AC %d.%d %c <br> %s\n", num1, left1, char_my_mode, sample_msg[sample_index]);
+            UARTprintf("$ &#177; AC %d.%d %c <br> %s\n", num1, left1, char_my_mode, sample_msg[sample_index]);
         } else {
-            UARTprintf("\n $ &#177; DC %d.%d %c <br> %s\n", num1, left1, char_my_mode, sample_msg[sample_index]);
+            UARTprintf("$ &#177; DC %d.%d %c <br> %s\n", num1, left1, char_my_mode, sample_msg[sample_index]);
         }
     } else if (my_state == NONE) {
-        UARTprintf("\n $ %s\n", message[msg_count]);
+        UARTprintf("$ %s\n", message[msg_count]);
     } else if (my_state == STATE_SELECTION) {
-        UARTprintf("\n $ %s\n", msgUpdate[msg_count]);
+        UARTprintf("$ %s\n", msgUpdate[msg_count]);
     }
 }

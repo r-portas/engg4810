@@ -28,6 +28,7 @@
 
 void init_uart();
 void read_uart();
+void send_mode();
 void send_pc();
 
 #endif

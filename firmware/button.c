@@ -2,6 +2,7 @@
 #include "mux.h"
 #include "timer_updates.h"
 #include "adc.h"
+#include "uart.h"
 
 char *message[] = {"Voltmeter >> ", "Ampmeter >> " , "Ohmeter >> ", "Continuity >>", "Logic >>", "AC >>"};
 char *msgUpdate [] = {"Voltmeter AC|DC ", "Ampmeter AC | DC" , "Mode:Ohmmeter" , "Mode: Continuity", "Mode: Logic"};
@@ -48,6 +49,9 @@ void update_mode() {
             sd_state = 1;
             break;
     }
+
+    // Send to PC software
+    send_mode();
 }
 
 void update_sd_count() {
