@@ -7,6 +7,9 @@ Vue.component('chart', {
 
       <input class="mdl-slider mdl-js-slider" type="range"
         min="0" :max="dataItems" v-model="scrollIndex" tabindex="0">
+
+      <p> Start time: {{startTime}}</p>
+      <p> End time: {{endTime}}</p>
     </div> 
   `,
 
@@ -18,7 +21,7 @@ Vue.component('chart', {
       g: null,
       height: 0,
       width: 0,
-      margin: { top: 20, right: 20, bottom: 30, left: 50 },
+      margin: { top: 20, right: 20, bottom: 100, left: 70 },
       // The time scale on the x axis
       xscale: null,
       yscale: null,
@@ -28,6 +31,11 @@ Vue.component('chart', {
       topMasks: [],
       bottomMasks: [],
 
+      startTime: '',
+      endTime: '',
+
+      isPaused: false,
+
       // The index to scroll to
       scrollIndex: 0,
 
@@ -35,8 +43,8 @@ Vue.component('chart', {
       dataLimit: 10,
       voltageRange: [-12, 12],
       currentRange: [-200, 200],
-      //resistanceRange: [0, 1000000],
-      resistanceRange: [0, 100000],
+      resistanceRange: [0, 1000000],
+      // resistanceRange: [0, 100000],
       logicRange: [-0.5, 1.5],
 
       selectedRange: 'voltage',
@@ -46,6 +54,7 @@ Vue.component('chart', {
         current: 'Current (mA)',
         resistance: 'Resistance (ohms)',
         logic: 'Logic Level (digital)',
+        continuity: 'Continuity',
       },
 
       yLabelObj: null,
@@ -195,6 +204,10 @@ Vue.component('chart', {
           y.domain(this.logicRange);
           break;
 
+        case 'continuity':
+          y.domain(this.logicRange);
+          break;
+
         case 'auto':
           console.log('Auto range not implemented yet');
           break;
@@ -204,12 +217,16 @@ Vue.component('chart', {
           break;
       }
 
-      const xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat('%H'));
+      const xAxis = d3.axisBottom(x).tickFormat(d3.isoFormat);
 
       // X axis
       this.g.append('g')
         .attr('transform', `translate(0, ${this.height})`)
         .call(xAxis)
+        .selectAll('text')
+        .attr('transform', 'rotate(45)')
+        .attr('x', 70)
+        .attr('y', 0)
         .select('.domain')
         .remove();
 
@@ -230,14 +247,22 @@ Vue.component('chart', {
         .style('text-anchor', 'middle')
         .text(this.rangeLabel[this.selectedRange]);
 
+      this.g.append('clipPath')
+        .attr('id', 'clip')
+        .append('rect')
+        .attr('width', this.width)
+        .attr('height', this.height);
+
       // Data
       this.g.append('path')
+        .attr('clip-path', 'url(#clip)')
         .datum(data)
         .classed('line', true)
         .attr('fill', 'none')
         .attr('stroke', 'steelblue')
         .attr('stroke-width', 1.5)
         .attr('d', line);
+
 
       // Draw the crosshair
       this.g.append('line')
@@ -274,10 +299,22 @@ Vue.component('chart', {
         // If the shift key is pressed, add to the bottom mask
         if (d3.event.ctrlKey || d3.event.shiftKey) {
           scope.addMask(mouse[0], mouse[1], 'low');
+
+          const collisions = scope.processCollisions();
+          if (scope.isInvalidConfiguration(collisions)) {
+            scope.deleteMask(mouse[0], mouse[1]);
+            alert('Invalid mask configuration');
+          }
         } else if (d3.event.altKey) {
           scope.deleteMask(mouse[0], mouse[1]);
         } else {
           scope.addMask(mouse[0], mouse[1], 'high');
+
+          const collisions = scope.processCollisions();
+          if (scope.isInvalidConfiguration(collisions)) {
+            scope.deleteMask(mouse[0], mouse[1]);
+            alert('Invalid mask configuration');
+          }
         }
 
         scope.drawMasks();
@@ -316,8 +353,9 @@ Vue.component('chart', {
             .attr('y2', y(d.value));
 
           const sampleNum = scope.data.indexOf(d) + 1;
-          const date = moment(d.date).format('LT');
-          const tooltipText = `${d.value}, ${sampleNum}, ${date}`;
+          const date = moment(d.date).format();
+          // const date = moment(d.date).format('LT');
+          const tooltipText = `(Reading: ${d.value}, SampleNum: ${sampleNum}, Date: ${date})`;
 
           scope.g.select('text.description')
             .attr('x', x(d.date) - 50)
@@ -376,8 +414,7 @@ Vue.component('chart', {
     },
 
     /**
-     * Updates the range of the chart and redraws it
-     */
+     * Updates the range of the chart and redraws it */
     setRange(range) {
       this.selectedRange = range;
 
@@ -582,6 +619,18 @@ Vue.component('chart', {
       let collisions = collision.checkCollision(data.translatedData, data.topMask, data.bottomMask);
       collisions = this.translatedCollisionScale(collisions);
       this.bus.$emit('collisions', collisions);
+      return collisions;
+    },
+
+    isInvalidConfiguration(collisions) {
+      const invalid = collisions.filter((collision) => {
+        return collision.name === 'Invalid Mask Configuration';
+      });
+
+      if (invalid.length > 0) {
+        return true;
+      }
+      return false;
     },
 
     /**
@@ -606,6 +655,15 @@ Vue.component('chart', {
       });
     },
 
+    calculateStartAndEnd() {
+      if (this.data.length > 0) {
+        const startDate = this.data[0].date;
+        const endDate = this.data[this.data.length - 1].date;
+        this.startTime = moment(startDate).format();
+        this.endTime = moment(endDate).format();
+      }
+    },
+
   },
 
   watch: {
@@ -628,11 +686,15 @@ Vue.component('chart', {
     },
 
     data() {
-      // Set the scroll index to the end
-      this.scrollIndex = this.data.length;
+      this.calculateStartAndEnd();
 
-      this.drawChart();
-      this.processCollisions();
+      if (this.isPaused === false) {
+        // Set the scroll index to the end
+        this.scrollIndex = this.data.length;
+
+        this.drawChart();
+        this.processCollisions();
+      }
     },
   },
 
@@ -647,5 +709,13 @@ Vue.component('chart', {
     this.bus.$on('set-masks', (masks) => { this.setMasks(masks); });
     this.bus.$on('set-range', (range) => { this.setRange(range); });
     this.bus.$on('get-masks', () => this.getMasks());
+
+    this.bus.$on('pause-on', () => {
+      this.isPaused = true;
+    });
+
+    this.bus.$on('pause-off', () => {
+      this.isPaused = false;
+    });
   },
 });

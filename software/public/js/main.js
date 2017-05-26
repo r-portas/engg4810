@@ -57,11 +57,9 @@ new Vue({
 
     addEntry(date, value) {
       // Only add data if we aren't paused
-      if (this.isPaused === false) {
-        const isoString = date.toISOString();
-        const parseTime = d3.isoParse;
-        this.data.push({ date: parseTime(isoString), value, currentMode: this.currentMode });
-      }
+      const isoString = date.toISOString();
+      const parseTime = d3.isoParse;
+      this.data.push({ date: parseTime(isoString), value, currentMode: this.currentMode });
     },
     /**
      * Checks if the current tab is active
@@ -146,8 +144,10 @@ new Vue({
     togglePause() {
       if (this.isPaused) {
         this.isPaused = false;
+        this.bus.$emit('pause-off');
       } else {
         this.isPaused = true;
+        this.bus.$emit('pause-on');
       }
     },
   },
@@ -188,7 +188,7 @@ new Vue({
       this.socket.emit('start-log', data);
     });
 
-    this.socket.$on('logging-finished', () => {
+    this.socket.on('logging-finished', () => {
       this.bus.$emit('logging-finished');
     });
 
@@ -207,6 +207,10 @@ new Vue({
 
     this.bus.$on('device-disconnect', () => {
       this.socket.emit('device-disconnect');
+    });
+
+    this.bus.$on('sampling-rate', (sampleRate) => {
+      this.socket.emit('sampling-rate', sampleRate);
     });
 
     this.bus.$on('get-ports', () => {

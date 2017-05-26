@@ -183,7 +183,13 @@ int main() {
     // set_frontend_state( 0b11010110 );
 
     // Current measure, 10ma range
-    set_frontend_state( 0b11010001 );
+    // set_frontend_state( 0b11010001 );
+
+    // Ohmmeter, 1k range
+    // set_frontend_state( 0b00001000 );
+
+    // Ohmmeter, 1M range
+    set_frontend_state( 0b10001000 );
 
     // set_frontend_state( 0b00000000 );
 
@@ -200,7 +206,7 @@ int main() {
         buttonInterrupt();
         //write_file();
         // SysCtlDelay(100000);
-        // read_uart();
+        read_uart();
 
         //printLCD("TEST");
         //adc_read();

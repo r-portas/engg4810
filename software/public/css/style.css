@@ -4,7 +4,7 @@ body {
 
 .chart {
     padding: 20px;
-    height: 60vh;
+    height: 70vh;
     width: 95%;
 }
 
@@ -30,6 +30,7 @@ body {
 .flex-container {
     display: flex;
     flex-wrap: wrap;
+    align-items: flex-start;
 }
 
 .ports-table {

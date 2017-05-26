@@ -45,6 +45,12 @@ Vue.component('data-card', {
         </label> 
         <br>
 
+        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="continuity">
+          <input type="radio" id="continuity" class="mdl-radio__button" value="continuity" v-model="rangeOption">
+          <span class="mdl-radio__label">Continuity</span>
+        </label> 
+        <br>
+
         <button v-on:click="clearMasks" class="settings-btn mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
           Clear Masks
         </button> 
