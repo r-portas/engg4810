@@ -151,18 +151,22 @@ void storeSpecialChar() {
     // switch back to DDRAM for LCD display
 }
 
-
 void sendSpecialChar() {
     sendByte(0x80, lcd_false);
 }
 
-/** reset the back Light **/
-void reset_backlight() {
 
+void back_light_off() {
+    GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2 , 0);
+}
+
+void back_light_on() {
+    GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2 , GPIO_PIN_2);
 }
 
 /** Init the back Light **/
 void init_backlight() {
-
-
+    // Init the back light for tiva (has to be toggled)
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_2);
 }

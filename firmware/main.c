@@ -191,9 +191,7 @@ int main() {
     char mode = 'V';
     //UARTprintf("Starting");
     while(1) {
-
         buttonInterrupt();
         read_uart();
     }
 }
-

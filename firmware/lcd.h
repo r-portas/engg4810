@@ -32,6 +32,10 @@
 #define CMD_PERIPH SYSCTL_PERIPH_GPIOE
 #define Delay(num) SysCtlDelay(num)
 
+#define BACK_LIGHT_PERIPH   SYSCTL_PERIPH_GPIOB
+#define BACK_LIGHT_PORT     GPIO_PORTB_BASE
+#define BACK_LIGHT_PIN      GPIO_PIN_2
+
 // pa5, pa6, pa7
 extern void init_LCD();
 extern void storeSpecialChar();

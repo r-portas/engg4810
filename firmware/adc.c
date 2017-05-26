@@ -36,7 +36,6 @@ void auto_range(float voltage) {
         range = 2;
         GPIOPinWrite(MUX_PORT_BASE, B , 0);
         GPIOPinWrite(MUX_PORT_BASE, C , C);
-
     }
     // 5 VOLTS
     if ((range == 2) && (voltage < 0.9)) {

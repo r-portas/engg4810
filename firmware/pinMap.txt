@@ -26,7 +26,7 @@ LCD pin Map
  
 PWM pins 
 PF4 --> buzzer
-PB1 --> LCD 
+PB2 --> LCD 
 
 LED blinking pins
 PA6 
