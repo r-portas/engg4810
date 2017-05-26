@@ -144,7 +144,6 @@ static char get_mode_char() {
     }
 }
 
-
 /** Formatting for pc communication **/
 void send_pc() {
     char mode_send = get_mode_char();

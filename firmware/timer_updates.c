@@ -120,10 +120,15 @@ void SysTickInt(void)
       pc_flag = 1;
   }
 
-  /*
-  if (light_tick > 5000) {
-      lcd_high_flag = 1;
-  }*/
+  /** for the light pwm  **/
+  if (light_tick < 750) {
+      lcd_on_flag = 1;
+  } else if (light_tick > 750) {
+      lcd_off_flag = 1;
+  }
+  if (light_tick > 1000) {
+      light_tick = 0;
+  }
   IntMasterEnable();
 }
 
@@ -163,7 +168,6 @@ void update_lcd() {
        }
        print_mode();
        printLCD(buffer);
-       //printLCD("text");
        position_cursor(1,0);
        printLCD(sample_msg[sample_index]);
        if (sd_state == 1) {
@@ -182,7 +186,7 @@ void update_lcd() {
        lcd_tick = 0;
     }
     // ask samples
-    if (my_state == ASK_SAMPLES){
+    if (my_state == ASK_SAMPLES) {
         printLCD(ask_prompt);
         position_cursor(1,0);
         printLCD(ask_samples[sd_sample_index]);
