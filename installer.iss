@@ -11,3 +11,6 @@ Source: "software\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 
 [Icons]
 Name: "{group}\Multimeter"; Filename: "{app}\run.bat"
+
+[Run]
+Filename: "{app}\driver\SETUP.EXE"; Parameters: "\S"

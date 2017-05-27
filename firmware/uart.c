@@ -1,74 +1,58 @@
 #include "uart.h"
 
-void init_uart() {
-    if (EXTERNAL_UART) {
-        //
-        // Enable the GPIO Peripheral used by the UART.
-        //
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-
-        //
-        // Enable UART1
-        //
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
-
-        //
-        // Configure GPIO Pins for UART mode.
-        //
-        GPIOPinConfigure(GPIO_PB0_U1RX);
-        GPIOPinConfigure(GPIO_PB1_U1TX);
-        GPIOPinTypeUART(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-        //
-        // Use the internal 16MHz oscillator as the UART clock source.
-        //
-        UARTClockSourceSet(UART1_BASE, UART_CLOCK_PIOSC);
-
-        //
-        // Initialize the UART for console I/O.
-        //
-        UARTStdioConfig(1, 9600, 16000000);
-
-    } else {
-        //
-        // Enable the GPIO Peripheral used by the UART.
-        //
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-
-        //
-        // Enable UART0
-        //
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-
-        //
-        // Configure GPIO Pins for UART mode.
-        //
-        GPIOPinConfigure(GPIO_PA0_U0RX);
-        GPIOPinConfigure(GPIO_PA1_U0TX);
-        GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-        //
-        // Use the internal 16MHz oscillator as the UART clock source.
-        //
-        UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
-
-        //
-        // Initialize the UART for console I/O.
-        //
-        UARTStdioConfig(0, 9600, 16000000);
-    }
-}
-
 char input[30];
 int inputIndex = 0;
-
 
 char buffer[20];
 char *mode_str;
 char *sample_str;
 const char space[2] = " ";
 
-/** update the sampling rate **/
+/**
+ * Initializes the UART connection
+ */
+void init_uart() {
+    if (EXTERNAL_UART) {
+        // Enable the GPIO Peripheral used by the UART.
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+
+        // Enable UART1
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);
+
+        // Configure GPIO Pins for UART mode.
+        GPIOPinConfigure(GPIO_PB0_U1RX);
+        GPIOPinConfigure(GPIO_PB1_U1TX);
+        GPIOPinTypeUART(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+        // Use the internal 16MHz oscillator as the UART clock source.
+        UARTClockSourceSet(UART1_BASE, UART_CLOCK_PIOSC);
+
+        // Initialize the UART for console I/O.
+        UARTStdioConfig(1, 9600, 16000000);
+    } else {
+        // Enable the GPIO Peripheral used by the UART.
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+        // Enable UART0
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+
+        // Configure GPIO Pins for UART mode.
+        GPIOPinConfigure(GPIO_PA0_U0RX);
+        GPIOPinConfigure(GPIO_PA1_U0TX);
+        GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+        // Use the internal 16MHz oscillator as the UART clock source.
+        UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
+
+        // Initialize the UART for console I/O.
+        UARTStdioConfig(0, 9600, 16000000);
+    }
+}
+
+
+/** 
+ * Update the sampling rate 
+ */
 void update_sampling_rate() {
     UARTprintf("Updating sampling!\n");
     if (strncmp(sample_str, "2", 1) == 0) {
@@ -92,7 +76,9 @@ void update_sampling_rate() {
     }
 }
 
-/** update the LCD brightness **/
+/**
+ * Update the LCD brightness
+ */
 static void update_brightness() {
     UARTprintf("Updating brightness!\n");
     switch(input[2]){
@@ -114,7 +100,9 @@ static void update_brightness() {
     }
 }
 
-/** update the internal type of the signal **/
+/** 
+ * Update the internal type of the signal
+ */
 static void update_signal_type() {
     UARTprintf("Updating signal type!\n");
     if (input[2] == '1') {
@@ -124,6 +112,9 @@ static void update_signal_type() {
     }
 }
 
+/**
+ * Processes the UART command
+ */
 void process_command() {
     switch(input[0]) {
         case 'l':
@@ -157,6 +148,9 @@ void process_command() {
     }
 }
 
+/**
+ * Reads from the UART connection
+ */
 void read_uart() {
     int32_t inputChar;
 
@@ -196,7 +190,10 @@ void read_uart() {
     }
 }
 
-/** r c v **/
+/**
+ * Returns the character mode
+ * either: r c v 
+ */
 static char get_mode_char() {
     if (my_mode == VOLTMETER) {
         return 'v';
@@ -209,13 +206,18 @@ static char get_mode_char() {
     }
 }
 
+/**
+ * Sends the mode via UART to software
+ */
 void send_mode() {
     char mode_send = get_mode_char();
 
     UARTprintf("%c\n", mode_send);
 }
 
-/** Formatting for pc communication **/
+/** 
+ * Formatting for pc communication
+ */
 void send_pc() {
     UARTprintf("# %d %d \n", data_buff[sample_count], sample_count);
     // mode followed by the sampling rate
