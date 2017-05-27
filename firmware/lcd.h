@@ -5,7 +5,6 @@
 
 #define lcd_false  0
 #define lcd_true   1
-
 /*
  *
  * Pin Connections:

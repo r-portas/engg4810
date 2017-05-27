@@ -16,10 +16,12 @@ long button_tick = 0;
 
 // change values on button read
 int sample_index = 0;
-int sample_rate[] = {1500, 3000, 6000, 15000, 180000, 360000, 900000, 1800000};
-char *sample_msg[] = {"2 read /s", "1 read/ s", "1 read/ 2s", "1 read/ 5s",
+
+int sample_rate[] = {1500, 3000, 6000, 15000, 30000, 180000, 360000, 900000, 1800000};
+char *sample_msg[] = {"2 read / s", "1 read/ s", "1 read/2s", "1 read/ 5s", "1 read/10 s"
                     "1 read/ min", "1 read/ 2 min" , "1 read/5 min",
                     "1 read/10 min" };
+
 
 char *ask_prompt = "Select samples : ";
 char *ask_samples[] = {"1", "2", "3,", "4", "5", "10", "15", "20", "50", "100", "200", "500" , "1000"};
@@ -56,8 +58,7 @@ int light_tick = 0;
 int lcd_on_flag = 0;
 int lcd_off_flag = 0;
 int char_my_mode = 0;
-
-
+int back_light_num = 0;
 
 /** update the modes print on LCD **/
 static void print_mode() {
@@ -97,12 +98,13 @@ void SysTickInt(void)
       toggle_pin();
 
     } else if (ac_set == 0) {
-        if (count_ticks > sample_rate[0]) {
+        if (count_ticks > sample_rate[sample_index]) {
              count_ticks = 0;
              toggle_pin();
              adc_read();
         }
     }
+
   /** update the lcd every so often 0.5 sec**/
       if (lcd_ticks > 1000) {
           lcd_flag = 1;
@@ -121,13 +123,15 @@ void SysTickInt(void)
   }
 
   /** for the light pwm  **/
-  if (light_tick < 750) {
-      lcd_on_flag = 1;
-  } else if (light_tick > 750) {
-      lcd_off_flag = 1;
-  }
-  if (light_tick > 1000) {
-      light_tick = 0;
+  if (light_tick < back_light_num) {
+      //lcd_on_flag = 1;
+      back_light_on();
+  } else if (light_tick > back_light_num) {
+      //lcd_off_flag = 1;
+      back_light_off();
+      if (light_tick > 100) {
+            light_tick = 0;
+      }
   }
   IntMasterEnable();
 }
@@ -140,9 +144,7 @@ char buffer[20];
 
 /** Updates the lcd**/
 void update_lcd() {
-    UARTprintf("updating l\n");
     if (my_state == STATE_MEASURE) {
-        UARTprintf("updating 2\n");
         if (ac_set) {
          final_2 = sqrt((running_volt/n));
          final_2 = final_2 * 1000;
@@ -152,14 +154,12 @@ void update_lcd() {
          running_volt = 0.0;
          n = 0;
        } else {
-           UARTprintf("updating l3\n");
            float final = get_voltage(display_val);
            final = final * 1000;
            num1 = final / 1000;
            left1 = final - (num1 * 1000);
            sprintf(buffer, " %d.%d", num1, left1);
        }
-
        sendSpecialChar();
        sendByte(0x00, lcd_true);
        if (ac_set) {
@@ -177,22 +177,18 @@ void update_lcd() {
        }
        lcd_tick = 0;
     }
-    UARTprintf("updating 4\n");
     // default state
     if (my_state == NONE) {
-        UARTprintf("updating 5\n");
        printLCD(message[msg_count]);
        lcd_tick = 0;
     }
     // ask to make a selection
     if (my_state == STATE_SELECTION) {
-        UARTprintf("updating 6\n");
        printLCD(msgUpdate[msg_count]);
        lcd_tick = 0;
     }
     // ask samples
     if (my_state == ASK_SAMPLES) {
-        UARTprintf("updating 7\n");
         printLCD(ask_prompt);
         position_cursor(1,0);
         printLCD(ask_samples[sd_sample_index]);
@@ -261,6 +257,16 @@ void buttonInterrupt() {
         send_pc();
         pc_flag = 0;
     }
+    /*
+    if (lcd_on_flag) {
+        back_light_on();
+        lcd_on_flag = 0;
+    }
+
+    if (lcd_off_flag) {
+        back_light_off();
+        lcd_off_flag = 0;
+    }*/
 }
 
 void initTimer()

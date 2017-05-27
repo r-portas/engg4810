@@ -19,7 +19,7 @@ LCD pin Map
  * PD3  -> D7 
  
  SD card pin map
- PA2 (clk)     SCLK (CLK)
+ PA2 (clk)     SCLK (CLK) 
  PA3 (cmd)     CS (DAT3)
  PA4 (rx)      D0 (DAT0) 
  PA5 (tx)      DI (CMD)   

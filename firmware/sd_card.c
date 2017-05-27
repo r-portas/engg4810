@@ -66,19 +66,11 @@ void write_log_line(float reading, char mode) {
 
 /** write to the sd card**/
 void write_file() {
-    //toggle_pin();
-    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
-    //IntMasterDisable();
     TimerDisable(TIMER5_BASE, TIMER_A);
     int bytes_written = 0;
-    // Write something
     f_write(&fil, "ABC\n", 4, &bytes_written);
-    //fprintf(&fil, "hello\n");
-    //UARTprintf("bytes %d\n", bytes_written);
     f_sync(&fil);
     TimerEnable(TIMER5_BASE, TIMER_A);
-    // IntMasterEnable();
-    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
 }
 
 void init_sd_card() {

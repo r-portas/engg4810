@@ -62,6 +62,35 @@ void init_uart() {
 char input[30];
 int inputIndex = 0;
 
+
+char buffer[20];
+char *mode_str;
+char *sample_str;
+const char space[2] = " ";
+
+/** update the sampling rate **/
+void update_sampling_rate() {
+    if (strncmp(sample_str, "2", 1) == 0) {
+        sample_index = 0;
+    } else if (strncmp(sample_str, "1", 1) == 0) {
+        sample_index = 1;
+    } else if (strncmp(sample_str, "0.5", 3) == 0) {
+        sample_index = 2;
+    } else if (strncmp(sample_str, "0.2", 3) == 0) {
+        sample_index = 3;
+    } else if (strncmp(sample_str, "0.1", 3) == 0) {
+        sample_index = 4;
+    } else if (strncmp(sample_str, "0.016", 5) == 0) {
+        sample_index = 5;
+    } else if (strncmp(sample_str, "0.0083", 6) == 0) {
+        sample_index = 6;
+    } else if (strncmp(sample_str, "0.0033", 6) == 0) {
+        sample_index = 7;
+    } else if (strncmp(sample_str, "0.0016", 6) == 0) {
+        sample_index = 8;
+    }
+}
+
 void process_command() {
     switch(input[0]) {
         case 'l':
@@ -77,8 +106,12 @@ void process_command() {
             my_mode = OHMETER;
             break;
         case 's':
-
-            // update the sampling mode
+            mode_str = strtok(input , space);
+            if (mode_str != NULL) {
+               sample_str = strtok (NULL, space);
+            }
+            update_sampling_rate();
+            UARTprintf("Rx sampling %s %s\n\n", mode_str, sample_str);
             break;
         default:
             break;

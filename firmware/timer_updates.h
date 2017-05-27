@@ -11,6 +11,7 @@
 #include "driverlib/systick.h"
 #include "controls.h"
 #include "sd_card.h"
+#include "lcd.h"
 
 void init_timers(void);
 extern int sampling_index;
