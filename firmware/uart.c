@@ -91,6 +91,36 @@ void update_sampling_rate() {
     }
 }
 
+/** update the LCD brightness **/
+static void update_brightness() {
+    switch(input[2]){
+        case '1':
+            back_light_num = 100;
+            break;
+        case '2':
+            back_light_num = 80;
+            break;
+        case '3':
+            back_light_num = 60;
+            break;
+        case '4':
+            back_light_num = 40;
+            break;
+        case '5':
+            back_light_num = 20;
+            break;
+    }
+}
+
+/** update the internal type of the signal **/
+static void update_signal_type() {
+    if (input[2] == '1') {
+        ac_set = 1;
+    } else if (input[2] == '0') {
+        ac_set = 0;
+    }
+}
+
 void process_command() {
     switch(input[0]) {
         case 'l':
@@ -112,6 +142,12 @@ void process_command() {
             }
             update_sampling_rate();
             UARTprintf("Rx sampling %s %s\n\n", mode_str, sample_str);
+            break;
+        case 'b':
+            update_brightness();
+            break;
+        case 'a':
+            update_signal_type();
             break;
         default:
             break;
