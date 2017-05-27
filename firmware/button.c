@@ -70,6 +70,9 @@ void check_buttons() {
         UARTprintf("Up pressed\n");
         if(my_mode == BRIGHTNESS) {
             back_light_num += 20;
+            if  ((back_light_num) > 100) {
+                back_light_num = 100;
+            }
             return;
         }
         if (my_state == STATE_MEASURE) {
@@ -98,6 +101,9 @@ void check_buttons() {
         UARTprintf("Down pressed\n");
         if(my_mode == BRIGHTNESS) {
             back_light_num -= 20;
+            if (back_light_num < 0) {
+                back_light_num = 0;
+            }
             return;
         }
         if (my_state == STATE_MEASURE) {

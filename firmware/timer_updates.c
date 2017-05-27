@@ -264,16 +264,7 @@ void buttonInterrupt() {
         send_pc();
         pc_flag = 0;
     }
-    /*
-    if (lcd_on_flag) {
-        back_light_on();
-        lcd_on_flag = 0;
-    }
-
-    if (lcd_off_flag) {
-        back_light_off();
-        lcd_off_flag = 0;
-    }*/
+    /** sd write **/
 }
 
 void initTimer()
