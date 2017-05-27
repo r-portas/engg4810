@@ -70,6 +70,7 @@ const char space[2] = " ";
 
 /** update the sampling rate **/
 void update_sampling_rate() {
+    UARTprintf("Updating sampling!\n");
     if (strncmp(sample_str, "2", 1) == 0) {
         sample_index = 0;
     } else if (strncmp(sample_str, "1", 1) == 0) {
@@ -88,6 +89,38 @@ void update_sampling_rate() {
         sample_index = 7;
     } else if (strncmp(sample_str, "0.0016", 6) == 0) {
         sample_index = 8;
+    }
+}
+
+/** update the LCD brightness **/
+static void update_brightness() {
+    UARTprintf("Updating brightness!\n");
+    switch(input[2]){
+        case '1':
+            back_light_num = 100;
+            break;
+        case '2':
+            back_light_num = 80;
+            break;
+        case '3':
+            back_light_num = 60;
+            break;
+        case '4':
+            back_light_num = 40;
+            break;
+        case '5':
+            back_light_num = 20;
+            break;
+    }
+}
+
+/** update the internal type of the signal **/
+static void update_signal_type() {
+    UARTprintf("Updating signal type!\n");
+    if (input[2] == '1') {
+        ac_set = 1;
+    } else if (input[2] == '0') {
+        ac_set = 0;
     }
 }
 
@@ -112,6 +145,12 @@ void process_command() {
             }
             update_sampling_rate();
             UARTprintf("Rx sampling %s %s\n\n", mode_str, sample_str);
+            break;
+        case 'b':
+            update_brightness();
+            break;
+        case 'a':
+            update_signal_type();
             break;
         default:
             break;

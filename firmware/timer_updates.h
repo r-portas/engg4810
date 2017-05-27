@@ -37,5 +37,6 @@ extern int char_my_mode;
 extern char *sample_msg[];
 extern int sd_sample_index;
 extern int buzzer_state;
+extern int back_light_num;
 
 #endif

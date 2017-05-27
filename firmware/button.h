@@ -28,6 +28,7 @@
 #define STATE_SD    10
 #define STATE_MEASURE   11
 #define ASK_SAMPLES 8
+#define STATE_BRIGHTNESS 7
 
 
 #define VOLTMETER   12
@@ -35,6 +36,8 @@
 #define OHMETER     14
 #define LOGIC       15
 #define NONE        16
+
+#define BRIGHTNESS  17
 
 /** external variables*/
 extern char *message[];

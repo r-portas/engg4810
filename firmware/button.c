@@ -4,9 +4,8 @@
 #include "adc.h"
 #include "uart.h"
 
-char *message[] = {"Voltmeter >> ", "Ampmeter >> " , "Ohmeter >> ", "Continuity >>", "Logic >>", "AC >>"};
-char *msgUpdate [] = {"Voltmeter AC|DC ", "Ampmeter AC | DC" , "Mode:Ohmmeter" , "Mode: Continuity", "Mode: Logic"};
-
+char *message[] = {"Voltmeter >> ", "Ampmeter >> " , "Ohmeter >> ", "Continuity >>", "Logic >>", "Brightness" };
+char *msgUpdate [] = {"Voltmeter AC|DC ", "Ampmeter AC | DC" , "Mode:Ohmmeter" , "Mode: Continuity", "Mode: Logic", "Mode Brightness"};
 int msg_count = 0;
 int my_mode = 0;
 int my_state    = NONE;
@@ -15,13 +14,14 @@ extern int ac_set;
 void count_check() {
     if (msg_count < 0) {
         msg_count = 0;
-    } else if (msg_count > 4) {
-        msg_count = 4;
+    } else if (msg_count > 6) {
+        msg_count = 6;
     }
+
     if (sample_index < 0) {
         sample_index = 0;
-    } else if (sample_index > 4) {
-        sample_index = 4;
+    } else if (sample_index > 6) {
+        sample_index = 6;
     }
 }
 
@@ -43,13 +43,11 @@ void update_mode() {
                 my_state = ASK_SAMPLES;
             }
             break;
-
         case ASK_SAMPLES:
             my_state = STATE_MEASURE;
             sd_state = 1;
             break;
     }
-
     // Send to PC software
     send_mode();
 }
@@ -70,6 +68,10 @@ void check_buttons() {
     /** Respond to the Up button ***/
     if (GPIOPinRead(GPIO_PORTE_BASE, GPIO_PIN_0) == GPIO_PIN_0) {
         UARTprintf("Up pressed\n");
+        if(my_mode == BRIGHTNESS) {
+            back_light_num += 20;
+            return;
+        }
         if (my_state == STATE_MEASURE) {
             sample_index++;
             count_check();
@@ -95,6 +97,10 @@ void check_buttons() {
     /** Respond to the Down button ***/
     if (GPIOPinRead(GPIO_PORTE_BASE, GPIO_PIN_1) == GPIO_PIN_1) {
         UARTprintf("Down pressed\n");
+        if(my_mode == BRIGHTNESS) {
+            back_light_num -= 20;
+            return;
+        }
         if (my_state == STATE_MEASURE) {
             //msg_count--;
             UARTprintf("state measure\n");
@@ -150,5 +156,4 @@ void init_buttons() {
     GPIOPinTypeGPIOInput(GPIO_PORTE_BASE, GPIO_PIN_1);
     GPIOPinTypeGPIOInput(GPIO_PORTE_BASE, GPIO_PIN_2);
     GPIOPinTypeGPIOInput(GPIO_PORTE_BASE, GPIO_PIN_3);
-    // check if they are pressed
 }

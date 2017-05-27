@@ -32,9 +32,7 @@ int sd_sample_index = 0;
 int sd_samples_ask = 0;
 int sd_state = 0;
 int samples_written = 0;
-
 int my_flag = 0;
-
 volatile int buzzer_ticks = 0;
 int buzzer_state = 0;
 int ac_read = 0;
@@ -60,6 +58,8 @@ int lcd_off_flag = 0;
 int char_my_mode = 0;
 int back_light_num = 0;
 
+
+
 /** update the modes print on LCD **/
 static void print_mode() {
     if (my_mode == VOLTMETER) {
@@ -76,6 +76,7 @@ static void print_mode() {
         char_my_mode = 'L';
     }
 }
+
 
 void SysTickInt(void)
 {
@@ -144,6 +145,12 @@ char buffer[20];
 
 /** Updates the lcd**/
 void update_lcd() {
+    if (my_mode == BRIGHTNESS) {
+        char lightBuffer[20];
+        sprintf(lightBuffer, "Level %d", back_light_num/20);
+        printLCD(lightBuffer);
+        return;
+    }
     if (my_state == STATE_MEASURE) {
         if (ac_set) {
          final_2 = sqrt((running_volt/n));

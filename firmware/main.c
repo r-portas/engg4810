@@ -60,7 +60,6 @@ void setup_frontend() {
 }
 
 void set_frontend_state(uint8_t val) {
-
     GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , 0);
 
@@ -139,7 +138,7 @@ void set_frontend_state(uint8_t val) {
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
 }
 
-  int main() {
+int main() {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
@@ -147,10 +146,6 @@ void set_frontend_state(uint8_t val) {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
     GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE,  GPIO_PIN_5);
     GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_5 , GPIO_PIN_5);
-
-    // Turn LCD on
-    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE,  GPIO_PIN_2);
-    GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2 , GPIO_PIN_2);
 
     // LEDs
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
