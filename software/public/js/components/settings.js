@@ -293,6 +293,9 @@ Vue.component('settings', {
       return parsed;
     },
 
+    /**
+     * Load the ports
+     */
     loadPorts(ports) {
       this.ports = ports;
     },

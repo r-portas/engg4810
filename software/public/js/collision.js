@@ -130,17 +130,20 @@ const collision = {
     };
   },
 
+  /**
+   * Checks that the collision continues on from the last one
+   */
   checkContinue(item, lastItem) {
     if (lastItem === null) {
       return null;
     }
 
-    console.log(item);
-    console.log(lastItem);
-    console.log(`${item.point1.x}, ${lastItem.maskItem.point2.x}`);
+    // console.log(item);
+    // console.log(lastItem);
+    // console.log(`${item.point1.x}, ${lastItem.maskItem.point2.x}`);
 
     if (item.minX === lastItem.maskItem.point2.x) {
-      console.log('Has intercept!');
+      // console.log('Has intercept!');
       return true;
     }
     return false;
@@ -166,6 +169,7 @@ const collision = {
         const topMaskItem = topMaskSegments[j];
         if (this.checkIntersect(dataItem, topMaskItem)) {
           if (this.checkContinue(topMaskItem, lastCollisionItem)) {
+            // TODO: Update this to the new point
           } else {
             collisions.push(this.createCollisionObject('Top Mask', dataItem, topMaskItem));
           }

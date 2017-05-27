@@ -11,6 +11,7 @@ new Vue({
 
   data() {
     return {
+      // The main communication bus
       bus: {},
       date: {},
 
@@ -34,6 +35,7 @@ new Vue({
       // The current mode
       currentMode: '',
 
+      // Tab settings
       currentTab: 'Chart',
       tabs: {
         CHART: 'Chart',
@@ -55,12 +57,16 @@ new Vue({
       sb.MaterialSnackbar.showSnackbar(data);
     },
 
+    /**
+     * Add data entry
+     */
     addEntry(date, value) {
       // Only add data if we aren't paused
       const isoString = date.toISOString();
       const parseTime = d3.isoParse;
       this.data.push({ date: parseTime(isoString), value, currentMode: this.currentMode });
     },
+
     /**
      * Checks if the current tab is active
      */
@@ -68,6 +74,9 @@ new Vue({
       return tabName === this.currentTab;
     },
 
+    /**
+     * Sets data, used for importing
+     */
     setData(data) {
       for (let item of data) {
         const date = moment(item.date);
@@ -75,6 +84,9 @@ new Vue({
       }
     },
 
+    /**
+     * Start random data feed
+     */
     startRandomData() {
       this.intervalRef = setInterval(() => {
         this.date.add(1, 'hours');
@@ -83,6 +95,9 @@ new Vue({
       }, 1000);
     },
 
+    /**
+     * Stop random data feed
+     */
     stopRandomData() {
       clearInterval(this.intervalRef);
     },
@@ -109,8 +124,7 @@ new Vue({
      * Processes serial input
      */
     processData(data) {
-      // console.log(data);
-
+      // Keep a track of the old data
       const oldMode = this.currentMode;
 
       if (data[0] === '$') {
@@ -119,17 +133,21 @@ new Vue({
         return;
       }
 
+      // Command is the first character
       const command = data[0];
       switch (command) {
         case 'r':
+          // Resistance mode
           this.currentMode = 'resistance';
           break;
 
         case 'v':
+          // Voltage mode
           this.currentMode = 'voltage';
           break;
 
         case 'c':
+          // Current mode
           this.currentMode = 'current';
           break;
 
@@ -137,11 +155,25 @@ new Vue({
           // Mode not set yet
           break;
 
+        case 'a':
+          // Update ac mode
+          const ac = data.split(' ')[1];
+
+          if (ac === '1') {
+            this.bus.$emit('update-ac-mode', true);
+          } else {
+            this.bus.$emit('update-ac-mode', false);
+          }
+
+          break;
+
         case '$':
+          // LCD Text mode
           this.bus.$emit('lcd-text', data);
           break;
 
         case '#':
+          // Data entry mode
           const value = parseFloat(data.split(' ')[1]);
           // const sampleNum = parseFloat(data.split(' ')[2]);
           const date = moment();
@@ -203,10 +235,16 @@ new Vue({
       this.bus.$emit('portslist', ports);
     });
 
+    /**
+     * Device status events
+     */
     this.socket.on('deviceconnected', this.setConnected);
     this.socket.on('devicedisconnected', this.setDisconnected);
     this.socket.on('devicedata', this.processData);
 
+    /**
+     * UI events
+     */
     this.bus.$on('toggle-pause', this.togglePause);
     this.bus.$on('delete-data', this.deleteData);
     this.bus.$on('show-snackbar', (message) => { this.showSnackbar(message); });
@@ -216,7 +254,9 @@ new Vue({
       this.socket.emit('set-brightness', data);
     });
 
-    // Logging
+    /**
+     * Logging modes
+     */
     this.bus.$on('start-log', (data) => {
       this.socket.emit('start-log', data);
     });
@@ -225,27 +265,55 @@ new Vue({
       this.bus.$emit('logging-finished');
     });
 
-    // TODO: Refactor this when firmware is done
+    /**
+     * AC Modes
+     */
+    this.bus.$on('set-ac-mode', (data) => {
+      this.socket.emit('set-ac-mode', data);
+    });
+
+    this.socket.on('update-ac-mode', (data) => {
+      this.bus.$emit('update-ac-mode', data);
+    });
+
+    /**
+     * Set range request
+     */
     this.bus.$on('set-range', (newRange) => {
       this.currentMode = newRange;
       this.socket.emit('set-range', newRange);
     });
 
+    /**
+     * Handle randome data
+     */
     this.bus.$on('start-random-data', this.startRandomData);
     this.bus.$on('stop-random-data', this.stopRandomData);
 
+    /**
+     * Set port request
+     */
     this.bus.$on('setport', (port) => {
       this.socket.emit('setport', port);
     });
 
+    /**
+     * Device disconnect event
+     */
     this.bus.$on('device-disconnect', () => {
       this.socket.emit('device-disconnect');
     });
 
+    /**
+     * Sampling rate request
+     */
     this.bus.$on('sampling-rate', (sampleRate) => {
       this.socket.emit('sampling-rate', sampleRate);
     });
 
+    /**
+     * Get ports request
+     */
     this.bus.$on('get-ports', () => {
       this.socket.emit('getports');
     });

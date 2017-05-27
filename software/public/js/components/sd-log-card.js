@@ -44,12 +44,18 @@ Vue.component('sd-log-card', {
   props: ['bus'],
 
   methods: {
+    /**
+     * Start SD card logging
+     */
     startLog() {
       this.isLogging = true;
 
       this.bus.$emit('start-log', { sampleRate: this.sampleRate, sampleNum: this.sampleNum });
     },
 
+    /**
+     * Stop SD card logging
+     */
     stopLog() {
       this.isLogging = false;
     },
