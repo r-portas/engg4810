@@ -76,6 +76,18 @@ io.on('connection', (socket) => {
   });
 
   /**
+   * Sets the AC mode on the device
+   */
+  socket.on('set-ac-mode', (mode) => {
+    console.log(`Sending '${mode}' over serial`);
+    if (serialDevice != null) {
+      if (serialDevice.isOpen()) {
+        serialDevice.write(`${mode}\n`);
+      }
+    }
+  });
+
+  /**
    * A range is changing the measurement mode
    */
   socket.on('set-range', (newRange) => {
@@ -130,6 +142,7 @@ io.on('connection', (socket) => {
   });
 });
 
+// Start server
 http.listen(port, () => console.log(`Multimeter running on port ${port}`));
 
 module.exports = app;

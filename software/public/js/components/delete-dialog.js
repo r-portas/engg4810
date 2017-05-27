@@ -30,14 +30,23 @@ Vue.component('delete-dialog', {
   props: ['bus'],
 
   methods: {
+    /**
+     * Open the modal
+     */
     openModal() {
       this.dialog.showModal();
     },
 
+    /**
+     * Close the modal
+     */
     closeModal() {
       this.dialog.close();
     },
 
+    /**
+     * Delete the data
+     */
     deleteData() {
       this.bus.$emit('delete-data');
       this.dialog.close();

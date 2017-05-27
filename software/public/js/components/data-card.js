@@ -11,9 +11,12 @@ Vue.component('data-card', {
 
       <p>Current mode: <b>{{rangeOption}}</b></p>
       
-      <p>LCD: <b>{{lcdText}}</b></p>
+      <p>LCD:</p>
+  
+      <p v-html="lcdText" style="font-family: monospace;"></p>
 
       <p>LCD Brightness Control</p>
+
       <input class="mdl-slider mdl-js-slider" type="range"
           min="0" :max="5" v-model="lcdBrightness" tabindex="0">
 
@@ -22,6 +25,11 @@ Vue.component('data-card', {
           Toggle Pause
         </button> 
         <br>
+
+        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="ac-switch">
+          <input v-model="acSwitch" type="checkbox" id="ac-switch" class="mdl-switch__input">
+          <span class="mdl-switch__label">AC Mode</span>
+        </label>
 
         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="auto">
           <input type="radio" id="auto" class="mdl-radio__button" value="auto" v-model="rangeOption">
@@ -79,6 +87,7 @@ Vue.component('data-card', {
       randomSwitch: false,
       lcdText: '',
       lcdBrightness: 0,
+      acSwitch: false,
     };
   },
 
@@ -116,6 +125,17 @@ Vue.component('data-card', {
     },
 
     /**
+     * AC switch update
+     */
+    acSwitch(newVal) {
+      if (newVal === true) {
+        this.bus.$emit('set-ac-mode', 'a 1');
+      } else {
+        this.bus.$emit('set-ac-mode', 'a 0');
+      }
+    },
+
+    /**
      * Sets the lcd brightness
      */
     lcdBrightness(newVal) {
@@ -130,7 +150,11 @@ Vue.component('data-card', {
     });
 
     this.bus.$on('lcd-text', (text) => {
-      this.lcdText = text;
+      this.lcdText = text.replace(/^\$ /g, '');
+    });
+
+    this.bus.$on('update-ac-mode', (val) => {
+      this.acSwitch = val;
     });
   },
 });
