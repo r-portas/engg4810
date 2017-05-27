@@ -77,6 +77,7 @@ void check_buttons() {
         }
         /** select AC **/
         if (my_state == STATE_SELECTION) {
+            UARTprintf("a 1\n");
             ac_set = 1;
         }
 
@@ -111,6 +112,7 @@ void check_buttons() {
         /** go to DC mode **/
         if (my_state == STATE_SELECTION) {
             ac_set = 0;
+            UARTprintf("a 0\n");
         }
         if (my_state == ASK_SAMPLES) {
             sd_sample_index--;
