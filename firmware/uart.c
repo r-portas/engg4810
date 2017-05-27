@@ -65,30 +65,22 @@ int inputIndex = 0;
 void process_command() {
     switch(input[0]) {
         case 'l':
-            // Change to logic level
-            // UARTprintf("LOGIC LEVEL VOLTAGE\n");
-            my_state = LOGIC;
+            my_mode = LOGIC;
             break;
         case 'v':
-            // Change to voltage mode
-            // UARTprintf("MULTIMETER VOLTAGE\n");
-            my_state = VOLTMETER;
+            my_mode = VOLTMETER;
             break;
         case 'c':
-            // Change to current mode
-            // UARTprintf("MULTIMETER CURRENT\n");
-            my_state = AMPMETER;
+            my_mode = AMPMETER;
             break;
         case 'r':
-            // Change to current mode
-            // UARTprintf("MULTIMETER RESISTANCE\n");
-            my_state = OHMETER;
+            my_mode = OHMETER;
             break;
         case 's':
-            // UARTprintf("SD Card log\n");
+
+            // update the sampling mode
             break;
         default:
-            // Probably an error
             break;
     }
 }
@@ -109,6 +101,7 @@ void read_uart() {
     }
 
     if (inputChar != -1) {
+
         // We have a valid character
         char validChar = (char)inputChar;
         input[inputIndex] = validChar;
@@ -152,9 +145,7 @@ void send_mode() {
 
 /** Formatting for pc communication **/
 void send_pc() {
-
     UARTprintf("# %d %d \n", data_buff[sample_count], sample_count);
-
     // mode followed by the sampling rate
     if (my_state == STATE_MEASURE) {
         if (ac_set) {

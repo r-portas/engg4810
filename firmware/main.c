@@ -41,6 +41,7 @@ void hardware_init() {
    init_buttons();
    //init_sd_card();
    roy_adc();
+   init_backlight();
    init_timers();
 }
 
@@ -138,7 +139,7 @@ void set_frontend_state(uint8_t val) {
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
 }
 
-int main() {
+ int main() {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     hardware_init();

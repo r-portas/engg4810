@@ -140,17 +140,19 @@ char buffer[20];
 
 /** Updates the lcd**/
 void update_lcd() {
+    UARTprintf("updating l\n");
     if (my_state == STATE_MEASURE) {
-       if (ac_set) {
+        UARTprintf("updating 2\n");
+        if (ac_set) {
          final_2 = sqrt((running_volt/n));
          final_2 = final_2 * 1000;
          num1 = final_2 / 1000;
          left1 = final_2 - (num1 * 1000);
-         //UARTprintf("vol %d . %d \r",num1, left1);
          sprintf(buffer, " %d.%d",num1, left1);
          running_volt = 0.0;
          n = 0;
        } else {
+           UARTprintf("updating l3\n");
            float final = get_voltage(display_val);
            final = final * 1000;
            num1 = final / 1000;
@@ -175,18 +177,22 @@ void update_lcd() {
        }
        lcd_tick = 0;
     }
+    UARTprintf("updating 4\n");
     // default state
     if (my_state == NONE) {
+        UARTprintf("updating 5\n");
        printLCD(message[msg_count]);
        lcd_tick = 0;
     }
     // ask to make a selection
     if (my_state == STATE_SELECTION) {
+        UARTprintf("updating 6\n");
        printLCD(msgUpdate[msg_count]);
        lcd_tick = 0;
     }
     // ask samples
     if (my_state == ASK_SAMPLES) {
+        UARTprintf("updating 7\n");
         printLCD(ask_prompt);
         position_cursor(1,0);
         printLCD(ask_samples[sd_sample_index]);
