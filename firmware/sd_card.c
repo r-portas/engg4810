@@ -66,11 +66,12 @@ void write_log_line(float reading, char mode) {
 
 /** write to the sd card**/
 void write_file() {
-    TimerDisable(TIMER5_BASE, TIMER_A);
+    //TimerDisable(TIMER5_BASE, TIMER_A);
     int bytes_written = 0;
     f_write(&fil, "ABC\n", 4, &bytes_written);
     f_sync(&fil);
-    TimerEnable(TIMER5_BASE, TIMER_A);
+    //UARTprintf("bytes %d\n", bytes_written);
+    //TimerEnable(TIMER5_BASE, TIMER_A);
 }
 
 void init_sd_card() {

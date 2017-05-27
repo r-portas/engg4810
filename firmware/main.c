@@ -20,6 +20,7 @@
 #include "utils/uartstdio.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/systick.h"
+#include "driverlib/fpu.h"
 #include "utils/fatfs/src/ff.h"
 #include "utils/fatfs/src/diskio.h"
 #include "lcd.h"
@@ -35,108 +36,26 @@
 int sd_flag = 0;
 
 void hardware_init() {
+   FPUEnable();
+
    init_LCD();
    init_uart();
    init_hardware_control();
    init_buttons();
-   //init_sd_card();
+   init_sd_card();
    roy_adc();
    init_backlight();
    init_timers();
 }
 
-#define SHCP GPIO_PIN_6
-#define STCP GPIO_PIN_5
-#define DS GPIO_PIN_4
-
 void setup_frontend() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     SysCtlDelay(3);
-
     GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE,  DS);
     GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE,  STCP);
     GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE,  SHCP);
-
 }
 
-void set_frontend_state(uint8_t val) {
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
-    GPIOPinWrite(GPIO_PORTC_BASE, STCP , 0);
-
-    uint8_t new_val = val << 4;
-    new_val = new_val & 0b00010000;
-    GPIOPinWrite(GPIO_PORTC_BASE, DS, new_val);
-
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
-    SysCtlDelay(100);
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
-
-
-    new_val = val << 3;
-    new_val = new_val & 0b00010000;
-    GPIOPinWrite(GPIO_PORTC_BASE, DS, new_val);
-
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
-    SysCtlDelay(100);
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
-
-
-    new_val = val << 2;
-    new_val = new_val & 0b00010000;
-    GPIOPinWrite(GPIO_PORTC_BASE, DS, new_val);
-
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
-    SysCtlDelay(100);
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
-
-
-    new_val = val << 1;
-    new_val = new_val & 0b00010000;
-    GPIOPinWrite(GPIO_PORTC_BASE, DS, new_val);
-
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
-    SysCtlDelay(100);
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
-
-    new_val = val << 0;
-    new_val = new_val & 0b00010000;
-    GPIOPinWrite(GPIO_PORTC_BASE, DS, new_val);
-
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
-    SysCtlDelay(100);
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
-
-
-    // Other direction
-
-    new_val = val >> 1;
-    new_val = new_val & 0b00010000;
-    GPIOPinWrite(GPIO_PORTC_BASE, DS, new_val);
-
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
-    SysCtlDelay(100);
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
-
-
-    new_val = val >> 2;
-    new_val = new_val & 0b00010000;
-    GPIOPinWrite(GPIO_PORTC_BASE, DS, new_val);
-
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
-    SysCtlDelay(100);
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
-
-
-    new_val = val >> 3;
-    new_val = new_val & 0b00010000;
-    GPIOPinWrite(GPIO_PORTC_BASE, DS, new_val);
-
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
-    SysCtlDelay(100);
-    GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
-
-    GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
-}
 
 int main() {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
@@ -159,9 +78,11 @@ int main() {
     GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
 
-    // Voltage measure, 12v mode
-    set_frontend_state( 0b11000000 );
 
+
+
+    // Voltage measure, 12v mode
+    //set_frontend_state(0b11000000);
     // Voltage measure, 5v mode
     // set_frontend_state( 0b11000100 );
 
@@ -172,16 +93,17 @@ int main() {
     // sset_frontend_state( 0b11100000 );
 
     // Current measure, 200ma range
-    // set_frontend_state( 0b11010110 );
+    //set_frontend_state( 0b11010110 );
 
     // Current measure, 10ma range
-    // set_frontend_state( 0b11010001 );
+    set_frontend_state( 0b11010001 );
 
     // Ohmmeter, 1k range
-    // set_frontend_state( 0b00001000 );
+    // set_frontend_state(0b00001101);
 
     // Ohmmeter, 1M range
-    //set_frontend_state(0b10001000);
+    // set_frontend_state(0b10001011);
+
     // set_frontend_state( 0b00000000 );
     float reading = 0.5;
     char mode = 'V';

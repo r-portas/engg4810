@@ -9,6 +9,10 @@
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 
+#define SHCP GPIO_PIN_6
+#define STCP GPIO_PIN_5
+#define DS GPIO_PIN_4
+
 // Controls for the hardware interfaces
 #define OHM_PORT    GPIO_PORTB_BASE
 #define OHM_PERI    SYSCTL_PERIPH_GPIOB

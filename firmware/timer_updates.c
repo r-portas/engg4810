@@ -56,8 +56,8 @@ int light_tick = 0;
 int lcd_on_flag = 0;
 int lcd_off_flag = 0;
 int char_my_mode = 0;
-int back_light_num = 0;
-
+int back_light_num = 100;
+int sd_ticks = 0;
 
 
 /** update the modes print on LCD **/
@@ -91,6 +91,7 @@ void SysTickInt(void)
     button_tick++;
     pc_tick++;
     light_tick++;
+    sd_ticks++;
     disk_timerproc(); // timer to keep the sd card going
 
     if (ac_set == 1) {
@@ -134,6 +135,10 @@ void SysTickInt(void)
             light_tick = 0;
       }
   }
+  if (sd_ticks > 6000) {
+      sd_flag = 1;
+      sd_ticks = 0;
+  }
   IntMasterEnable();
 }
 
@@ -167,11 +172,11 @@ void update_lcd() {
            left1 = final - (num1 * 1000);
            sprintf(buffer, " %d.%d", num1, left1);
        }
+
        sendSpecialChar();
        sendByte(0x00, lcd_true);
        if (ac_set) {
            printLCD("AC");
-
        } else {
            printLCD("DC");
        }
@@ -264,7 +269,6 @@ void buttonInterrupt() {
         send_pc();
         pc_flag = 0;
     }
-    /** sd write **/
 }
 
 void initTimer()
