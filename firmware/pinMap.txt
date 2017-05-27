@@ -14,11 +14,11 @@ LCD pin Map
  * PE4  -> RS
  * PE5  -> EN  
  * PD0  -> D4  
- * PD1  -> D5
+ * PD1  -> D5 
  * PD2  -> D6
  * PD3  -> D7 
  
- SD card pin map
+ SD card pin map 
  PA2 (clk)     SCLK (CLK) 
  PA3 (cmd)     CS (DAT3)
  PA4 (rx)      D0 (DAT0) 

@@ -70,6 +70,7 @@ const char space[2] = " ";
 
 /** update the sampling rate **/
 void update_sampling_rate() {
+    UARTprintf("Updating sampling!\n");
     if (strncmp(sample_str, "2", 1) == 0) {
         sample_index = 0;
     } else if (strncmp(sample_str, "1", 1) == 0) {
@@ -93,6 +94,7 @@ void update_sampling_rate() {
 
 /** update the LCD brightness **/
 static void update_brightness() {
+    UARTprintf("Updating brightness!\n");
     switch(input[2]){
         case '1':
             back_light_num = 100;
@@ -114,6 +116,7 @@ static void update_brightness() {
 
 /** update the internal type of the signal **/
 static void update_signal_type() {
+    UARTprintf("Updating signal type!\n");
     if (input[2] == '1') {
         ac_set = 1;
     } else if (input[2] == '0') {
