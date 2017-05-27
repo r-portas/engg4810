@@ -267,8 +267,7 @@ void buttonInterrupt() {
     /** sd write **/
 }
 
-void initTimer()
-{
+void initTimer() {
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
   while(!SysCtlPeripheralReady(SYSCTL_PERIPH_TIMER5))
   {
