@@ -5,7 +5,6 @@
 
 #define lcd_false  0
 #define lcd_true   1
-
 /*
  *
  * Pin Connections:
@@ -17,6 +16,7 @@
  * PD3  -> D7
  *
 */
+
 #define RS GPIO_PIN_4 // Pin 5
 #define EN GPIO_PIN_5 // Pin 6
 #define D4 GPIO_PIN_0 // Pin 23
@@ -44,5 +44,6 @@ extern void sendByte(char byteToSend, int isData);
 extern void printLCD(char *text);
 extern void clearLCD();
 extern void position_cursor(int x, int y);
+extern void init_backlight();
 
 #endif

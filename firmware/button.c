@@ -58,8 +58,8 @@ void update_sd_count() {
     // loop
     if (sd_sample_index < 0) {
         sd_sample_index = 0;
-    } else  if (sd_sample_index > 8) {
-        sd_sample_index = 8;
+    } else  if (sd_sample_index > 9) {
+        sd_sample_index = 9;
     }
     // update the count
     sd_samples_ask = sample_list[sd_sample_index];
@@ -135,8 +135,8 @@ void check_buttons() {
     // loop back the index
     if (sample_index < 0) {
         sample_index = 0;
-    } else if (sample_index > 4) {
-        sample_index = 4;
+    } else if (sample_index > 8) {
+        sample_index = 8;
     }
 }
 
