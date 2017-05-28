@@ -42,13 +42,6 @@ void adc_read() {
     }
 
     display_val =  data_buff[0];
-    /*sample_count++;
-
-    // wrap around
-    if (sample_count > 2000) {
-        sample_count = 0;
-    }*/
-    sample_count++;
 }
 
 /**

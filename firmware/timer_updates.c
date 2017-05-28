@@ -38,7 +38,7 @@ int buzzer_state = 0;
 int ac_read = 0;
 int zero_crossing[100];
 int zero_count = 0;
-extern sd_flag;
+extern int sd_flag;
 int lcd_flag = 0;
 int ac_set = 0;
 float running_volt = 0.00;
@@ -126,7 +126,6 @@ void SysTickInt(void)
       buzzer_ticks = 0;
       play_buzzer();
   }
-
   /** for the light pwm  **/
   if (light_tick < back_light_num) {
       //lcd_on_flag = 1;
@@ -262,10 +261,12 @@ void play_buzzer() {
     }
 }
 
+/** update the ac buffer **/
 void update_buffer_rms() {
     // update the rms value here
-   float raw_volt = get_voltage(display_val);
-   running_volt = running_volt + (raw_volt * raw_volt);
+    float raw_voltage = display_val / 65535.00;
+    raw_voltage = raw_voltage * 3.3;
+    running_volt = running_volt + (raw_voltage * raw_voltage);
    n++;
 }
 

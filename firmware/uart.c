@@ -227,7 +227,7 @@ void send_pc() {
         if (ac_set) {
             sprintf(pc_buffer, "$ &#177; AC %.2f %c <br> %s\n", global_voltage, char_my_mode, sample_msg[sample_index]);
         } else {
-            sprintf(pc_buffer, "$ &#177; AC %.2f %c <br> %s\n", global_voltage, char_my_mode, sample_msg[sample_index]);
+            sprintf(pc_buffer, "$ &#177; DC %.2f %c <br> %s\n", global_voltage, char_my_mode, sample_msg[sample_index]);
         }
         UARTprintf("%s", pc_buffer);
     } else if (my_state == NONE) {
