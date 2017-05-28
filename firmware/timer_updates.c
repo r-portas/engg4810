@@ -117,7 +117,6 @@ void SysTickInt(void)
              global_voltage = get_voltage(display_val);
         }
     }
-
   /** update the lcd every so often 0.5 sec**/
   if (lcd_ticks > 1000) {
       lcd_flag = 1;
@@ -185,7 +184,7 @@ void update_lcd() {
         }
         if (ac_set) {
          global_voltage = sqrt((running_volt/n));
-         //sprintf(buffer, "%.2f", global_voltage);
+         // need it after the conversions
          running_volt = 0.0;
          n = 0;
         }
@@ -280,7 +279,6 @@ void buttonInterrupt() {
        check_buttons();
        button_flag = 0;
    }
-
    // Should not be in a interrupt
     if (lcd_flag) {
        clearLCD();
