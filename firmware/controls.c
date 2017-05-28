@@ -117,46 +117,103 @@ float update_voltage(int volt_range, float voltage) {
 }
 
 /** conversions for the current mode **/
-float update_current(int current_range, float voltage) {
-    float converted_curr;
+double update_current(int current_range, float voltage) {
+    double converted_curr;
     switch(current_range) {
        case 1:
-           //have to add later
+
+           converted_curr = (voltage * -0.695) + 1.155;
+           converted_curr = (converted_curr / 98.2);
            break;
        case 2:
-           converted_curr = (voltage * -3.41) + 5.628;
+           // 200mA
+           converted_curr = (voltage * -3.177) + 5.241;
+           converted_curr = (converted_curr / 24.54);
            break;
     }
+    return converted_curr;
 }
 
 /** convert the raw reading for 1k range **/
 float convert_ohm_1k(float voltage) {
-    float ohm = (voltage * -659) + 1101;
-    long long vol = (ohm * 1000);
-    num = vol / 1000;
-    left = vol - (num * 1000);
+    float ohm = (voltage * -746.073) + 1227.465;
     return ohm;
 }
+
 /** convert the raw reading for 1M range **/
 float convert_ohm_1M(float voltage) {
    float ohm = (voltage * -653) + 1096;
-   long long ohm_c = (ohm * 1000);
-   num = ohm_c / 1000;
-   left = ohm_c - (num * 1000);
+   return ohm;
+}
+
+
+float convert_logic(float voltage) {
+   float ohm = (voltage * -6.7642) + 9.8786;
+   long long log_c = (ohm * 1000);
+   num = log_c / 1000;
+   left = log_c - (num * 1000);
    return ohm;
 }
 
 /** get the raw voltage from the number **/
 float get_voltage(int final) {
     float voltage = final / 65535.00;
+    double current;
+
     voltage = voltage * 3.3;
-    voltage = update_voltage(voltage_range, voltage);
-    auto_range_voltage(voltage);
+    switch(my_mode) {
+        case VOLTMETER:
+            voltage = update_voltage(voltage_range, voltage);
+            auto_range_voltage(voltage);
+            break;
+        case AMPMETER:
+            current = update_current(current_range, voltage);
+            // set front end for default (200 mA)
+            current = current * 1000;
+            voltage = (float)current;
+            auto_range_current(voltage);
+            break;
+        case OHMETER:
+            voltage = convert_ohm_1k(voltage);
+            //voltage = update_ohms(ohm_range, voltage);
+            //auto_range_ohms(voltage);
+            break;
+        case LOGIC:
+            break;
+            // no range for logic
+            // voltage = convert_logic(voltage);
+    }
     char volt_str[40];
-    sprintf(volt_str, "mode %d | %.2f", voltage_range, voltage);
+    sprintf(volt_str, "%d %.2f",  final, voltage);
     UARTprintf("FINAL %s\n", volt_str);
     return voltage;
 }
+
+
+/** auto range the current **/
+void auto_range_current(float voltage) {
+
+    if ((current_range == 1) && (voltage > 10.0)) {
+        UARTprintf("going into 200 %.2f \n", voltage);
+        current_range = 2;
+    } else if ((current_range == 2) && (voltage < 10.0)) {
+        UARTprintf("going into 10 %.2f\n", voltage);
+        current_range = 1;
+    }
+    switch(current_range) {
+        // 10 mA
+        case 1:
+            set_frontend_state(0b11010001);
+            break;
+        // 200 mA
+        case 2:
+            set_frontend_state(0b11010110);
+            break;
+        default:
+            set_frontend_state(0b11010110);
+    }
+}
+
 
 void auto_range_voltage(float voltage) {
 
@@ -173,12 +230,11 @@ void auto_range_voltage(float voltage) {
     if ((voltage_range == 2) && (voltage > 4.75)) {
         voltage_range = 3;
     }
-
     // 15 VOLT RANGE
     if ((voltage_range == 3) && (voltage < 4.75)) {
         voltage_range = 2;
     }
-    // update frontend
+    // update front end
     switch(voltage_range) {
         // 1V range
         case 1:
@@ -197,40 +253,6 @@ void auto_range_voltage(float voltage) {
     }
 }
 
-void update_fronend() {
-    int mapped_volts;
-    int raw_val = display_val;
-    int raw_voltage = get_voltage(display_val);
-    // 15 Volts default
-    if (my_mode == VOLTMETER) {
-        mapped_volts = update_voltage(3, raw_voltage);
-        auto_range_voltage(mapped_volts);
-    }
-}
-
-/*float update_current(int curr_range, float voltage) {
-    float value;
-    switch(curr_range) {
-        case 1:
-            value =
-            break;
-        case 2:
-            value =
-            break;
-        case 3:
-            value =
-            break;
-    }
-    return value;
-}*/
-
-float convert_logic(float voltage) {
-   float ohm = (voltage * -6.7642) + 9.8786;
-   long long log_c = (ohm * 1000);
-   num = log_c / 1000;
-   left = log_c - (num * 1000);
-   return ohm;
-}
 
 // comes into the function after the adc read
 void update_hardware() {

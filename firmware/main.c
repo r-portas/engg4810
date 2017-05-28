@@ -76,7 +76,6 @@ int main() {
     GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
 
-
     // Voltage measure, 12v mode
     set_frontend_state(0b11000000);
 
@@ -87,16 +86,15 @@ int main() {
     //set_frontend_state( 0b11000010);
 
     // Logic Probe
-    // sset_frontend_state( 0b11100000 );
+    // set_frontend_state(0b11100000);
 
     // Current measure, 200ma range
-   // set_frontend_state( 0b11010110 );
+    // set_frontend_state( 0b11010110 );
 
     // Current measure, 10ma range
     //set_frontend_state( 0b11010001 );
-
     // Ohmmeter, 1k range
-    // set_frontend_state(0b00001101);
+    //   set_frontend_state(0b00001101);
 
     // Ohmmeter, 1M range
     // set_frontend_state(0b10001011);
