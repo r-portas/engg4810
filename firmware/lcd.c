@@ -9,8 +9,6 @@
 #include "uart.h"
 #include "utils/uartstdio.h"
 
-
-
 // Pulse the EN bit LOW - HIGH - LOW
 // To signal the LCD to accept the data/cmd
 void pulseLCD()
@@ -139,6 +137,72 @@ char customChar[8] = {
          0b00000,
          0b00000
 };
+
+char ohmChar[8] = {
+        0b00000,
+        0b00000,
+        0b01110,
+        0b10001,
+        0b10001,
+        0b01010,
+        0b11011,
+        0b00000
+};
+
+char bright_level_1[8] = {
+        0b00001,
+        0b00011,
+        0b00111,
+        0b01111,
+        0b01111,
+        0b11111,
+        0b11111,
+        0b11111
+};
+
+char bright_level_2[8] = {
+        0b00001,
+        0b00001,
+        0b00011,
+        0b00011,
+        0b00111,
+        0b00111,
+        0b01111,
+        0b11111
+};
+
+char bright_level_3[8] = {
+        0b00001,
+        0b00001,
+        0b00001,
+        0b00011,
+        0b00011,
+        0b00111,
+        0b00111,
+        0b01111
+};
+
+char bright_level_4[8] = {
+        0b00000,
+        0b00000,
+        0b00001,
+        0b00001,
+        0b00011,
+        0b00111,
+        0b01111
+};
+
+char bright_level_5[8] = {
+        0b00000,
+        0b00000,
+        0b00000,
+        0b00000,
+        0b00000,
+        0b00000,
+        0b00011,
+        0b01111
+};
+
 
 void storeSpecialChar() {
     // select the CGRAM

@@ -58,7 +58,7 @@ int lcd_off_flag = 0;
 int char_my_mode = 0;
 int back_light_num = 100;
 int sd_ticks = 0;
-
+float global_voltage = 0.00;
 
 /** update the modes print on LCD **/
 static void print_mode() {
@@ -104,6 +104,7 @@ void SysTickInt(void)
              count_ticks = 0;
              toggle_pin();
              adc_read();
+             global_voltage = get_voltage(display_val);
         }
     }
 
@@ -166,11 +167,7 @@ void update_lcd() {
          running_volt = 0.0;
          n = 0;
        } else {
-           float final = get_voltage(display_val);
-           final = final * 1000;
-           num1 = final / 1000;
-           left1 = final - (num1 * 1000);
-           sprintf(buffer, " %d.%d", num1, left1);
+           sprintf(buffer, "%.2f", global_voltage);
        }
 
        sendSpecialChar();

@@ -7,6 +7,19 @@ char ohm_string[20];
 int num;
 int left;
 
+int voltage_range = 3;
+/** Voltage Range Notes
+ * 3 -> 15 Volts (default)
+ * 2 -> 5 Volts
+ * 1 -> 1 Volts
+ */
+
+int current_range = 2;
+/** Current Range Notes
+ * 2 -> 200 mA (default)
+ * 1 -> 10  mA
+ */
+
 void set_frontend_state(uint8_t val) {
     GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , 0);
@@ -86,18 +99,34 @@ void set_frontend_state(uint8_t val) {
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
 }
 
+/** conversions for the voltage mode **/
 float update_voltage(int volt_range, float voltage) {
-    switch(volt_range){
+    float converted_val;
+    switch(volt_range) {
         case 1:
-            voltage = (voltage * -0.5897) + 0.9534;
+            converted_val = (voltage * -0.724) + 1.191;
             break;
         case 2:
-            voltage = (voltage * -2.9462) + 4.8103;
+            converted_val = (voltage * -3.656) + 6.032;
             break;
         case 3:
-            voltage = (voltage * -9.6681) + 15.913;
+            converted_val = (voltage * -9.6681) + 15.913;
+            break;
     }
-    return voltage;
+    return converted_val;
+}
+
+/** conversions for the current mode **/
+float update_current(int current_range, float voltage) {
+    float converted_curr;
+    switch(current_range) {
+       case 1:
+           //have to add later
+           break;
+       case 2:
+           converted_curr = (voltage * -3.41) + 5.628;
+           break;
+    }
 }
 
 /** convert the raw reading for 1k range **/
@@ -117,58 +146,54 @@ float convert_ohm_1M(float voltage) {
    return ohm;
 }
 
-/** 3 -> 15 volts **/
-int voltage_range = 3;
 /** get the raw voltage from the number **/
 float get_voltage(int final) {
-    // convert this to a raw voltage
-    //long long final = (display_val);
-    float voltage = final / 65536.00;
+    float voltage = final / 65535.00;
     voltage = voltage * 3.3;
-
-    long long vol = (voltage * 1000);
-    int num1 = vol / 1000;
-    int left1 = vol - (num * 1000);
-
-    UARTprintf("DEBUG %d.%d\n", num1, left1);
-    voltage = convert_ohm_1M(voltage);
-    vol = (voltage * 1000);
-    num1 = vol / 1000;
-    left1 = vol - (num * 1000);
-    UARTprintf("FINAL %d.%d\n", num1, left1);
-
+    voltage = update_voltage(voltage_range, voltage);
+    auto_range_voltage(voltage);
+    char volt_str[40];
+    sprintf(volt_str, "mode %d | %.2f", voltage_range, voltage);
+    UARTprintf("FINAL %s\n", volt_str);
     return voltage;
 }
 
-
-
-
 void auto_range_voltage(float voltage) {
-    // switch between the states
-    // 1V RANGE
-    if ((voltage_range == 1) && (voltage > 5)) {
-        voltage_range = 3;
-    }
 
-    if ((voltage_range == 1) && (voltage > 0.95)) {
+    // 1V RANGE
+    if ((voltage_range == 1) && (voltage > 0.9)) {
         voltage_range = 2;
-        set_frontend_state(0b11000010 );
     }
 
     // 5 VOLTS
     if ((voltage_range == 2) && (voltage < 0.9)) {
         voltage_range = 1;
-        set_frontend_state( 0b11000100 );
     }
 
-    if ((voltage_range == 2) && (voltage > 5.5)) {
+    if ((voltage_range == 2) && (voltage > 4.75)) {
         voltage_range = 3;
-        // set fronend 15 volts
     }
 
     // 15 VOLT RANGE
-    if ((voltage_range == 3) && (voltage < 5)) {
+    if ((voltage_range == 3) && (voltage < 4.75)) {
         voltage_range = 2;
+    }
+    // update frontend
+    switch(voltage_range) {
+        // 1V range
+        case 1:
+            set_frontend_state(0b11000010);
+            break;
+
+       // 5V range
+        case 2:
+            set_frontend_state(0b11000100);
+            break;
+
+        // 15V range
+        case 3:
+            set_frontend_state(0b11000000);
+            break;
     }
 }
 

@@ -211,7 +211,6 @@ static char get_mode_char() {
  */
 void send_mode() {
     char mode_send = get_mode_char();
-
     UARTprintf("%c\n", mode_send);
 }
 
@@ -219,14 +218,19 @@ void send_mode() {
  * Formatting for pc communication
  */
 void send_pc() {
-    UARTprintf("# %d %d \n", data_buff[sample_count], sample_count);
+    char pc_buffer[100];
+
+    sprintf(pc_buffer,"# %.2f \n", global_voltage);
+    UARTprintf("%s", pc_buffer);
+
     // mode followed by the sampling rate
     if (my_state == STATE_MEASURE) {
         if (ac_set) {
-            UARTprintf("$ &#177; AC %d.%d %c <br> %s\n", num1, left1, char_my_mode, sample_msg[sample_index]);
+            sprintf(pc_buffer, "$ &#177; AC %.2f %c <br> %s\n", global_voltage, char_my_mode, sample_msg[sample_index]);
         } else {
-            UARTprintf("$ &#177; DC %d.%d %c <br> %s\n", num1, left1, char_my_mode, sample_msg[sample_index]);
+            sprintf(pc_buffer, "$ &#177; AC %.2f %c <br> %s\n", global_voltage, char_my_mode, sample_msg[sample_index]);
         }
+        UARTprintf("%s", pc_buffer);
     } else if (my_state == NONE) {
         UARTprintf("$ %s\n", message[msg_count]);
     } else if (my_state == STATE_SELECTION) {

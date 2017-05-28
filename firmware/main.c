@@ -1,4 +1,3 @@
-////////// INCLUDES
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -37,12 +36,12 @@ int sd_flag = 0;
 
 void hardware_init() {
    FPUEnable();
-
+   FPULazyStackingEnable();
    init_LCD();
    init_uart();
    init_hardware_control();
    init_buttons();
-   init_sd_card();
+   //init_sd_card();
    roy_adc();
    init_backlight();
    init_timers();
@@ -55,7 +54,6 @@ void setup_frontend() {
     GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE,  STCP);
     GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE,  SHCP);
 }
-
 
 int main() {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
@@ -80,21 +78,22 @@ int main() {
 
 
     // Voltage measure, 12v mode
-    //set_frontend_state(0b11000000);
+    set_frontend_state(0b11000000);
+
     // Voltage measure, 5v mode
-    // set_frontend_state( 0b11000100 );
+    //set_frontend_state( 0b11000100 );
 
     // Voltage measure, 1v mode
-    //set_frontend_state( 0b11000010 );
+    //set_frontend_state( 0b11000010);
 
     // Logic Probe
     // sset_frontend_state( 0b11100000 );
 
     // Current measure, 200ma range
-    //set_frontend_state( 0b11010110 );
+   // set_frontend_state( 0b11010110 );
 
     // Current measure, 10ma range
-    set_frontend_state( 0b11010001 );
+    //set_frontend_state( 0b11010001 );
 
     // Ohmmeter, 1k range
     // set_frontend_state(0b00001101);
