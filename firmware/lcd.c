@@ -53,7 +53,7 @@ void cursorOffLCD(void) {
     sendByte(0x0C, lcd_false);
 }
 
-
+// positions the cursor for the next line
 void position_cursor(int x, int y) {
     int address;
    if (x == 0) {
@@ -127,6 +127,7 @@ void printLCD(char *text)
     }
 }
 
+// Internal store for custom char
 char customChar[8] = {
          0b01000,
          0b11101,
@@ -204,6 +205,7 @@ char bright_level_5[8] = {
 };
 
 
+// Store the special char in CGRAM memory
 void storeSpecialChar() {
     // select the CGRAM
     sendByte(0x40, lcd_false);
@@ -218,14 +220,17 @@ void storeSpecialChar() {
     }
 }
 
+// send special charachter
 void sendSpecialChar() {
     sendByte(0x80, lcd_false);
 }
 
+// Switches off the backlight
 void back_light_off() {
     GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2 , 0);
 }
 
+// switch the backlight on
 void back_light_on() {
     GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2 , GPIO_PIN_2);
 }

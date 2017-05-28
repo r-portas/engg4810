@@ -34,6 +34,7 @@
 
 int sd_flag = 0;
 
+/*** Initialise the hardware **/
 void hardware_init() {
    FPUEnable();
    FPULazyStackingEnable();
@@ -47,6 +48,7 @@ void hardware_init() {
    init_timers();
 }
 
+/*** set ups the frontend ***/
 void setup_frontend() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     SysCtlDelay(3);
@@ -56,6 +58,7 @@ void setup_frontend() {
 }
 
 int main() {
+    // sets ups the clock divider/
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN |
                          SYSCTL_XTAL_16MHZ);
     hardware_init();
@@ -71,37 +74,13 @@ int main() {
     GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE,  GPIO_PIN_7);
     GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7 , GPIO_PIN_7);
 
+    /** Updates the frontend **/
     setup_frontend();
     GPIOPinWrite(GPIO_PORTC_BASE, DS , DS);
     GPIOPinWrite(GPIO_PORTC_BASE, SHCP , SHCP);
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , STCP);
 
-    // Voltage measure, 12v mode
-    set_frontend_state(0b11000000);
-
-    // Voltage measure, 5v mode
-    //set_frontend_state( 0b11000100 );
-
-    // Voltage measure, 1v mode
-    //set_frontend_state( 0b11000010);
-
-    // Logic Probe
-    // set_frontend_state(0b11100000);
-
-    // Current measure, 200ma range
-    // set_frontend_state( 0b11010110 );
-
-    // Current measure, 10ma range
-    //set_frontend_state( 0b11010001 );
-    // Ohmmeter, 1k range
-    //   set_frontend_state(0b00001101);
-
-    // Ohmmeter, 1M range
-    // set_frontend_state(0b10001011);
-
-    // set_frontend_state( 0b00000000 );
-
-    //UARTprintf("Starting");
+    /** Updates the button presses and uart ***/
     while(1) {
         buttonInterrupt();
         read_uart();

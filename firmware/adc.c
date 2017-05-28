@@ -25,7 +25,7 @@ uint32_t data_buff[2000];
 int sample_count = 0;
 uint32_t data_count = 0;
 
-
+// reads the data from the adc
 void adc_read() {
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3 , GPIO_PIN_3);
     SysCtlDelay(6);
@@ -42,31 +42,6 @@ void adc_read() {
     }
 
     display_val =  data_buff[0];
-}
-
-/**
- * Initialize the ADC
- */
-void init_adc() {
-    // configure the clock for ADC
-    // enable the SSI and GPIO port
-    SysCtlPeripheralEnable(ADC_SSI_SYSCTL_PERIPH);
-
-    while(!SysCtlPeripheralReady(ADC_SSI_SYSCTL_PERIPH)) {
-    }
-
-    //SSIClockSourceSet(SYSCTL_PERIPH_SSI0, SSI_CLOCK_SYSTEM);
-    SysCtlPeripheralEnable(ADC_GPIO_SYSCTL_PERIPH);
-    GPIOPinTypeSSI(ADC_GPIO_PORT_BASE, TX_PIN | RX_PIN | ADC_SCLK_PIN);
-    // Configure the CS pin as output to select CS
-    GPIOPinTypeGPIOOutput(ADC_GPIO_PORT_BASE, GPIO_PIN_3);
-    // Configure the clock settings
-    // SPI mode, master mode, 1MHz SSI frequency, and 8-bit data
-    SSIConfigSetExpClk(ADC_SSI_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
-                           SSI_MODE_MASTER, 1000000, 16);
-
-    // Link clock and enable SSI for conversion
-    SSIEnable(ADC_SSI_BASE);
 }
 
 

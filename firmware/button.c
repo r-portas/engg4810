@@ -4,6 +4,8 @@
 #include "adc.h"
 #include "uart.h"
 
+
+/** Updates all the variables **/
 char *message[] = {"Voltmeter >> ", "Ampmeter >> " , "Ohmeter >> ", "Continuity >>", "Logic >>", "Brightness" };
 char *msgUpdate [] = {"Voltmeter AC|DC ", "Ampmeter AC | DC" , "Mode:Ohmmeter" , "Mode: Continuity", "Mode: Logic", "Mode Brightness"};
 int msg_count = 0;
@@ -11,6 +13,7 @@ int my_mode = 0;
 int my_state    = NONE;
 extern int ac_set;
 
+/** loops back the msg on the tiva **/
 void count_check() {
     if (msg_count < 0) {
         msg_count = 0;
@@ -51,6 +54,10 @@ void update_mode() {
     send_mode();
 }
 
+
+/***
+ * checks the count samples for the sd
+ * **/
 void update_sd_count() {
     // loop
     if (sd_sample_index < 0) {
@@ -63,6 +70,8 @@ void update_sd_count() {
     UARTprintf("samples asked %d  | %d | %d \n", sd_samples_ask, ask_samples[sd_sample_index], sd_sample_index);
 }
 
+
+/*** checks the polling of the buttons and process commands **/
 void check_buttons() {
     /** Respond to the Up button ***/
     if (GPIOPinRead(GPIO_PORTE_BASE, GPIO_PIN_0) == GPIO_PIN_0) {
@@ -153,6 +162,7 @@ void check_buttons() {
     }
 }
 
+/*** Enables the buttons **/
 void init_buttons() {
     // enable the port E
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);

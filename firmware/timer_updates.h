@@ -24,6 +24,7 @@ extern int ac_state;
 extern int sd_samples;
 extern int sd_state;
 
+// flags to control the sd sampling state
 extern int sd_sample_index;
 extern int sd_samples_ask;
 extern int sd_state;

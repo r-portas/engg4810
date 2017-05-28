@@ -20,6 +20,7 @@ int current_range = 2;
  * 1 -> 10  mA
  */
 
+/*** Sets up the front end state ***/
 void set_frontend_state(uint8_t val) {
     GPIOPinWrite(GPIO_PORTC_BASE, SHCP , 0);
     GPIOPinWrite(GPIO_PORTC_BASE, STCP , 0);
@@ -159,10 +160,8 @@ float convert_logic(float voltage) {
 void auto_range_current(float voltage) {
 
     if ((current_range == 1) && (voltage > 10.0)) {
-        UARTprintf("going into 200 %.2f \n", voltage);
         current_range = 2;
     } else if ((current_range == 2) && (voltage < 10.0)) {
-        UARTprintf("going into 10 %.2f\n", voltage);
         current_range = 1;
     }
     switch(current_range) {
@@ -179,6 +178,7 @@ void auto_range_current(float voltage) {
     }
 }
 
+/*** updates the autorange ***/
 void auto_range_voltage(float voltage) {
 
     // 1V RANGE
@@ -222,8 +222,11 @@ char volt_str[40];
 
 /** get the raw voltage from the number **/
 float get_voltage(int final) {
+    /*** updates the voltage ***/
     float voltage = (float)final / 65535.00;
     voltage = voltage * 3.3;
+
+    /** switch the mode and updates the frontend **/
     switch(my_mode) {
         case VOLTMETER:
             voltage = update_voltage(voltage_range, voltage);
@@ -238,16 +241,10 @@ float get_voltage(int final) {
             break;
         case OHMETER:
             voltage = convert_ohm_1k(voltage);
-            //voltage = update_ohms(ohm_range, voltage);
-            //auto_range_ohms(voltage);
             break;
         case LOGIC:
             break;
-            // no range for logic
-            // voltage = convert_logic(voltage);
     }
-    sprintf(volt_str, "%d %.2f",  final, voltage);
-    UARTprintf("FINAL %s\n", volt_str);
     return voltage;
 }
 
@@ -282,7 +279,7 @@ float get_ac_voltage(float rms) {
 }
 
 
-// comes into the function after the adc read
+/*** comes into the function after the adc read ***/
 void update_hardware() {
     if (my_mode == OHMETER) {
         float volt = get_voltage(display_val);
@@ -308,8 +305,6 @@ void init_hardware_control() {
     GPIOPinTypeGPIOOutput(OHM_PORT,  OHM_PIN_0);
     GPIOPinWrite(OHM_PORT, OHM_PIN_0 , 0);
 
-    // Initialize the OHM meter control (port B, pin 3)
-    // Initialize the Continuity control pin
     SysCtlPeripheralEnable(CONT_PERIPH);
     GPIOPinTypeGPIOOutput(CONTI_PORT,  CONT_PIN);
     GPIOPinWrite(CONTI_PORT, CONT_PIN , 0);

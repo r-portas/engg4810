@@ -62,6 +62,7 @@ int sd_ticks = 0;
 float global_voltage = 0.00;
 int buzzer_flag = 0;
 
+/*** Plays the buzzer ***/
 void play_buzzer() {
     buzzer_state = 1;
     // plays the buzzer
@@ -92,6 +93,7 @@ static void print_mode() {
     }
 }
 
+/** Interbal timer to control the ticks state **/
 void SysTickInt(void)
 {
     IntMasterDisable();
@@ -267,6 +269,7 @@ void update_buffer_rms() {
     n++;
 }
 
+/** Makes the updates for the button Interrupt ***/
 void buttonInterrupt() {
    if (buzzer_flag) {
        play_buzzer();
@@ -300,6 +303,7 @@ void buttonInterrupt() {
     }
 }
 
+/** Init the internal timers **/
 void initTimer() {
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER5);
   while(!SysCtlPeripheralReady(SYSCTL_PERIPH_TIMER5))
@@ -316,6 +320,7 @@ void initTimer() {
   TimerEnable(TIMER5_BASE, TIMER_A);
 }
 
+/** Init the timers **/
 void init_timers() {
     initTimer();
 }
