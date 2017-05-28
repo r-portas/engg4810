@@ -46,4 +46,7 @@ extern void clearLCD();
 extern void position_cursor(int x, int y);
 extern void init_backlight();
 
+extern void back_light_on();
+extern void back_light_off();
+
 #endif

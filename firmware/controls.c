@@ -155,41 +155,6 @@ float convert_logic(float voltage) {
    return ohm;
 }
 
-/** get the raw voltage from the number **/
-float get_voltage(int final) {
-    float voltage = final / 65535.00;
-    double current;
-
-    voltage = voltage * 3.3;
-    switch(my_mode) {
-        case VOLTMETER:
-            voltage = update_voltage(voltage_range, voltage);
-            auto_range_voltage(voltage);
-            break;
-        case AMPMETER:
-            current = update_current(current_range, voltage);
-            // set front end for default (200 mA)
-            current = current * 1000;
-            voltage = (float)current;
-            auto_range_current(voltage);
-            break;
-        case OHMETER:
-            voltage = convert_ohm_1k(voltage);
-            //voltage = update_ohms(ohm_range, voltage);
-            //auto_range_ohms(voltage);
-            break;
-        case LOGIC:
-            break;
-            // no range for logic
-            // voltage = convert_logic(voltage);
-    }
-    char volt_str[40];
-    sprintf(volt_str, "%d %.2f",  final, voltage);
-    UARTprintf("FINAL %s\n", volt_str);
-    return voltage;
-}
-
-
 /** auto range the current **/
 void auto_range_current(float voltage) {
 
@@ -213,7 +178,6 @@ void auto_range_current(float voltage) {
             set_frontend_state(0b11010110);
     }
 }
-
 
 void auto_range_voltage(float voltage) {
 
@@ -251,6 +215,41 @@ void auto_range_voltage(float voltage) {
             set_frontend_state(0b11000000);
             break;
     }
+}
+
+double current;
+char volt_str[40];
+
+/** get the raw voltage from the number **/
+float get_voltage(int final) {
+    float voltage = (float)final / 65535.00;
+
+    voltage = voltage * 3.3;
+    switch(my_mode) {
+        case VOLTMETER:
+            voltage = update_voltage(voltage_range, voltage);
+            auto_range_voltage(voltage);
+            break;
+        case AMPMETER:
+            current = update_current(current_range, voltage);
+            // set front end for default (200 mA)
+            current = current * 1000;
+            voltage = (float)current;
+            auto_range_current(voltage);
+            break;
+        case OHMETER:
+            voltage = convert_ohm_1k(voltage);
+            //voltage = update_ohms(ohm_range, voltage);
+            //auto_range_ohms(voltage);
+            break;
+        case LOGIC:
+            break;
+            // no range for logic
+            // voltage = convert_logic(voltage);
+    }
+    sprintf(volt_str, "%d %.2f",  final, voltage);
+    UARTprintf("FINAL %s\n", volt_str);
+    return voltage;
 }
 
 

@@ -8,8 +8,7 @@ Vue.component('chart', {
       <input class="mdl-slider mdl-js-slider" type="range"
         min="0" :max="dataItems" v-model="scrollIndex" tabindex="0">
 
-      <p> Start time: {{startTime}}</p>
-      <p> End time: {{endTime}}</p>
+      <p> Duration: {{startTime}}/{{endTime}}</p>
     </div> 
   `,
 
