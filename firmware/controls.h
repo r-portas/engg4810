@@ -29,6 +29,7 @@ extern float get_voltage(int final);
 extern void auto_range_voltage(float voltage);
 extern void auto_range_current(float voltage);
 extern void set_frontend_state(uint8_t val);
+extern float get_ac_voltage(float rms);
 
 // strings for updating the lcd
 extern char ohm_string[20];

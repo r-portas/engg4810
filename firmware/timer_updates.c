@@ -20,8 +20,8 @@ int sample_index = 0;
 
 int sample_rate[] = {1500, 3000, 6000, 15000, 30000, 180000, 360000, 900000, 1800000};
 char *sample_msg[] = {"2 read / s", "1 read/ s", "1 read/2s", "1 read/ 5s", "1 read/10 s"
-                    "1 read/ min", "1 read/ 2 min" , "1 read/5 min",
-                    "1 read/10 min" };
+                    "1 r/min", "1 r/2 min" , "1 r/5 min",
+                    "1 r /10 min" };
 
 
 char *ask_prompt = "Select samples : ";
