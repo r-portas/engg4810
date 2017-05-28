@@ -121,12 +121,14 @@ double update_current(int current_range, float voltage) {
     double converted_curr;
     switch(current_range) {
        case 1:
-           converted_curr = (voltage * -0.7057) + 1.1723;
+
+           converted_curr = (voltage * -0.695) + 1.155;
            converted_curr = (converted_curr / 98.2);
            break;
        case 2:
-           converted_curr = (voltage * -3.41) + 5.628;
-           converted_curr = (converted_curr / 24.4);
+           // 200mA
+           converted_curr = (voltage * -3.177) + 5.241;
+           converted_curr = (converted_curr / 24.54);
            break;
     }
     return converted_curr;
