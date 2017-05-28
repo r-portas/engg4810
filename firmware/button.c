@@ -17,11 +17,10 @@ void count_check() {
     } else if (msg_count > 6) {
         msg_count = 6;
     }
-
     if (sample_index < 0) {
         sample_index = 0;
-    } else if (sample_index > 6) {
-        sample_index = 6;
+    } else if (sample_index > 7) {
+        sample_index = 7;
     }
 }
 
