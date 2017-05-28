@@ -246,8 +246,6 @@ float get_voltage(int final) {
             // no range for logic
             // voltage = convert_logic(voltage);
     }
-    sprintf(volt_str, "%d %.2f",  final, voltage);
-    UARTprintf("FINAL %s\n", volt_str);
     return voltage;
 }
 
@@ -255,30 +253,29 @@ float get_voltage(int final) {
 
 /** get the raw voltage from the number **/
 float get_ac_voltage(float rms) {
-    float voltage = rms;
     switch(my_mode) {
         case VOLTMETER:
-            voltage = update_voltage(voltage_range, voltage);
-            auto_range_voltage(voltage);
+            rms = update_voltage(voltage_range, rms);
+            auto_range_voltage(rms);
             break;
         case AMPMETER:
-            current = update_current(current_range, voltage);
+            current = update_current(current_range, rms);
             // set front end for default (200 mA)
             current = current * 1000;
-            voltage = (float)current;
-            auto_range_current(voltage);
+            rms = (float)current;
+            auto_range_current(rms);
             break;
         case OHMETER:
-            voltage = convert_ohm_1k(voltage);
-            //voltage = update_ohms(ohm_range, voltage);
-            //auto_range_ohms(voltage);
+            rms = convert_ohm_1k(rms);
+            //rms = update_ohms(ohm_range, rms);
+            //auto_range_ohms(rms);
             break;
         case LOGIC:
             break;
             // no range for logic
-            // voltage = convert_logic(voltage);
+            // rms = convert_logic(rms);
     }
-    return voltage;
+    return rms;
 }
 
 

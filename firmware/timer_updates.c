@@ -108,8 +108,26 @@ void SysTickInt(void)
     disk_timerproc(); // timer to keep the sd card going
 
     if (ac_set == 1) {
-      adc_read();
-      rms_flag = 1;
+        if (count_ticks > sample_rate[sample_index]) {
+             count_ticks = 0;
+             int i = 0;
+             int n = 20;
+
+             float total = 0.0;
+
+             for (i = 0; i < n; i++) {
+
+                adc_read();
+                total += get_voltage(display_val);
+
+                SysCtlDelay(100);
+             }
+
+             global_voltage = sqrtf( total/(float)n );
+            char tempBuff[30];
+            sprintf(tempBuff, ">>> GV: %.2f, %d\n", total, n);
+            UARTprintf("%s", tempBuff);
+        }
     }  else if (ac_set == 0) {
         if (count_ticks > sample_rate[sample_index]) {
              count_ticks = 0;
@@ -181,12 +199,6 @@ void update_lcd() {
         if (my_mode == OHMETER) {
             printLCD("OHMS");
             return;
-        }
-        if (ac_set) {
-            global_voltage =  get_ac_voltage(sqrt((running_volt/n)));
-            // need it after the conversions
-            running_volt = 0.0;
-            n = 0;
         }
         sprintf(buffer, "%.2f", global_voltage);
         if (my_mode == VOLTMETER) {
