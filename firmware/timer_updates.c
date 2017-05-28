@@ -161,7 +161,7 @@ void update_lcd() {
 
     if (my_mode == VOLTMETER) {
         if (global_voltage > 12.00) {
-            printLCD("   OVER RANGE  ");
+            printLCD("   OVER LIMIT  ");
             return;
         }
     }

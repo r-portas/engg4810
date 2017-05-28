@@ -14,7 +14,7 @@ int voltage_range = 3;
  * 1 -> 1 Volts
  */
 
-int current_range = 1;
+int current_range = 2;
 /** Current Range Notes
  * 2 -> 200 mA (default)
  * 1 -> 10  mA
@@ -117,8 +117,8 @@ float update_voltage(int volt_range, float voltage) {
 }
 
 /** conversions for the current mode **/
-float update_current(int current_range, float voltage) {
-    float converted_curr;
+double update_current(int current_range, float voltage) {
+    double converted_curr;
     switch(current_range) {
        case 1:
            converted_curr = (voltage * -0.7057) + 1.1723;
@@ -156,6 +156,8 @@ float convert_logic(float voltage) {
 /** get the raw voltage from the number **/
 float get_voltage(int final) {
     float voltage = final / 65535.00;
+    double current;
+
     voltage = voltage * 3.3;
     switch(my_mode) {
         case VOLTMETER:
@@ -163,9 +165,11 @@ float get_voltage(int final) {
             auto_range_voltage(voltage);
             break;
         case AMPMETER:
-            voltage = update_current(2, voltage);
+            current = update_current(current_range, voltage);
+            // set front end for default (200 mA)
+            current = current * 1000;
+            voltage = (float)current;
             auto_range_current(voltage);
-            voltage = voltage * 1000;
             break;
         case OHMETER:
             voltage = convert_ohm_1k(voltage);
@@ -173,6 +177,7 @@ float get_voltage(int final) {
             //auto_range_ohms(voltage);
             break;
         case LOGIC:
+            break;
             // no range for logic
             // voltage = convert_logic(voltage);
     }
@@ -185,21 +190,25 @@ float get_voltage(int final) {
 
 /** auto range the current **/
 void auto_range_current(float voltage) {
-    if ((current_range == 1) && (voltage > 0.01)) {
+
+    if ((current_range == 1) && (voltage > 10.0)) {
+        UARTprintf("going into 200 %.2f \n", voltage);
         current_range = 2;
-    } else if ((current_range == 2) && (voltage < 0.2)) {
+    } else if ((current_range == 2) && (voltage < 10.0)) {
+        UARTprintf("going into 10 %.2f\n", voltage);
         current_range = 1;
     }
     switch(current_range) {
         // 10 mA
         case 1:
-            //set_frontend_state(0b11010001);
+            set_frontend_state(0b11010001);
             break;
-
         // 200 mA
         case 2:
-            //set_frontend_state(0b11010110);
+            set_frontend_state(0b11010110);
             break;
+        default:
+            set_frontend_state(0b11010110);
     }
 }
 

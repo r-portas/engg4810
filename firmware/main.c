@@ -89,7 +89,7 @@ int main() {
     // set_frontend_state(0b11100000);
 
     // Current measure, 200ma range
-    //set_frontend_state( 0b11010110 );
+    // set_frontend_state( 0b11010110 );
 
     // Current measure, 10ma range
     //set_frontend_state( 0b11010001 );
