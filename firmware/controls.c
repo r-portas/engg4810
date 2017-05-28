@@ -223,7 +223,6 @@ char volt_str[40];
 /** get the raw voltage from the number **/
 float get_voltage(int final) {
     float voltage = (float)final / 65535.00;
-
     voltage = voltage * 3.3;
     switch(my_mode) {
         case VOLTMETER:
@@ -249,6 +248,36 @@ float get_voltage(int final) {
     }
     sprintf(volt_str, "%d %.2f",  final, voltage);
     UARTprintf("FINAL %s\n", volt_str);
+    return voltage;
+}
+
+
+
+/** get the raw voltage from the number **/
+float get_ac_voltage(float rms) {
+    float voltage = rms;
+    switch(my_mode) {
+        case VOLTMETER:
+            voltage = update_voltage(voltage_range, voltage);
+            auto_range_voltage(voltage);
+            break;
+        case AMPMETER:
+            current = update_current(current_range, voltage);
+            // set front end for default (200 mA)
+            current = current * 1000;
+            voltage = (float)current;
+            auto_range_current(voltage);
+            break;
+        case OHMETER:
+            voltage = convert_ohm_1k(voltage);
+            //voltage = update_ohms(ohm_range, voltage);
+            //auto_range_ohms(voltage);
+            break;
+        case LOGIC:
+            break;
+            // no range for logic
+            // voltage = convert_logic(voltage);
+    }
     return voltage;
 }
 

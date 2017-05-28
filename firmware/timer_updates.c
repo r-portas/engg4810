@@ -117,7 +117,7 @@ void SysTickInt(void)
              global_voltage = get_voltage(display_val);
         }
     }
-  /** update the lcd every so often 0.5 sec**/
+  /** update the LCD every so often 0.5 sec**/
   if (lcd_ticks > 1000) {
       lcd_flag = 1;
       lcd_ticks = 0;
@@ -183,14 +183,12 @@ void update_lcd() {
             return;
         }
         if (ac_set) {
-         global_voltage = sqrt((running_volt/n));
-         // need it after the conversions
-         running_volt = 0.0;
-         n = 0;
+            global_voltage =  get_ac_voltage(sqrt((running_volt/n)));
+            // need it after the conversions
+            running_volt = 0.0;
+            n = 0;
         }
-
         sprintf(buffer, "%.2f", global_voltage);
-
         if (my_mode == VOLTMETER) {
             switch(voltage_range) {
                 case 1:
