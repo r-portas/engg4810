@@ -100,8 +100,7 @@ int main() {
     // set_frontend_state(0b10001011);
 
     // set_frontend_state( 0b00000000 );
-    float reading = 0.5;
-    char mode = 'V';
+
     //UARTprintf("Starting");
     while(1) {
         buttonInterrupt();

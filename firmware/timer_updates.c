@@ -10,6 +10,7 @@
 #include "utils/fatfs/src/ff.h"
 #include "utils/fatfs/src/diskio.h"
 #include "math.h"
+
 volatile uint32_t millis = 0;
 volatile int count_ticks = 0;
 long button_tick = 0;
@@ -61,6 +62,19 @@ int sd_ticks = 0;
 float global_voltage = 0.00;
 int buzzer_flag = 0;
 
+void play_buzzer() {
+    buzzer_state = 1;
+    // plays the buzzer
+    if (buzzer_state == 1) {
+           millis ^= 1;
+       if (millis == 0) {
+                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
+            } else {
+                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
+       }
+    }
+}
+
 /** update the modes print on LCD **/
 static void print_mode() {
     if (my_mode == VOLTMETER) {
@@ -77,7 +91,6 @@ static void print_mode() {
         char_my_mode = 'L';
     }
 }
-
 
 void SysTickInt(void)
 {
@@ -146,14 +159,14 @@ void SysTickInt(void)
 uint32_t lcd_tick = 0;
 extern int display_val;
 char buffer[100];
-char temp[10];
+char lightBuffer[20];
+char temp[20];
 char signal_setting[20];
 
 
 /** Updates the lcd**/
 void update_lcd() {
     if (my_mode == BRIGHTNESS) {
-        char lightBuffer[20];
         sprintf(lightBuffer, "Level %d", back_light_num/20);
         printLCD(lightBuffer);
         return;
@@ -161,7 +174,7 @@ void update_lcd() {
 
     if (my_mode == VOLTMETER) {
         if (global_voltage > 12.00) {
-            printLCD("   OVER LIMIT  ");
+            printLCD("OVER LIMIT");
             return;
         }
     }
@@ -248,22 +261,9 @@ void update_lcd() {
     sendByte(0x01, lcd_true);
 }
 
-int ac_tick = 0;
-void play_buzzer() {
-    buzzer_state = 1;
-    // plays the buzzer
-    if (buzzer_state == 1) {
-           millis ^= 1;
-       if (millis == 0) {
-                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
-            } else {
-                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
-       }
-    }
-}
 
 void update_buffer_rms() {
-    // update the rms value here
+   // update the rms value here
    float raw_volt = get_voltage(display_val);
    running_volt = running_volt + (raw_volt * raw_volt);
    n++;
