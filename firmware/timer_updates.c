@@ -40,7 +40,7 @@ int zero_crossing[100];
 int zero_count = 0;
 extern sd_flag;
 int lcd_flag = 0;
-int ac_set = 1;
+int ac_set = 0;
 float running_volt = 0.00;
 int n  = 0;
 float final_2;
@@ -59,20 +59,21 @@ int char_my_mode = 0;
 int back_light_num = 100;
 int sd_ticks = 0;
 float global_voltage = 0.00;
+int buzzer_flag = 0;
 
 /** update the modes print on LCD **/
 static void print_mode() {
     if (my_mode == VOLTMETER) {
-        printLCD(" V ");
+        printLCD("V ");
         char_my_mode = 'V';
     } else if (my_mode == AMPMETER) {
-        printLCD (" A ");
+        printLCD ("A ");
         char_my_mode = 'A';
     } else if (my_mode == OHMETER) {
-        printLCD (" O ");
+        printLCD ("O ");
         char_my_mode = 'O';
     } else if (my_mode == LOGIC) {
-        printLCD (" L ");
+        printLCD ("L ");
         char_my_mode = 'L';
     }
 }
@@ -84,7 +85,6 @@ void SysTickInt(void)
     uint32_t status = 0;
     status = TimerIntStatus(TIMER5_BASE, true);
     TimerIntClear(TIMER5_BASE, status);
-
     count_ticks++;
     buzzer_ticks++;
     lcd_ticks++;
@@ -97,23 +97,20 @@ void SysTickInt(void)
     if (ac_set == 1) {
       adc_read();
       rms_flag = 1;
-      toggle_pin();
-
-    } else if (ac_set == 0) {
+    }  else if (ac_set == 0) {
         if (count_ticks > sample_rate[sample_index]) {
              count_ticks = 0;
-             toggle_pin();
              adc_read();
              global_voltage = get_voltage(display_val);
         }
     }
 
   /** update the lcd every so often 0.5 sec**/
-      if (lcd_ticks > 1000) {
-          lcd_flag = 1;
-          lcd_ticks = 0;
-          my_flag = 1;
-      }
+  if (lcd_ticks > 1000) {
+      lcd_flag = 1;
+      lcd_ticks = 0;
+      my_flag = 1;
+  }
   /** checks the button every so often **/
   if (button_tick > 1200) {
       button_tick = 0;
@@ -123,6 +120,11 @@ void SysTickInt(void)
   if (pc_tick > 1000) {
       pc_tick = 0;
       pc_flag = 1;
+  }
+
+  if (buzzer_ticks > 4) {
+      buzzer_ticks = 0;
+      play_buzzer();
   }
 
   /** for the light pwm  **/
@@ -136,18 +138,17 @@ void SysTickInt(void)
             light_tick = 0;
       }
   }
-  if (sd_ticks > 6000) {
-      sd_flag = 1;
-      sd_ticks = 0;
-  }
+
   IntMasterEnable();
 }
 
-int num1= 0;
-int left1 = 0;
+
 uint32_t lcd_tick = 0;
 extern int display_val;
-char buffer[20];
+char buffer[100];
+char temp[10];
+char signal_setting[20];
+
 
 /** Updates the lcd**/
 void update_lcd() {
@@ -157,45 +158,85 @@ void update_lcd() {
         printLCD(lightBuffer);
         return;
     }
+
+    if (my_mode == VOLTMETER) {
+        if (global_voltage > 12.00) {
+            printLCD("   OVER RANGE  ");
+            return;
+        }
+    }
+
     if (my_state == STATE_MEASURE) {
+        if (my_mode == OHMETER) {
+            printLCD("OHMS");
+            return;
+        }
         if (ac_set) {
-         final_2 = sqrt((running_volt/n));
-         final_2 = final_2 * 1000;
-         num1 = final_2 / 1000;
-         left1 = final_2 - (num1 * 1000);
-         sprintf(buffer, " %d.%d",num1, left1);
+         global_voltage = sqrt((running_volt/n));
+         //sprintf(buffer, "%.2f", global_voltage);
          running_volt = 0.0;
          n = 0;
-       } else {
-           sprintf(buffer, "%.2f", global_voltage);
-       }
+        }
 
-       sendSpecialChar();
-       sendByte(0x00, lcd_true);
-       if (ac_set) {
-           printLCD("AC");
-       } else {
-           printLCD("DC");
-       }
-       print_mode();
-       printLCD(buffer);
-       position_cursor(1,0);
-       printLCD(sample_msg[sample_index]);
-       if (sd_state == 1) {
-           printLCD(" SD : %");
-       }
-       lcd_tick = 0;
+        sprintf(buffer, "%.2f", global_voltage);
+
+        if (my_mode == VOLTMETER) {
+            switch(voltage_range) {
+                case 1:
+                   sprintf(temp, "1V ");
+                      break;
+                  case 2:
+                      sprintf(temp, "5V ");
+                      break;
+                  case 3:
+                      sprintf(temp, "15V ");
+                      break;
+              }
+
+           } else if (my_mode == AMPMETER) {
+               switch(current_range) {
+                   case 1:
+                       sprintf(temp, "10mA ");
+                       break;
+                   case 2:
+                       sprintf(temp, "200mA ");
+                       break;
+               }
+           }
+           if ((my_mode == VOLTMETER) || (my_mode == AMPMETER)) {
+               if (ac_set) {
+                   sprintf(signal_setting, "AC ");
+               } else {
+                   sprintf(signal_setting, "DC ");
+               }
+           }
+
+           print_mode();
+           printLCD(temp);
+           printLCD(signal_setting);
+           sendByte(0x00, lcd_true);
+           printLCD(buffer);
+           position_cursor(1,0);
+           printLCD(sample_msg[sample_index]);
+
+           if (sd_state == 1) {
+               printLCD(" SD : %");
+           }
+           lcd_tick = 0;
     }
+
     // default state
     if (my_state == NONE) {
        printLCD(message[msg_count]);
        lcd_tick = 0;
     }
+
     // ask to make a selection
     if (my_state == STATE_SELECTION) {
        printLCD(msgUpdate[msg_count]);
        lcd_tick = 0;
     }
+
     // ask samples
     if (my_state == ASK_SAMPLES) {
         printLCD(ask_prompt);
@@ -203,30 +244,22 @@ void update_lcd() {
         printLCD(ask_samples[sd_sample_index]);
         lcd_tick = 0;
     }
+    //sendSpecialChar();
+    sendByte(0x01, lcd_true);
 }
 
 int ac_tick = 0;
 void play_buzzer() {
+    buzzer_state = 1;
     // plays the buzzer
-    if ((buzzer_ticks > 50) && (buzzer_state == 1)) {
+    if (buzzer_state == 1) {
            millis ^= 1;
-           if (millis == 0) {
-                    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
-                } else {
-                    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
-                }
-           buzzer_ticks = 0;
-    }
-}
-
-
-void toggle_pin() {
-    millis ^= 1;
-  if (millis == 0) {
-           GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
-       } else {
-           GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
+       if (millis == 0) {
+                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , GPIO_PIN_4);
+            } else {
+                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_4 , 0);
        }
+    }
 }
 
 void update_buffer_rms() {
@@ -237,14 +270,16 @@ void update_buffer_rms() {
 }
 
 void buttonInterrupt() {
-   //button_tick++;
-   buzzer_ticks++;
-
+   if (buzzer_flag) {
+       play_buzzer();
+       buzzer_flag = 0;
+   }
    /** check for button press **/
    if (button_flag) {
        check_buttons();
        button_flag = 0;
    }
+
    // Should not be in a interrupt
     if (lcd_flag) {
        clearLCD();

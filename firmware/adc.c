@@ -26,42 +26,6 @@ int sample_count = 0;
 uint32_t data_count = 0;
 
 
-/*float update_voltage(float voltage) {
-    switch(range){
-        case 1:
-            voltage = (voltage * -0.5897) + 0.9534;
-            break;
-        case 2:
-            voltage = (voltage * -2.9462) + 4.8103;
-            break;
-        case 3:
-            voltage = (voltage * -7.0312) + 11.993;
-    }
-    return voltage;
-}*/
-
-/**
- * Performs autoranging
- *
- * @param float voltage - The voltage
- */
-void auto_range(float voltage) {
-    // switch between the states
-    // 1V RANGE
-    if ((range == 1) && (voltage > 0.95)) {
-        range = 2;
-        GPIOPinWrite(MUX_PORT_BASE, B , 0);
-        GPIOPinWrite(MUX_PORT_BASE, C , C);
-    }
-    // 5 VOLTS
-    if ((range == 2) && (voltage < 0.9)) {
-        range = 1;
-        GPIOPinWrite(MUX_PORT_BASE, B , B);
-        GPIOPinWrite(MUX_PORT_BASE, C , 0);
-    }
-}
-
-
 void adc_read() {
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3 , GPIO_PIN_3);
     SysCtlDelay(6);
@@ -72,18 +36,18 @@ void adc_read() {
     while(SSIBusy(SSI1_BASE)) {
     }
 
-    SSIDataGet(SSI1_BASE, &data_buff[sample_count]);
+    SSIDataGet(SSI1_BASE, &data_buff[0]);
 
     while(SSIBusy(SSI1_BASE)) {
     }
 
-    display_val =  data_buff[sample_count];
-    sample_count++;
+    display_val =  data_buff[0];
+    /*sample_count++;
 
     // wrap around
     if (sample_count > 2000) {
         sample_count = 0;
-    }
+    }*/
     sample_count++;
 }
 

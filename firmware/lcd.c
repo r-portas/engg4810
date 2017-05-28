@@ -213,6 +213,9 @@ void storeSpecialChar() {
         sendByte(customChar[i], lcd_true);
     }
     // switch back to DDRAM for LCD display
+    for (i = 0; i < 8; i++) {
+        sendByte(bright_level_5[i], lcd_true);
+    }
 }
 
 void sendSpecialChar() {

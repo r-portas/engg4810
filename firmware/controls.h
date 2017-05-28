@@ -32,4 +32,7 @@ extern void auto_range_voltage(float voltage);
 extern char ohm_string[20];
 extern int num;
 extern int left;
+extern int voltage_range;
+extern int current_range;
+
 #endif

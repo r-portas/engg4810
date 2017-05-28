@@ -222,7 +222,6 @@ void send_pc() {
 
     sprintf(pc_buffer,"# %.2f \n", global_voltage);
     UARTprintf("%s", pc_buffer);
-
     // mode followed by the sampling rate
     if (my_state == STATE_MEASURE) {
         if (ac_set) {
